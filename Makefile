@@ -59,7 +59,7 @@ install:
 	install -m 755 etc/$(DAEMON_NAME).init $(DIR_ETC_INITD)/$(DAEMON_NAME)
 
 clean:
-	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) $(DAEMON_NAME)
+	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) $(DAEMON_NAME) $(DAEMON_NAME)-$(VERSION).tar.gz
 	-@echo ' '
 
 tarball: clean
