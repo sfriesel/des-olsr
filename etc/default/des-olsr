@@ -1,0 +1,6 @@
+# Config file for package des-olsr
+DAEMON_OPTS="/etc/des-olsr.conf"
+TAP_NAME=tapolsr
+TAP_IP=10.0.0.1
+CLI_PORT=4519
+IFACE=eth0,wlan0
