@@ -47,63 +47,63 @@ int cli_beverbose(struct cli_def* cli, char* command, char* argv[], int argc) {
 }
 
 int olsr_cli_helloint(struct cli_def* cli, char* command, char* argv[], int argc) {
-	u_int8_t mode;
+	unsigned int mode;
 
 	if (argc != 1 || sscanf(argv[0], "%u", &mode) != 1) {
 		cli_print(cli, "usage of %s command [0, 1]\n", command);
 		return CLI_ERROR_ARG;
 	}
-	hello_interval = mode;
+	hello_interval = (uint8_t) mode;
 	dessert_debug("set HELLO_INTERVAL to %i", hello_interval);
 	return CLI_OK;
 }
 
 int olsr_cli_tcint(struct cli_def* cli, char* command, char* argv[], int argc) {
-	u_int8_t mode;
+	unsigned int mode;
 
 	if (argc != 1 || sscanf(argv[0], "%u", &mode) != 1) {
 		cli_print(cli, "usage of %s command [0, 1]\n", command);
 		return CLI_ERROR_ARG;
 	}
-	tc_interval = mode;
+	tc_interval = (uint8_t) mode;
 	dessert_debug("set TC_INTERVAL to %i", tc_interval);
 	return CLI_OK;
 }
 
 int olsr_cli_validitycoeff(struct cli_def* cli, char* command, char* argv[], int argc) {
-	u_int8_t mode;
+	unsigned int mode;
 
 	if (argc != 1 || sscanf(argv[0], "%u", &mode) != 1) {
 		cli_print(cli, "usage of %s command [0, 1]\n", command);
 		return CLI_ERROR_ARG;
 	}
 	if (mode >= LINK_HOLD_TIME_COEFF) {
-		tc_hold_time_coeff = mode;
+		tc_hold_time_coeff = (uint8_t) mode;
 		dessert_debug("set TC_HOLD_TIME_COEFF to %i", tc_hold_time_coeff);
 	} dessert_debug("TC_HOLD_TIME_COEFF must be greater than LINK_HOLD_TIME_KOEFF");
 	return CLI_OK;
 }
 
 int olsr_cli_willingness(struct cli_def* cli, char* command, char* argv[], int argc) {
-	u_int8_t mode;
+	unsigned int mode;
 
 	if (argc != 1 || sscanf(argv[0], "%u", &mode) != 1) {
 		cli_print(cli, "usage of %s command [0, 1]\n", command);
 		return CLI_ERROR_ARG;
 	}
-	willingness = mode;
+	willingness = (uint8_t) mode;
 	dessert_debug("set WILLINGNESS to %i", willingness);
 	return CLI_OK;
 }
 
 int olsr_cli_window_size(struct cli_def* cli, char* command, char* argv[], int argc) {
-	u_int8_t mode;
+	unsigned int mode;
 
 	if (argc != 1 || sscanf(argv[0], "%u", &mode) != 1) {
 		cli_print(cli, "usage of %s command [0, 1]\n", command);
 		return CLI_ERROR_ARG;
 	}
-	window_size = mode;
+	window_size = (uint8_t) mode;
 	dessert_debug("set WINDOW_SIZE to %i", window_size);
 	return CLI_OK;
 }
@@ -238,16 +238,6 @@ int olsr_cli_print_rt_so(struct cli_def* cli, char* command, char* argv[], int a
 }
 
 // -------------------- common cli functions ----------------------------------------------
-
-int cli_setport(struct cli_def *cli, char *command, char *argv[], int argc) {
-    uint16_t t = (uint16_t) atoi(argv[0]);
-    if(t < 1024 || t > 49151) {
-        dessert_err("Port number has to be in [1024, 49151]");
-        return CLI_ERROR;
-    }
-    dessert_set_cli_port(t);
-    return (CLI_OK);
-}
 
 int cli_setrouting_log(struct cli_def *cli, char *command, char *argv[], int argc) {
 	routing_log_file = malloc(strlen(argv[0]));

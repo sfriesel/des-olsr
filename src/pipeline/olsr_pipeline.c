@@ -42,33 +42,14 @@ void _rlfile_log(const u_int8_t src_addr[ETH_ALEN], const u_int8_t dest_addr[ETH
 	FILE* f = fopen(routing_log_file, "a+");
 	if (f == NULL) dessert_debug("file = 0");
 	if (out_iface == NULL) {
-		fprintf(f, "%02x:%02x:%02x:%02x:%02x:%02x\t%02x:%02x:%02x:%02x:%02x:%02x\t%u\t%u\t%02x:%02x:%02x:%02x:%02x:%02x\t%s\t%s\n",
-			src_addr[0], src_addr[1], src_addr[2], src_addr[3], src_addr[4], src_addr[5],
-			dest_addr[0], dest_addr[1], dest_addr[2], dest_addr[3], dest_addr[4], dest_addr[5],
-			seq_num, hop_count,
-			in_iface[0], in_iface[1], in_iface[2],
-			in_iface[3], in_iface[4], in_iface[5],
-			"NULL", "NULL");
+		fprintf(f, "%M\t%M\t%u\t%u\t%M\t%s\t%s\n",
+			src_addr, dest_addr, seq_num, hop_count, in_iface, "NULL", "NULL");
 	} else if (in_iface == NULL) {
-		fprintf(f, "%02x:%02x:%02x:%02x:%02x:%02x\t%02x:%02x:%02x:%02x:%02x:%02x\t%u\t%u\t%s\t%02x:%02x:%02x:%02x:%02x:%02x\t%02x:%02x:%02x:%02x:%02x:%02x\n",
-			src_addr[0], src_addr[1], src_addr[2], src_addr[3], src_addr[4], src_addr[5],
-			dest_addr[0], dest_addr[1], dest_addr[2], dest_addr[3], dest_addr[4], dest_addr[5],
-			seq_num, hop_count, "NULL",
-			out_iface[0], out_iface[1], out_iface[2],
-			out_iface[3], out_iface[4], out_iface[5],
-			next_hop_addr[0], next_hop_addr[1], next_hop_addr[2],
-			next_hop_addr[3], next_hop_addr[4], next_hop_addr[5]);
+		fprintf(f, "%M\t%M\t%u\t%u\t%s\t%M\t%M\n",
+            src_addr, dest_addr, seq_num, hop_count, "NULL", out_iface, next_hop_addr);
 	} else {
-		fprintf(f, "%02x:%02x:%02x:%02x:%02x:%02x\t%02x:%02x:%02x:%02x:%02x:%02x\t%u\t%u\t%02x:%02x:%02x:%02x:%02x:%02x\t%02x:%02x:%02x:%02x:%02x:%02x\t%02x:%02x:%02x:%02x:%02x:%02x\n",
-			src_addr[0], src_addr[1], src_addr[2], src_addr[3], src_addr[4], src_addr[5],
-			dest_addr[0], dest_addr[1], dest_addr[2], dest_addr[3], dest_addr[4], dest_addr[5],
-			seq_num, hop_count,
-			in_iface[0], in_iface[1], in_iface[2],
-			in_iface[3], in_iface[4], in_iface[5],
-			out_iface[0], out_iface[1], out_iface[2],
-			out_iface[3], out_iface[4], out_iface[5],
-			next_hop_addr[0], next_hop_addr[1], next_hop_addr[2],
-			next_hop_addr[3], next_hop_addr[4], next_hop_addr[5]);
+		fprintf(f, "%M\t%M\t%u\t%u\t%M\t%M\t%M\n",
+			src_addr, dest_addr, seq_num, hop_count, in_iface, out_iface, next_hop_addr);
 	}
 	fclose(f);
 	pthread_rwlock_unlock(&rlflock);
