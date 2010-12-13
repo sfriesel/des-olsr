@@ -73,8 +73,9 @@ int main(int argc, char** argv) {
 			return EXIT_FAILURE;
 		}
 	} else {
-		dessert_init("OLSR", 0x02, DESSERT_OPT_DAEMONIZE);
 		cfg = dessert_cli_get_cfg(argc, argv);
+		dessert_info("starting OLSR in daemonize mode");
+		dessert_init("OLSR", 0x02, DESSERT_OPT_DAEMONIZE);
 	}
 
 	// routing table initialisation
