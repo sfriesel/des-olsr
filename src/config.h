@@ -25,6 +25,7 @@ For further information and questions please use the web site
 #define OLSR_CONFIG
 
 #include <stdlib.h>
+#include <dessert.h>
 
 enum bool {TRUE = 1, FALSE = 0};
 
@@ -38,9 +39,7 @@ enum bool {TRUE = 1, FALSE = 0};
 
 // emission intervals
 #define HELLO_INTERVAL				2
-#define HELLO_MIN_INTERVAL			HELLO_INTERVAL / 4
 #define TC_INTERVAL					5
-#define TC_MIN_INTERVAL				TC_INTERVAL / 4
 
 // holding times
 #define LINK_HOLD_TIME_COEFF		7
@@ -74,21 +73,30 @@ enum bool {TRUE = 1, FALSE = 0};
 
 #define C_INV_COEFF					64
 
-#define BE_VERBOSE					FALSE
+#define VERBOSE					FALSE
 
-extern int 							be_verbose;
+extern int 							verbose;
 extern u_int8_t						hello_interval;
 extern u_int8_t						tc_interval;
 extern u_int8_t						tc_hold_time_coeff;
 extern u_int8_t						willingness;
 extern int							rc_metric;
+extern char*						routing_log_file;
+extern int 							hello_size;
+extern int 							tc_size;
+extern dessert_periodic_t*			periodic_send_hello;
+extern dessert_periodic_t*			periodic_send_tc;
+
 // window size for calculation of PDR or ETX
 extern u_int8_t						window_size;
 #define RC_METRIC_PLR				1
 #define RC_METRIC_HC				2
 #define RC_METRIC_ETX				3
 #define RC_METRIC_ETX_ADD			4
-extern char*					routing_log_file;
+#define HELLO_SIZE					128
+#define TC_SIZE						128
 
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+#define max(a, b) (((a) > (b)) ? (a) : (b))
 
 #endif

@@ -23,36 +23,26 @@ For further information and questions please use the web site
 
 #include <libcli.h>
 
-int cli_beverbose(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_set_verbose(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_set_hello_size(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_set_hello_interval(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_set_tc_size(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_set_tc_interval(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_set_validity_coeff(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_set_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_set_willingness(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_set_window_size(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_set_port(struct cli_def *cli, char *command, char *argv[], int argc);
+int cli_set_routing_log(struct cli_def *cli, char *command, char *argv[], int argc);
 
-int olsr_cli_helloint(struct cli_def* cli, char* command, char* argv[], int argc);
-
-int olsr_cli_tcint(struct cli_def* cli, char* command, char* argv[], int argc);
-
-int olsr_cli_validitycoeff(struct cli_def* cli, char* command, char* argv[], int argc);
-
-int olsr_cli_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc);
-
-int olsr_cli_willingness(struct cli_def* cli, char* command, char* argv[], int argc);
-
-int olsr_cli_window_size(struct cli_def* cli, char* command, char* argv[], int argc);
-
-int olsr_cli_print_ns(struct cli_def* cli, char* command, char* argv[], int argc);
-
-int olsr_cli_print_ns_so(struct cli_def* cli, char* command, char* argv[], int argc);
-
-int olsr_cli_print_ls(struct cli_def* cli, char* command, char* argv[], int argc);
-
-int olsr_cli_print_2hns(struct cli_def* cli, char* command, char* argv[], int argc);
-
-int olsr_cli_print_tc(struct cli_def* cli, char* command, char* argv[], int argc);
-
-int olsr_cli_print_rt_so(struct cli_def* cli, char* command, char* argv[], int argc);
-
-int olsr_cli_print_rt(struct cli_def* cli, char* command, char* argv[], int argc);
-
-int cli_setport(struct cli_def *cli, char *command, char *argv[], int argc);
-
-int cli_setrouting_log(struct cli_def *cli, char *command, char *argv[], int argc);
-
-
+int cli_print_hello_size(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_print_hello_interval(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_print_tc_size(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_print_tc_interval(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_print_ns(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_print_ns_so(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_print_ls(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_print_2hns(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_print_tc(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_print_rt_so(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_print_rt(struct cli_def* cli, char* command, char* argv[], int argc);

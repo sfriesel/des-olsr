@@ -86,7 +86,7 @@ int olsr_handle_hello(dessert_msg_t* msg, size_t len,
 		expired_time.tv_usec = curr_time.tv_usec;
 
 		float hello_inf_f = hf_parce_time(hdr->hello_interval);
-		if (be_verbose == TRUE)
+		if (verbose == TRUE)
 			dessert_debug("get HELLO with hello_inf = %f", hello_inf_f);
 		float hello_hold_time_f = hello_inf_f * (LINK_HOLD_TIME_COEFF + 1);
 		struct timeval hold_time;
@@ -278,7 +278,7 @@ int olsr_fwd2dest(dessert_msg_t* msg, size_t len,
 		pthread_rwlock_unlock(&rlseqlock);
 		if (pk == TRUE) {
 			// this packet was already processed
-			if (be_verbose == TRUE)
+			if (verbose == TRUE)
 				dessert_debug("DUP! from %x:%x:%x:%x:%x:%x to %x:%x:%x:%x:%x:%x hops %i",
 					l25h->ether_shost[0], l25h->ether_shost[1], l25h->ether_shost[2],
 					l25h->ether_shost[1], l25h->ether_shost[4], l25h->ether_shost[5],
@@ -311,7 +311,7 @@ int olsr_fwd2dest(dessert_msg_t* msg, size_t len,
 				result = olsr_db_ls_getmainaddr(iface, msg->l2h.ether_shost, prev_hop_main_addr);
 			} else {
 				olsr_db_unlock();
-				if (be_verbose == TRUE) {
+				if (verbose == TRUE) {
 					dessert_debug("drop broadcast %i duplicate", brc_data->id);
 				}
 				return DESSERT_MSG_DROP;

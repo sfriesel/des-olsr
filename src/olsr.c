@@ -1,67 +1,44 @@
-/******************************************************************************
-Copyright 2009, Freie Universitaet Berlin (FUB). All rights reserved.
-
-These sources were developed at the Freie Universitaet Berlin,
-Computer Systems and Telematics / Distributed, embedded Systems (DES) group
-(http://cst.mi.fu-berlin.de, http://www.des-testbed.net)
--------------------------------------------------------------------------------
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with
-this program. If not, see http://www.gnu.org/licenses/ .
---------------------------------------------------------------------------------
-For further information and questions please use the web site
-       http://www.des-testbed.net
-*******************************************************************************/
-
-#include "cli/olsr_cli.h"
-#include "pipeline/olsr_pipeline.h"
-#include "database/olsr_database.h"
-#include "config.h"
 #include <dessert.h>
 #include <dessert-extra.h>
 #include <printf.h>
 
-int be_verbose = BE_VERBOSE;
-u_int8_t hello_interval = HELLO_INTERVAL;
-u_int8_t tc_interval = TC_INTERVAL;
-u_int8_t tc_hold_time_coeff = TC_HOLD_TIME_COEFF;
-u_int8_t willingness = WILL_DEFAULT;
-u_int8_t window_size = WINDOW_SIZE;
-int rc_metric = RC_METRIC_ETX;
-char* routing_log_file = NULL;
+#include "config.h"
+#include "cli/olsr_cli.h"
+#include "pipeline/olsr_pipeline.h"
+#include "database/olsr_database.h"
+
+int 		hello_size 			= HELLO_SIZE;
+u_int8_t 	hello_interval 		= HELLO_INTERVAL;
+int 		tc_size 			= TC_SIZE;
+u_int8_t 	tc_interval 		= TC_INTERVAL;
+int 		verbose 			= VERBOSE;
+u_int8_t 	window_size 		= WINDOW_SIZE;
+u_int8_t 	tc_hold_time_coeff 	= TC_HOLD_TIME_COEFF;
+u_int8_t 	willingness 		= WILL_DEFAULT;
+int 		rc_metric 			= RC_METRIC_ETX;
+char* 		routing_log_file 	= NULL;
+
+dessert_periodic_t* periodic_send_hello;
+dessert_periodic_t* periodic_send_tc;
 
 int print_macaddress_arginfo(const struct printf_info *info, size_t n, int *argtypes) {
-    /* We always take exactly one argument and this is a pointer to the
-     structure.. */
-    if (n > 0)
-        argtypes[0] = PA_POINTER;
+    if (n > 0) argtypes[0] = PA_POINTER;  		// we always take exactly one argument (pointer to the structure)
     return 1;
 }
 
 int print_macaddress(FILE *stream, const struct printf_info *info, const void * const *args) {
     const uint8_t *address;
     int len;
-
     address = *(uint8_t **) (args[0]);
-    len = fprintf(stream, "%02x:%02x:%02x:%02x:%02x:%02x", address[0],
-            address[1], address[2], address[3], address[4], address[5]);
-    if (len == -1)
-        return -1;
-
+    len = fprintf(stream, "%02x:%02x:%02x:%02x:%02x:%02x", address[0], address[1], address[2], address[3], address[4], address[5]);
+    if (len == -1) return -1;
     return len;
 }
 
 int main(int argc, char** argv) {
-    register_printf_function('M', print_macaddress, print_macaddress_arginfo);
+    register_printf_function("M", print_macaddress, print_macaddress_arginfo);
 
+    /* initialize daemon with correct parameters */
 	FILE *cfg = NULL;
 	if ((argc == 2) && (strcmp(argv[1], "-nondaemonize") == 0)) {
 		dessert_info("starting OLSR in non daemonize mode");
@@ -73,41 +50,47 @@ int main(int argc, char** argv) {
 			return EXIT_FAILURE;
 		}
 	} else {
-		cfg = dessert_cli_get_cfg(argc, argv);
 		dessert_info("starting OLSR in daemonize mode");
+		cfg = dessert_cli_get_cfg(argc, argv);
 		dessert_init("OLSR", 0x02, DESSERT_OPT_DAEMONIZE);
 	}
 
-	// routing table initialisation
+	/* routing table initialization */
 	olsr_db_init();
 
 	/* initalize logging */
     dessert_logcfg(DESSERT_LOG_STDERR);
 
-	// cli initialization
+    /* cli initialization */
 	struct cli_command* cli_cfg_set = cli_register_command(dessert_cli, NULL, "set", NULL, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set variable");
-	cli_register_command(dessert_cli, cli_cfg_set, "verbose", cli_beverbose, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "be more verbose");
-	cli_register_command(dessert_cli, cli_cfg_set, "hellointerval", olsr_cli_helloint, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set HELLO interval in sec");
-	cli_register_command(dessert_cli, cli_cfg_set, "tcinterval", olsr_cli_tcint, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set TC interval in sek");
-	cli_register_command(dessert_cli, cli_cfg_set, "validitycoeff", olsr_cli_validitycoeff, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set validity time coefficient");
-	cli_register_command(dessert_cli, cli_cfg_set, "willingness", olsr_cli_willingness, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set willingness of host to re-send broadcast messages");
-	cli_register_command(dessert_cli, cli_cfg_set, "windowsize", olsr_cli_window_size, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set WINDOW_SIZE for calculation of link quality (PDR or ETX)");
-	cli_register_command(dessert_cli, cli_cfg_set, "routinglog", cli_setrouting_log, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set path to routing logging file");
-	cli_register_command(dessert_cli, cli_cfg_set, "metric", olsr_cli_rc_metric, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set metric that must be used on route calculation (PLR | HC)");
 	cli_register_command(dessert_cli, dessert_cli_cfg_iface, "sys", dessert_cli_cmd_addsysif, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "initialize sys interface");
 	cli_register_command(dessert_cli, dessert_cli_cfg_iface, "mesh", dessert_cli_cmd_addmeshif, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "initialize mesh interface");
+	cli_register_command(dessert_cli, cli_cfg_set, "hello_size", cli_set_hello_size, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set HELLO packet size");
+	cli_register_command(dessert_cli, cli_cfg_set, "hello_interval", cli_set_hello_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set HELLO interval");
+	cli_register_command(dessert_cli, cli_cfg_set, "tc_size", cli_set_tc_size, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set TC packet size");
+	cli_register_command(dessert_cli, cli_cfg_set, "tc_interval", cli_set_tc_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set TC interval");
+	cli_register_command(dessert_cli, cli_cfg_set, "verbose", cli_set_verbose, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "be more verbose");
+	cli_register_command(dessert_cli, cli_cfg_set, "window_size", cli_set_window_size, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set window size for calculation of link quality (PDR or ETX)");
+	cli_register_command(dessert_cli, cli_cfg_set, "validity_coeff", cli_set_validity_coeff, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set validity time coefficient");
+	cli_register_command(dessert_cli, cli_cfg_set, "willingness", cli_set_willingness, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set willingness of host to re-send broadcast messages");
+	cli_register_command(dessert_cli, cli_cfg_set, "routing_log", cli_set_routing_log, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set path to routing logging file");
 
-	struct cli_command* cli_command_print =
-			cli_register_command(dessert_cli, NULL, "print", NULL, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print table");
-	cli_register_command(dessert_cli, cli_command_print, "ns", olsr_cli_print_ns, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print neighbor set table");
-	cli_register_command(dessert_cli, cli_command_print, "ns_so", olsr_cli_print_ns_so, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print neighbor set table (simple output)");
-	cli_register_command(dessert_cli, cli_command_print, "ls", olsr_cli_print_ls, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print link set table");
-	cli_register_command(dessert_cli, cli_command_print, "2hns", olsr_cli_print_2hns, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print 2-hop neighbor set table");
-	cli_register_command(dessert_cli, cli_command_print, "tc", olsr_cli_print_tc, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print TC set table");
-	cli_register_command(dessert_cli, cli_command_print, "rt", olsr_cli_print_rt, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print routing table");
-	cli_register_command(dessert_cli, cli_command_print, "rt_so", olsr_cli_print_rt_so, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print routing table (simple output)");
+	struct cli_command* cli_command_print = cli_register_command(dessert_cli, NULL, "print", NULL, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print table");
+	cli_register_command(dessert_cli, cli_command_print, "hello_size", cli_print_hello_size, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print HELLO packet size");
+	cli_register_command(dessert_cli, cli_command_print, "hello_interval", cli_print_hello_interval, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print HELLO interval");
+	cli_register_command(dessert_cli, cli_command_print, "tc_size", cli_print_tc_size, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print TC packet size");
+	cli_register_command(dessert_cli, cli_command_print, "tc_interval", cli_print_tc_interval, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print TC interval");
+	cli_register_command(dessert_cli, cli_command_print, "ns", cli_print_ns, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print neighbor set table");
+	cli_register_command(dessert_cli, cli_command_print, "ns_so", cli_print_ns_so, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print neighbor set table (simple output)");
+	cli_register_command(dessert_cli, cli_command_print, "ls", cli_print_ls, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print link set table");
+	cli_register_command(dessert_cli, cli_command_print, "2hns", cli_print_2hns, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print 2-hop neighbor set table");
+	cli_register_command(dessert_cli, cli_command_print, "tc", cli_print_tc, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print TC set table");
+	cli_register_command(dessert_cli, cli_command_print, "rt", cli_print_rt, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print routing table");
+	cli_register_command(dessert_cli, cli_command_print, "rt_so", cli_print_rt_so, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print routing table (simple output)");
 
-	// registering callbacks
+	cli_register_command(dessert_cli, NULL, "metric", cli_set_rc_metric, PRIVILEGE_UNPRIVILEGED, MODE_CONFIG, "set route calculation metric (PLR | HC)");
+
+	/* register callbacks */
 	dessert_meshrxcb_add(dessert_msg_check_cb, 10);
 	dessert_meshrxcb_add(dessert_msg_ifaceflags_cb, 20);
 	dessert_meshrxcb_add(olsr_drop_errors, 30);
@@ -119,24 +102,24 @@ int main(int argc, char** argv) {
 
 	dessert_sysrxcb_add(olsr_sys2rp, 10);
 
-	cli_file(dessert_cli, cfg, PRIVILEGE_PRIVILEGED, MODE_CONFIG);
-
-	// registering periodic tasks
+	/* registering periodic tasks */
 	struct timeval hello_interval_tv;
 	hello_interval_tv.tv_sec = hello_interval;
 	hello_interval_tv.tv_usec = 0;
-	dessert_periodic_add(olsr_periodic_send_hello, NULL, NULL, &hello_interval_tv);
+	periodic_send_hello = dessert_periodic_add(olsr_periodic_send_hello, NULL, NULL, &hello_interval_tv);
 
 	struct timeval tc_interval_tv;
 	tc_interval_tv.tv_sec = tc_interval;
 	tc_interval_tv.tv_usec = 0;
-	dessert_periodic_add(olsr_periodic_send_tc, NULL, NULL, &tc_interval_tv);
+	periodic_send_tc = dessert_periodic_add(olsr_periodic_send_tc, NULL, NULL, &tc_interval_tv);
 
 	struct timeval build_rt_interval;
 	build_rt_interval.tv_sec = BUILD_RT_INTERVAL;
 	build_rt_interval.tv_usec = 0;
 	dessert_periodic_add(olsr_periodic_build_routingtable, NULL, NULL, &build_rt_interval);
 
+	/* running cli & daemon */
+	cli_file(dessert_cli, cfg, PRIVILEGE_PRIVILEGED, MODE_CONFIG);
 	dessert_cli_run();
 	dessert_run();
 

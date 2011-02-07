@@ -23,3 +23,9 @@
 20101007 - Minor changes
          - Added TTL decrease callback
          - Current version 1.3
+
+20110207 - cleared code e.g. deleted unused variables
+         - more cli getter and setter for some daemon parameters
+		 - hello_size/hello_interval
+		 - tc_size/tc_interval
+

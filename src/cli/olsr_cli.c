@@ -26,10 +26,11 @@ For further information and questions please use the web site
 #include <stdio.h>
 #include "olsr_cli.h"
 #include "../database/olsr_database.h"
+#include "../pipeline/olsr_pipeline.h"
 #include "../config.h"
 
 // -------------------- config ------------------------------------------------------------
-int cli_beverbose(struct cli_def* cli, char* command, char* argv[], int argc) {
+int cli_set_verbose(struct cli_def* cli, char* command, char* argv[], int argc) {
 	u_int32_t mode;
 
 	if (argc != 1 || sscanf(argv[0], "%u", &mode) != 1|| (mode != 0 && mode != 1)) {
@@ -38,39 +39,79 @@ int cli_beverbose(struct cli_def* cli, char* command, char* argv[], int argc) {
 	}
 	if (mode == 1) {
 		dessert_info("be verbose = TRUE");
-		be_verbose = TRUE;
+		verbose = TRUE;
 	} else {
 		dessert_info("be verbose = FALSE");
-		be_verbose = FALSE;
+		verbose = FALSE;
 	}
 	return CLI_OK;
 }
 
-int olsr_cli_helloint(struct cli_def* cli, char* command, char* argv[], int argc) {
-	unsigned int mode;
+int cli_set_hello_size(struct cli_def *cli, char *command, char *argv[], int argc) {
+    uint16_t min_size = sizeof(dessert_msg_t) + sizeof(struct ether_header) + 2;
 
-	if (argc != 1 || sscanf(argv[0], "%u", &mode) != 1) {
-		cli_print(cli, "usage of %s command [0, 1]\n", command);
-		return CLI_ERROR_ARG;
+    if(argc != 1) {
+        label_out_usage:
+        cli_print(cli, "usage %s [%d..1500]\n", command, min_size);
+        return CLI_ERROR;
+    }
+
+    uint16_t psize = (uint16_t) strtoul(argv[0], NULL, 10);
+    if(psize < min_size || psize > 1500) goto label_out_usage;
+    hello_size = psize;
+    dessert_notice("setting HELLO size to %d", hello_size);
+    return CLI_OK;
+}
+
+int cli_set_hello_interval(struct cli_def* cli, char* command, char* argv[], int argc) {
+	if(argc != 1) {
+		cli_print(cli, "usage %s  [interval]\n", command);
+		return CLI_ERROR;
 	}
-	hello_interval = (uint8_t) mode;
-	dessert_debug("set HELLO_INTERVAL to %i", hello_interval);
+
+	hello_interval = (uint16_t) strtoul(argv[0], NULL, 10);
+	dessert_periodic_del(periodic_send_hello);
+	struct timeval hello_interval_tv;
+	hello_interval_tv.tv_sec = hello_interval;
+	hello_interval_tv.tv_usec = 0;
+	periodic_send_hello = dessert_periodic_add(olsr_periodic_send_hello, NULL, NULL, &hello_interval_tv);
+	dessert_notice("setting HELLO interval to %d", hello_interval);
 	return CLI_OK;
 }
 
-int olsr_cli_tcint(struct cli_def* cli, char* command, char* argv[], int argc) {
-	unsigned int mode;
+int cli_set_tc_size(struct cli_def *cli, char *command, char *argv[], int argc) {
+    uint16_t min_size = sizeof(dessert_msg_t) + sizeof(struct ether_header) + 2;
 
-	if (argc != 1 || sscanf(argv[0], "%u", &mode) != 1) {
-		cli_print(cli, "usage of %s command [0, 1]\n", command);
-		return CLI_ERROR_ARG;
+    if(argc != 1) {
+        label_out_usage:
+        cli_print(cli, "usage %s [%d..1500]\n", command, min_size);
+        return CLI_ERROR;
+    }
+
+    uint16_t psize = (uint16_t) strtoul(argv[0], NULL, 10);
+    if(psize < min_size || psize > 1500) goto label_out_usage;
+    tc_size = psize;
+    dessert_notice("setting TC size to %d", tc_size);
+    return CLI_OK;
+}
+
+int cli_set_tc_interval(struct cli_def* cli, char* command, char* argv[], int argc) {
+	if(argc != 1) {
+		cli_print(cli, "usage %s  [interval]\n", command);
+		return CLI_ERROR;
 	}
-	tc_interval = (uint8_t) mode;
-	dessert_debug("set TC_INTERVAL to %i", tc_interval);
+
+	tc_interval = (uint16_t) strtoul(argv[0], NULL, 10);
+	dessert_periodic_del(periodic_send_tc);
+	struct timeval tc_interval_tv;
+	tc_interval_tv.tv_sec = tc_interval;
+	tc_interval_tv.tv_usec = 0;
+	periodic_send_tc = dessert_periodic_add(olsr_periodic_send_tc, NULL, NULL, &tc_interval_tv);
+	dessert_notice("setting TC interval to %d", tc_interval);
 	return CLI_OK;
 }
 
-int olsr_cli_validitycoeff(struct cli_def* cli, char* command, char* argv[], int argc) {
+int cli_set_validity_coeff(struct cli_def* cli, char* command, char* argv[], int argc) {
 	unsigned int mode;
 
 	if (argc != 1 || sscanf(argv[0], "%u", &mode) != 1) {
@@ -84,7 +125,7 @@ int olsr_cli_validitycoeff(struct cli_def* cli, char* command, char* argv[], int
 	return CLI_OK;
 }
 
-int olsr_cli_willingness(struct cli_def* cli, char* command, char* argv[], int argc) {
+int cli_set_willingness(struct cli_def* cli, char* command, char* argv[], int argc) {
 	unsigned int mode;
 
 	if (argc != 1 || sscanf(argv[0], "%u", &mode) != 1) {
@@ -96,7 +137,7 @@ int olsr_cli_willingness(struct cli_def* cli, char* command, char* argv[], int a
 	return CLI_OK;
 }
 
-int olsr_cli_window_size(struct cli_def* cli, char* command, char* argv[], int argc) {
+int cli_set_window_size(struct cli_def* cli, char* command, char* argv[], int argc) {
 	unsigned int mode;
 
 	if (argc != 1 || sscanf(argv[0], "%u", &mode) != 1) {
@@ -108,7 +149,7 @@ int olsr_cli_window_size(struct cli_def* cli, char* command, char* argv[], int a
 	return CLI_OK;
 }
 
-int olsr_cli_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc) {
+int cli_set_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc) {
 	if (argc != 1 || (strcmp(argv[0], "PLR") != 0 && strcmp(argv[0], "HC") != 0 && strcmp(argv[0], "ETX") != 0 && strcmp(argv[0], "ETX-ADD") != 0)) {
 		cli_print(cli, "usage of %s command [PLR, HC, ETX, ETX-ADD]\n", command);
 		dessert_err("usage of %s command [PLR, HC, ETX, ETX-ADD]");
@@ -133,9 +174,32 @@ int olsr_cli_rc_metric(struct cli_def* cli, char* command, char* argv[], int arg
 // -------------------- Testing ------------------------------------------------------------
 
 /**
+* Print hello size
+*/
+int cli_print_hello_size(struct cli_def *cli, char *command, char *argv[], int argc) {
+    cli_print(cli, "Hello size = %d bytes\n", hello_size);
+    return CLI_OK;
+}
+
+int cli_print_hello_interval(struct cli_def *cli, char *command, char *argv[], int argc) {
+    cli_print(cli, "Hello interval = %d sec\n", hello_interval);
+    return CLI_OK;
+}
+
+int cli_print_tc_size(struct cli_def *cli, char *command, char *argv[], int argc) {
+    cli_print(cli, "TC size = %d bytes\n", tc_size);
+    return CLI_OK;
+}
+
+int cli_print_tc_interval(struct cli_def *cli, char *command, char *argv[], int argc) {
+    cli_print(cli, "TC interval = %d sec\n", tc_interval);
+    return CLI_OK;
+}
+
+/**
  * Print neighbor set table
  */
-int olsr_cli_print_ns(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_print_ns(struct cli_def* cli, char* command, char* argv[], int argc){
 	char* report;
 	olsr_db_wlock();
 	int result = olsr_db_ns_report(&report);
@@ -150,7 +214,7 @@ int olsr_cli_print_ns(struct cli_def* cli, char* command, char* argv[], int argc
 /**
  * Print neighbor set table (simple output)
  */
-int olsr_cli_print_ns_so(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_print_ns_so(struct cli_def* cli, char* command, char* argv[], int argc){
 	char* report;
 	olsr_db_wlock();
 	int result = olsr_db_ns_report_so(&report);
@@ -165,7 +229,7 @@ int olsr_cli_print_ns_so(struct cli_def* cli, char* command, char* argv[], int a
 /**
  * Print link set table
  */
-int olsr_cli_print_ls(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_print_ls(struct cli_def* cli, char* command, char* argv[], int argc){
 	char* report;
 	olsr_db_wlock();
 	int result = olsr_db_ls_report(&report);
@@ -180,7 +244,7 @@ int olsr_cli_print_ls(struct cli_def* cli, char* command, char* argv[], int argc
 /**
  * Print 2hop neighbor set table
  */
-int olsr_cli_print_2hns(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_print_2hns(struct cli_def* cli, char* command, char* argv[], int argc){
 	char* report;
 	olsr_db_wlock();
 	int result = olsr_db_2hns_report(&report);
@@ -195,7 +259,7 @@ int olsr_cli_print_2hns(struct cli_def* cli, char* command, char* argv[], int ar
 /**
  * Print TC set table
  */
-int olsr_cli_print_tc(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_print_tc(struct cli_def* cli, char* command, char* argv[], int argc){
 	char* report;
 	olsr_db_wlock();
 	int result = olsr_db_tc_report(&report);
@@ -210,7 +274,7 @@ int olsr_cli_print_tc(struct cli_def* cli, char* command, char* argv[], int argc
 /**
  * Print routing table
  */
-int olsr_cli_print_rt(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_print_rt(struct cli_def* cli, char* command, char* argv[], int argc){
 	char* report;
 	olsr_db_rlock();
 	int result = olsr_db_rt_report(&report);
@@ -225,7 +289,7 @@ int olsr_cli_print_rt(struct cli_def* cli, char* command, char* argv[], int argc
 /**
 * Print routing table (simple output)
 */
-int olsr_cli_print_rt_so(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_print_rt_so(struct cli_def* cli, char* command, char* argv[], int argc){
 	char* report;
 	olsr_db_rlock();
 	int result = olsr_db_rt_report_so(&report);
@@ -239,7 +303,7 @@ int olsr_cli_print_rt_so(struct cli_def* cli, char* command, char* argv[], int a
 
 // -------------------- common cli functions ----------------------------------------------
 
-int cli_setrouting_log(struct cli_def *cli, char *command, char *argv[], int argc) {
+int cli_set_routing_log(struct cli_def *cli, char *command, char *argv[], int argc) {
 	routing_log_file = malloc(strlen(argv[0]));
 	strcpy(routing_log_file, argv[0]);
 	FILE* f = fopen(routing_log_file, "a+");
