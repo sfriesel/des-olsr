@@ -38,8 +38,8 @@ enum bool {TRUE = 1, FALSE = 0};
 #define SEQNO_MAX					(1 << 16) - 1
 
 // emission intervals
-#define HELLO_INTERVAL				2
-#define TC_INTERVAL					5
+#define HELLO_INTERVAL				2000
+#define TC_INTERVAL					5000
 
 // holding times
 #define LINK_HOLD_TIME_COEFF		7
@@ -65,7 +65,7 @@ enum bool {TRUE = 1, FALSE = 0};
 #define WILL_ALLWAYS				7
 
 // build intervals
-#define BUILD_RT_INTERVAL			1
+#define BUILD_RT_INTERVAL			1000
 
 // link quality
 #define WINDOW_SIZE					50
@@ -76,10 +76,10 @@ enum bool {TRUE = 1, FALSE = 0};
 #define VERBOSE					FALSE
 
 extern int 							verbose;
-extern u_int8_t						hello_interval;
-extern u_int8_t						tc_interval;
-extern u_int8_t						tc_hold_time_coeff;
-extern u_int8_t						willingness;
+extern int							hello_interval;
+extern int							tc_interval;
+extern int							tc_hold_time_coeff;
+extern int							willingness;
 extern int							rc_metric;
 extern char*						routing_log_file;
 extern int 							hello_size;
@@ -88,7 +88,7 @@ extern dessert_periodic_t*			periodic_send_hello;
 extern dessert_periodic_t*			periodic_send_tc;
 
 // window size for calculation of PDR or ETX
-extern u_int8_t						window_size;
+extern int							window_size;
 #define RC_METRIC_PLR				1
 #define RC_METRIC_HC				2
 #define RC_METRIC_ETX				3

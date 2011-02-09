@@ -29,3 +29,6 @@
 		 - hello_size/hello_interval
 		 - tc_size/tc_interval
 
+20110209 - minor changes
+         - time intervals now are specified in milliseconds
+

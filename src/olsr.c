@@ -1,3 +1,26 @@
+/******************************************************************************
+Copyright 2009, Freie Universitaet Berlin (FUB). All rights reserved.
+
+These sources were developed at the Freie Universitaet Berlin,
+Computer Systems and Telematics / Distributed, embedded Systems (DES) group
+(http://cst.mi.fu-berlin.de, http://www.des-testbed.net)
+-------------------------------------------------------------------------------
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program. If not, see http://www.gnu.org/licenses/ .
+--------------------------------------------------------------------------------
+For further information and questions please use the web site
+       http://www.des-testbed.net
+*******************************************************************************/
+
 #include <dessert.h>
 #include <dessert-extra.h>
 #include <printf.h>
@@ -8,13 +31,13 @@
 #include "database/olsr_database.h"
 
 int 		hello_size 			= HELLO_SIZE;
-u_int8_t 	hello_interval 		= HELLO_INTERVAL;
+int 		hello_interval 		= HELLO_INTERVAL;
 int 		tc_size 			= TC_SIZE;
-u_int8_t 	tc_interval 		= TC_INTERVAL;
+int		 	tc_interval 		= TC_INTERVAL;
 int 		verbose 			= VERBOSE;
-u_int8_t 	window_size 		= WINDOW_SIZE;
-u_int8_t 	tc_hold_time_coeff 	= TC_HOLD_TIME_COEFF;
-u_int8_t 	willingness 		= WILL_DEFAULT;
+int		 	window_size 		= WINDOW_SIZE;
+int	 		tc_hold_time_coeff 	= TC_HOLD_TIME_COEFF;
+int		 	willingness 		= WILL_DEFAULT;
 int 		rc_metric 			= RC_METRIC_ETX;
 char* 		routing_log_file 	= NULL;
 
@@ -104,13 +127,13 @@ int main(int argc, char** argv) {
 
 	/* registering periodic tasks */
 	struct timeval hello_interval_tv;
-	hello_interval_tv.tv_sec = hello_interval;
-	hello_interval_tv.tv_usec = 0;
+	hello_interval_tv.tv_sec = hello_interval / 1000;
+	hello_interval_tv.tv_usec = (hello_interval % 1000) * 1000;
 	periodic_send_hello = dessert_periodic_add(olsr_periodic_send_hello, NULL, NULL, &hello_interval_tv);
 
 	struct timeval tc_interval_tv;
-	tc_interval_tv.tv_sec = tc_interval;
-	tc_interval_tv.tv_usec = 0;
+	tc_interval_tv.tv_sec = tc_interval / 1000;
+	tc_interval_tv.tv_usec = (tc_interval % 1000) * 1000;
 	periodic_send_tc = dessert_periodic_add(olsr_periodic_send_tc, NULL, NULL, &tc_interval_tv);
 
 	struct timeval build_rt_interval;

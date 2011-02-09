@@ -69,11 +69,11 @@ int cli_set_hello_interval(struct cli_def* cli, char* command, char* argv[], int
 		return CLI_ERROR;
 	}
 
-	hello_interval = (uint16_t) strtoul(argv[0], NULL, 10);
+	hello_interval = strtoul(argv[0], NULL, 10);
 	dessert_periodic_del(periodic_send_hello);
 	struct timeval hello_interval_tv;
-	hello_interval_tv.tv_sec = hello_interval;
-	hello_interval_tv.tv_usec = 0;
+	hello_interval_tv.tv_sec = hello_interval / 1000;
+	hello_interval_tv.tv_usec = (hello_interval % 1000) * 1000;
 	periodic_send_hello = dessert_periodic_add(olsr_periodic_send_hello, NULL, NULL, &hello_interval_tv);
 	dessert_notice("setting HELLO interval to %d", hello_interval);
 	return CLI_OK;
@@ -101,11 +101,11 @@ int cli_set_tc_interval(struct cli_def* cli, char* command, char* argv[], int ar
 		return CLI_ERROR;
 	}
 
-	tc_interval = (uint16_t) strtoul(argv[0], NULL, 10);
+	tc_interval = strtoul(argv[0], NULL, 10);
 	dessert_periodic_del(periodic_send_tc);
 	struct timeval tc_interval_tv;
-	tc_interval_tv.tv_sec = tc_interval;
-	tc_interval_tv.tv_usec = 0;
+	tc_interval_tv.tv_sec = tc_interval / 1000;
+	tc_interval_tv.tv_usec = (tc_interval % 1000) * 1000;
 	periodic_send_tc = dessert_periodic_add(olsr_periodic_send_tc, NULL, NULL, &tc_interval_tv);
 	dessert_notice("setting TC interval to %d", tc_interval);
 	return CLI_OK;
@@ -182,7 +182,7 @@ int cli_print_hello_size(struct cli_def *cli, char *command, char *argv[], int a
 }
 
 int cli_print_hello_interval(struct cli_def *cli, char *command, char *argv[], int argc) {
-    cli_print(cli, "Hello interval = %d sec\n", hello_interval);
+    cli_print(cli, "Hello interval = %d millisec\n", hello_interval);
     return CLI_OK;
 }
 
@@ -192,7 +192,7 @@ int cli_print_tc_size(struct cli_def *cli, char *command, char *argv[], int argc
 }
 
 int cli_print_tc_interval(struct cli_def *cli, char *command, char *argv[], int argc) {
-    cli_print(cli, "TC interval = %d sec\n", tc_interval);
+    cli_print(cli, "TC interval = %d millisec\n", tc_interval);
     return CLI_OK;
 }
 
