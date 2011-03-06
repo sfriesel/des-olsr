@@ -85,9 +85,10 @@ int main(int argc, char** argv) {
     dessert_logcfg(DESSERT_LOG_STDERR);
 
     /* cli initialization */
-	struct cli_command* cli_cfg_set = cli_register_command(dessert_cli, NULL, "set", NULL, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set variable");
 	cli_register_command(dessert_cli, dessert_cli_cfg_iface, "sys", dessert_cli_cmd_addsysif, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "initialize sys interface");
 	cli_register_command(dessert_cli, dessert_cli_cfg_iface, "mesh", dessert_cli_cmd_addmeshif, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "initialize mesh interface");
+
+	struct cli_command* cli_cfg_set = cli_register_command(dessert_cli, NULL, "set", NULL, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set variable");
 	cli_register_command(dessert_cli, cli_cfg_set, "hello_size", cli_set_hello_size, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set HELLO packet size");
 	cli_register_command(dessert_cli, cli_cfg_set, "hello_interval", cli_set_hello_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set HELLO interval");
 	cli_register_command(dessert_cli, cli_cfg_set, "tc_size", cli_set_tc_size, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set TC packet size");
@@ -97,21 +98,19 @@ int main(int argc, char** argv) {
 	cli_register_command(dessert_cli, cli_cfg_set, "validity_coeff", cli_set_validity_coeff, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set validity time coefficient");
 	cli_register_command(dessert_cli, cli_cfg_set, "willingness", cli_set_willingness, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set willingness of host to re-send broadcast messages");
 	cli_register_command(dessert_cli, cli_cfg_set, "routing_log", cli_set_routing_log, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set path to routing logging file");
+	cli_register_command(dessert_cli, cli_cfg_set, "metric", cli_set_rc_metric, PRIVILEGE_UNPRIVILEGED, MODE_CONFIG, "set route calculation metric (PLR | HC | ETX | ETX-ADD)");
 
-	struct cli_command* cli_command_print = cli_register_command(dessert_cli, NULL, "print", NULL, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print table");
-	cli_register_command(dessert_cli, cli_command_print, "hello_size", cli_print_hello_size, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print HELLO packet size");
-	cli_register_command(dessert_cli, cli_command_print, "hello_interval", cli_print_hello_interval, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print HELLO interval");
-	cli_register_command(dessert_cli, cli_command_print, "tc_size", cli_print_tc_size, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print TC packet size");
-	cli_register_command(dessert_cli, cli_command_print, "tc_interval", cli_print_tc_interval, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print TC interval");
-	cli_register_command(dessert_cli, cli_command_print, "ns", cli_print_ns, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print neighbor set table");
-	cli_register_command(dessert_cli, cli_command_print, "ns_so", cli_print_ns_so, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print neighbor set table (simple output)");
-	cli_register_command(dessert_cli, cli_command_print, "ls", cli_print_ls, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print link set table");
-	cli_register_command(dessert_cli, cli_command_print, "2hns", cli_print_2hns, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print 2-hop neighbor set table");
-	cli_register_command(dessert_cli, cli_command_print, "tc", cli_print_tc, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print TC set table");
-	cli_register_command(dessert_cli, cli_command_print, "rt", cli_print_rt, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print routing table");
-	cli_register_command(dessert_cli, cli_command_print, "rt_so", cli_print_rt_so, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "print routing table (simple output)");
-
-	cli_register_command(dessert_cli, NULL, "metric", cli_set_rc_metric, PRIVILEGE_UNPRIVILEGED, MODE_CONFIG, "set route calculation metric (PLR | HC)");
+	cli_register_command(dessert_cli, dessert_cli_show, "hello_size", cli_show_hello_size, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show HELLO packet size");
+	cli_register_command(dessert_cli, dessert_cli_show, "hello_interval", cli_show_hello_interval, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show HELLO interval");
+	cli_register_command(dessert_cli, dessert_cli_show, "tc_size", cli_show_tc_size, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show TC packet size");
+	cli_register_command(dessert_cli, dessert_cli_show, "tc_interval", cli_show_tc_interval, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show TC interval");
+	cli_register_command(dessert_cli, dessert_cli_show, "ns", cli_show_ns, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show neighbor set table");
+	cli_register_command(dessert_cli, dessert_cli_show, "ns_so", cli_show_ns_so, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show neighbor set table (simple output)");
+	cli_register_command(dessert_cli, dessert_cli_show, "ls", cli_show_ls, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show link set table");
+	cli_register_command(dessert_cli, dessert_cli_show, "2hns", cli_show_2hns, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show 2-hop neighbor set table");
+	cli_register_command(dessert_cli, dessert_cli_show, "tc", cli_show_tc, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show TC set table");
+	cli_register_command(dessert_cli, dessert_cli_show, "rt", cli_show_rt, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show routing table");
+	cli_register_command(dessert_cli, dessert_cli_show, "rt_so", cli_show_rt_so, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show routing table (simple output)");
 
 	/* register callbacks */
 	dessert_meshrxcb_add(dessert_msg_check_cb, 10);
@@ -137,8 +136,8 @@ int main(int argc, char** argv) {
 	periodic_send_tc = dessert_periodic_add(olsr_periodic_send_tc, NULL, NULL, &tc_interval_tv);
 
 	struct timeval build_rt_interval;
-	build_rt_interval.tv_sec = BUILD_RT_INTERVAL;
-	build_rt_interval.tv_usec = 0;
+	build_rt_interval.tv_sec = BUILD_RT_INTERVAL / 1000;
+	build_rt_interval.tv_usec = (BUILD_RT_INTERVAL % 1000) * 1000;
 	dessert_periodic_add(olsr_periodic_build_routingtable, NULL, NULL, &build_rt_interval);
 
 	/* running cli & daemon */

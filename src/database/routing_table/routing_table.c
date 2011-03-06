@@ -87,7 +87,7 @@ int olsr_db_rt_getnexthop(u_int8_t dest_addr[ETH_ALEN], u_int8_t next_hop_out[ET
 // ------------------- reporting -----------------------------------------------
 
 int olsr_db_rt_report(char** str_out) {
-	int report_str_len = 89;
+	int report_str_len = 150;
 	olsr_db_rt_t* current_entry = rt_set;
 	char* output;
 	char entry_str[report_str_len  + 1];

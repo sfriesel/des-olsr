@@ -33,3 +33,8 @@
          - time intervals now are specified in milliseconds
 
 20110301 - Released as 1.4
+
+20110306 - changing CLI "print" parameters to "show"
+         - adding CLI parameter to config file with comments
+         - unifying routing tables to the streucture: destination | next hop | out iface addr | daemon specifc
+         - changing "metric x" CLI parameter to "set metric x" and fixing crash bug

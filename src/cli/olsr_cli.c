@@ -152,7 +152,6 @@ int cli_set_window_size(struct cli_def* cli, char* command, char* argv[], int ar
 int cli_set_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc) {
 	if (argc != 1 || (strcmp(argv[0], "PLR") != 0 && strcmp(argv[0], "HC") != 0 && strcmp(argv[0], "ETX") != 0 && strcmp(argv[0], "ETX-ADD") != 0)) {
 		cli_print(cli, "usage of %s command [PLR, HC, ETX, ETX-ADD]\n", command);
-		dessert_err("usage of %s command [PLR, HC, ETX, ETX-ADD]");
 		return CLI_ERROR_ARG;
 	}
 	if (strcmp(argv[0], "PLR") == 0) {
@@ -176,22 +175,22 @@ int cli_set_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc
 /**
 * Print hello size
 */
-int cli_print_hello_size(struct cli_def *cli, char *command, char *argv[], int argc) {
+int cli_show_hello_size(struct cli_def *cli, char *command, char *argv[], int argc) {
     cli_print(cli, "Hello size = %d bytes\n", hello_size);
     return CLI_OK;
 }
 
-int cli_print_hello_interval(struct cli_def *cli, char *command, char *argv[], int argc) {
+int cli_show_hello_interval(struct cli_def *cli, char *command, char *argv[], int argc) {
     cli_print(cli, "Hello interval = %d millisec\n", hello_interval);
     return CLI_OK;
 }
 
-int cli_print_tc_size(struct cli_def *cli, char *command, char *argv[], int argc) {
+int cli_show_tc_size(struct cli_def *cli, char *command, char *argv[], int argc) {
     cli_print(cli, "TC size = %d bytes\n", tc_size);
     return CLI_OK;
 }
 
-int cli_print_tc_interval(struct cli_def *cli, char *command, char *argv[], int argc) {
+int cli_show_tc_interval(struct cli_def *cli, char *command, char *argv[], int argc) {
     cli_print(cli, "TC interval = %d millisec\n", tc_interval);
     return CLI_OK;
 }
@@ -199,7 +198,7 @@ int cli_print_tc_interval(struct cli_def *cli, char *command, char *argv[], int 
 /**
  * Print neighbor set table
  */
-int cli_print_ns(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_show_ns(struct cli_def* cli, char* command, char* argv[], int argc){
 	char* report;
 	olsr_db_wlock();
 	int result = olsr_db_ns_report(&report);
@@ -214,7 +213,7 @@ int cli_print_ns(struct cli_def* cli, char* command, char* argv[], int argc){
 /**
  * Print neighbor set table (simple output)
  */
-int cli_print_ns_so(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_show_ns_so(struct cli_def* cli, char* command, char* argv[], int argc){
 	char* report;
 	olsr_db_wlock();
 	int result = olsr_db_ns_report_so(&report);
@@ -229,7 +228,7 @@ int cli_print_ns_so(struct cli_def* cli, char* command, char* argv[], int argc){
 /**
  * Print link set table
  */
-int cli_print_ls(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_show_ls(struct cli_def* cli, char* command, char* argv[], int argc){
 	char* report;
 	olsr_db_wlock();
 	int result = olsr_db_ls_report(&report);
@@ -244,7 +243,7 @@ int cli_print_ls(struct cli_def* cli, char* command, char* argv[], int argc){
 /**
  * Print 2hop neighbor set table
  */
-int cli_print_2hns(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_show_2hns(struct cli_def* cli, char* command, char* argv[], int argc){
 	char* report;
 	olsr_db_wlock();
 	int result = olsr_db_2hns_report(&report);
@@ -259,7 +258,7 @@ int cli_print_2hns(struct cli_def* cli, char* command, char* argv[], int argc){
 /**
  * Print TC set table
  */
-int cli_print_tc(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_show_tc(struct cli_def* cli, char* command, char* argv[], int argc){
 	char* report;
 	olsr_db_wlock();
 	int result = olsr_db_tc_report(&report);
@@ -274,7 +273,7 @@ int cli_print_tc(struct cli_def* cli, char* command, char* argv[], int argc){
 /**
  * Print routing table
  */
-int cli_print_rt(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_show_rt(struct cli_def* cli, char* command, char* argv[], int argc){
 	char* report;
 	olsr_db_rlock();
 	int result = olsr_db_rt_report(&report);
@@ -289,7 +288,7 @@ int cli_print_rt(struct cli_def* cli, char* command, char* argv[], int argc){
 /**
 * Print routing table (simple output)
 */
-int cli_print_rt_so(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_show_rt_so(struct cli_def* cli, char* command, char* argv[], int argc){
 	char* report;
 	olsr_db_rlock();
 	int result = olsr_db_rt_report_so(&report);

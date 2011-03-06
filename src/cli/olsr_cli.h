@@ -35,14 +35,14 @@ int cli_set_window_size(struct cli_def* cli, char* command, char* argv[], int ar
 int cli_set_port(struct cli_def *cli, char *command, char *argv[], int argc);
 int cli_set_routing_log(struct cli_def *cli, char *command, char *argv[], int argc);
 
-int cli_print_hello_size(struct cli_def* cli, char* command, char* argv[], int argc);
-int cli_print_hello_interval(struct cli_def* cli, char* command, char* argv[], int argc);
-int cli_print_tc_size(struct cli_def* cli, char* command, char* argv[], int argc);
-int cli_print_tc_interval(struct cli_def* cli, char* command, char* argv[], int argc);
-int cli_print_ns(struct cli_def* cli, char* command, char* argv[], int argc);
-int cli_print_ns_so(struct cli_def* cli, char* command, char* argv[], int argc);
-int cli_print_ls(struct cli_def* cli, char* command, char* argv[], int argc);
-int cli_print_2hns(struct cli_def* cli, char* command, char* argv[], int argc);
-int cli_print_tc(struct cli_def* cli, char* command, char* argv[], int argc);
-int cli_print_rt_so(struct cli_def* cli, char* command, char* argv[], int argc);
-int cli_print_rt(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_show_hello_size(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_show_hello_interval(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_show_tc_size(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_show_tc_interval(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_show_ns(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_show_ns_so(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_show_ls(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_show_2hns(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_show_tc(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_show_rt_so(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_show_rt(struct cli_def* cli, char* command, char* argv[], int argc);
