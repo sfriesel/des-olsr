@@ -30,16 +30,16 @@ For further information and questions please use the web site
 #include "pipeline/olsr_pipeline.h"
 #include "database/olsr_database.h"
 
-int 		hello_size 			= HELLO_SIZE;
-int 		hello_interval 		= HELLO_INTERVAL;
-int 		tc_size 			= TC_SIZE;
-int		 	tc_interval 		= TC_INTERVAL;
-int 		verbose 			= VERBOSE;
-int		 	window_size 		= WINDOW_SIZE;
-int	 		tc_hold_time_coeff 	= TC_HOLD_TIME_COEFF;
-int		 	willingness 		= WILL_DEFAULT;
-int 		rc_metric 			= RC_METRIC_ETX;
-char* 		routing_log_file 	= NULL;
+int     hello_size           = HELLO_SIZE;
+int     hello_interval       = HELLO_INTERVAL;
+int     tc_size              = TC_SIZE;
+int     tc_interval          = TC_INTERVAL;
+int     verbose              = VERBOSE;
+int     window_size          = WINDOW_SIZE;
+int     tc_hold_time_coeff   = TC_HOLD_TIME_COEFF;
+int     willingness          = WILL_DEFAULT;
+int     rc_metric            = RC_METRIC_ETX;
+char*   routing_log_file     = NULL;
 
 dessert_periodic_t* periodic_send_hello;
 dessert_periodic_t* periodic_send_tc;
