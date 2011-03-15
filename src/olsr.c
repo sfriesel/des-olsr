@@ -44,8 +44,8 @@ char*   routing_log_file     = NULL;
 dessert_periodic_t* periodic_send_hello;
 dessert_periodic_t* periodic_send_tc;
 
-int print_macaddress_arginfo(const struct printf_info *info, size_t n, int *argtypes) {
-    if (n > 0) argtypes[0] = PA_POINTER;  		// we always take exactly one argument (pointer to the structure)
+int print_macaddress_arginfo(const struct printf_info *info, size_t n, int *argtypes, int *size) {
+    if (n > 0) argtypes[0] = PA_POINTER; // we always take exactly one argument (pointer to the structure)
     return 1;
 }
 
@@ -59,10 +59,10 @@ int print_macaddress(FILE *stream, const struct printf_info *info, const void * 
 }
 
 int main(int argc, char** argv) {
-    register_printf_function("M", print_macaddress, print_macaddress_arginfo);
+	register_printf_specifier('M', print_macaddress, print_macaddress_arginfo);
 
     /* initialize daemon with correct parameters */
-	FILE *cfg = NULL;
+    FILE *cfg = NULL;
 	if ((argc == 2) && (strcmp(argv[1], "-nondaemonize") == 0)) {
 		dessert_info("starting OLSR in non daemonize mode");
 		dessert_init("OLSR", 0x02, DESSERT_OPT_NODAEMONIZE);
