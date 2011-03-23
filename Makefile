@@ -44,9 +44,15 @@ all: build
 build: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -O0 -o $(DAEMON_NAME) $(OBJS) $(USER_OBJS) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $(DAEMON_NAME) $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
+
+android: CC=android-gcc
+android: CFLAGS = -I$(DESSERT_LIB)/include
+android: LDFLAGS = -L$(DESSERT_LIB)/lib -Wl,-rpath-link=$(DESSERT_LIB)/lib -ldessert -ldessert-extra
+android: LIBS =
+android: build package
 
 install:
 	mkdir -p $(DIR_BIN)
