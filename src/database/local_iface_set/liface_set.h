@@ -23,6 +23,7 @@ For further information and questions please use the web site
 
 #ifndef OLSR_LIFACE_SET
 #define OLSR_LIFACE_SET
+#include "../../android.h"
 
 int olsr_db_lis_islocaliface(u_int8_t iface_addr[ETH_ALEN]);
 

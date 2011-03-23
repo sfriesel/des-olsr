@@ -27,6 +27,7 @@ For further information and questions please use the web site
 #include <stdlib.h>
 #include <uthash.h>
 #include <linux/if_ether.h>
+#include "../../android.h"
 
 typedef struct olsr_db_tc_tcsentry {
 	u_int8_t		link_quality;

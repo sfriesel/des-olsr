@@ -25,8 +25,10 @@ For further information and questions please use the web site
 #define OLSR_LINK_SET
 #include <uthash.h>
 #include <dessert.h>
+#include "../../android.h"
 #include "sliding_window.h"
 #include "../timeslot.h"
+
 
 typedef struct olsr_db_linkset_nl_entry {
 	u_int8_t 			neighbor_iface_addr[ETH_ALEN];		// key

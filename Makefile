@@ -8,6 +8,7 @@ DIR_BIN=$(DESTDIR)/usr/sbin
 DIR_ETC=$(DESTDIR)/etc
 DIR_ETC_DEF=$(DIR_ETC)/default
 DIR_ETC_INITD=$(DIR_ETC)/init.d
+DIR_ANDROID=android.files
 TARFILES = src etc Makefile *.mk ChangeLog
 
 CONFIG+=debug
@@ -54,6 +55,10 @@ android: LDFLAGS = -L$(DESSERT_LIB)/lib -Wl,-rpath-link=$(DESSERT_LIB)/lib -ldes
 android: LIBS =
 android: build package
 
+package:
+	mv $(DAEMON_NAME) android.files/daemon
+	zip -j android.files/$(DAEMON_NAME).zip android.files/*
+
 install:
 	mkdir -p $(DIR_BIN)
 	install -m 755 $(DAEMON_NAME) $(DIR_BIN)
@@ -65,7 +70,7 @@ install:
 	install -m 755 etc/$(DAEMON_NAME).init $(DIR_ETC_INITD)/$(DAEMON_NAME)
 
 clean:
-	-$(RM) $(OBJS)$(EXECUTABLES)$(C_DEPS) $(DAEMON_NAME) $(DAEMON_NAME)-$(VERSION).tar.gz $(DAEMON_NAME)-$(VERSION)
+	-$(RM) $(OBJS)$(EXECUTABLES)$(C_DEPS) $(DAEMON_NAME) $(DAEMON_NAME)-$(VERSION).tar.gz $(DAEMON_NAME)-$(VERSION) $(DIR_ANDROID)/daemon $(DIR_ANDROID)/des-olsr.zip
 	-@echo ' '
 
 tarball: clean

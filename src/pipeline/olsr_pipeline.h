@@ -25,6 +25,8 @@ For further information and questions please use the web site
 #define OLSR_PIPELINE
 
 #include <dessert.h>
+#include "../android.h"
+
 
 // ------------- message formats ----------------------------------------------
 

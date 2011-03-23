@@ -26,6 +26,7 @@ For further information and questions please use the web site
 
 #include <linux/if_ether.h>
 #include <stdlib.h>
+#include "android.h"
 
 /**
  * Compares two integers

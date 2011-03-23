@@ -26,6 +26,8 @@ For further information and questions please use the web site
 
 #include <dessert.h>
 #include <uthash.h>
+#include "../../android.h"
+
 
 typedef struct olsr_db_tuple {
 	u_int8_t 		neighbor_main_addr[ETH_ALEN];			// key

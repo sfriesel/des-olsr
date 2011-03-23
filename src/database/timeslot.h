@@ -26,6 +26,7 @@ For further information and questions please use the web site
 
 #include <stdlib.h>
 #include <uthash.h>
+#include "../android.h"
 
 typedef void object_purger_t(struct timeval* purge_time, void* src_object, void* object);
 

@@ -26,6 +26,7 @@ For further information and questions please use the web site
 
 #include <stdlib.h>
 #include <linux/if_ether.h>
+#include "../../android.h"
 
 int	olsr_db_dt_init();
 
