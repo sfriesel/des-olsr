@@ -23,5 +23,4 @@ For further information and questions please use the web site
 #ifdef ANDROID
 #include <sys/time.h>
 #include <linux/if_ether.h>
-#define EXPLODE_ARRAY6( ARRAY ) ARRAY[0], ARRAY[1], ARRAY[2], ARRAY[3], ARRAY[4], ARRAY[5]
 #endif
