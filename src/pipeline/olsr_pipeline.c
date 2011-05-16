@@ -40,30 +40,39 @@ void _rlfile_log(const u_int8_t src_addr[ETH_ALEN], const u_int8_t dest_addr[ETH
 		const u_int8_t out_iface[ETH_ALEN], const u_int8_t next_hop_addr[ETH_ALEN]) {
 	pthread_rwlock_wrlock(&rlflock);
 	FILE* f = fopen(routing_log_file, "a+");
-	if (f == NULL) dessert_debug("file = 0");
-        #ifndef ANDROID
-	if (out_iface == NULL) {
-		fprintf(f, "%M\t%M\t%u\t%u\t%M\t%s\t%s\n",
-			src_addr, dest_addr, seq_num, hop_count, in_iface, "NULL", "NULL");
-	} else if (in_iface == NULL) {
-		fprintf(f, "%M\t%M\t%u\t%u\t%s\t%M\t%M\n",
-            src_addr, dest_addr, seq_num, hop_count, "NULL", out_iface, next_hop_addr);
-	} else {
-		fprintf(f, "%M\t%M\t%u\t%u\t%M\t%M\t%M\n",
-			src_addr, dest_addr, seq_num, hop_count, in_iface, out_iface, next_hop_addr);
+	if (f == NULL) {
+		dessert_debug("file = 0");
+		return;
 	}
-	#else
 	if (out_iface == NULL) {
-                fprintf(f, "%02x:%02x:%02x:%02x:%02x:%02x\t%02x:%02x:%02x:%02x:%02x:%02x\t%u\t%u\t%02x:%02x:%02x:%02x:%02x:%02x\t%s\t%s\n",
-                        EXPLODE_ARRAY6(src_addr), EXPLODE_ARRAY6(dest_addr), seq_num, hop_count, EXPLODE_ARRAY6(in_iface), "NULL", "NULL");
-        } else if (in_iface == NULL) {
-                fprintf(f, "%02x:%02x:%02x:%02x:%02x:%02x\t%02x:%02x:%02x:%02x:%02x:%02x\t%u\t%u\t%s\t%02x:%02x:%02x:%02x:%02x:%02x\t%02x:%02x:%02x:%02x:%02x:%02x\n",
-                        EXPLODE_ARRAY6(src_addr), EXPLODE_ARRAY6(dest_addr), seq_num, hop_count, "NULL", EXPLODE_ARRAY6(out_iface), EXPLODE_ARRAY6(next_hop_addr));
-        } else {
-                fprintf(f, "%02x:%02x:%02x:%02x:%02x:%02x\t%02x:%02x:%02x:%02x:%02x:%02x\t%u\t%u\t%02x:%02x:%02x:%02x:%02x:%02x\t%02x:%02x:%02x:%02x:%02x:%02x\t%02x:%02x:%02x:%02x:%02x:%02x\n",
-                        EXPLODE_ARRAY6(src_addr), EXPLODE_ARRAY6(dest_addr), seq_num, hop_count, EXPLODE_ARRAY6(in_iface), EXPLODE_ARRAY6(out_iface), EXPLODE_ARRAY6(next_hop_addr));
-        }
-        #endif
+		fprintf(f, MAC "\t" MAC "\t%u\t%u\t" MAC "\t%s\t%s\n",
+		        EXPLODE_ARRAY6(src_addr),
+		        EXPLODE_ARRAY6(dest_addr),
+		        seq_num,
+		        hop_count,
+		        EXPLODE_ARRAY6(in_iface),
+		        "NULL",
+		        "NULL");
+	} else if (in_iface == NULL) {
+		fprintf(f, MAC "\t" MAC "\t%u\t%u\t%s\t" MAC "\t" MAC "\n",
+		        EXPLODE_ARRAY6(src_addr),
+		        EXPLODE_ARRAY6(dest_addr),
+		        seq_num,
+		        hop_count,
+		        "NULL",
+		        EXPLODE_ARRAY6(out_iface),
+		        EXPLODE_ARRAY6(next_hop_addr));
+	} else {
+		fprintf(f,
+		        MAC "\t" MAC "\t%u\t%u\t" MAC "\t" MAC "\t" MAC "\n",
+		        EXPLODE_ARRAY6(src_addr),
+		        EXPLODE_ARRAY6(dest_addr),
+		        seq_num,
+		        hop_count,
+		        EXPLODE_ARRAY6(in_iface),
+		        EXPLODE_ARRAY6(out_iface),
+		        EXPLODE_ARRAY6(next_hop_addr));
+	}
 	fclose(f);
 	pthread_rwlock_unlock(&rlflock);
 }
