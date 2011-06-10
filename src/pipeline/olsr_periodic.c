@@ -170,9 +170,9 @@ int olsr_periodic_send_tc(void *data, struct timeval *scheduled, struct timeval 
 
 int olsr_periodic_build_routingtable(void *data, struct timeval *scheduled, struct timeval *interval) {
     pthread_rwlock_rdlock(&pp_rwlock);
-    int pending = pending_rtc;
+    uint8_t pending = pending_rtc;
     pthread_rwlock_unlock(&pp_rwlock);
-    if (pending != FALSE) {
+    if(pending != FALSE) {
         dessert_debug("re-building routing table");
         olsr_db_wlock();
         olsr_db_rt_destroy();
@@ -181,6 +181,9 @@ int olsr_periodic_build_routingtable(void *data, struct timeval *scheduled, stru
         pthread_rwlock_wrlock(&pp_rwlock);
         pending_rtc = FALSE;
         pthread_rwlock_unlock(&pp_rwlock);
+    }
+    else {
+        dessert_debug("routing table not updated: pending is FALSE");
     }
     return 0;
 }

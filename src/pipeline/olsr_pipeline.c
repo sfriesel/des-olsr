@@ -29,8 +29,8 @@ For further information and questions please use the web site
 #include "../database/rl_seq_t/rl_seq.h"
 
 pthread_rwlock_t pp_rwlock = PTHREAD_RWLOCK_INITIALIZER;
-int pending_rtc = FALSE;
-u_int32_t broadcast_id;
+uint8_t pending_rtc = FALSE;
+uint32_t broadcast_id;
 
 pthread_rwlock_t rlflock = PTHREAD_RWLOCK_INITIALIZER;
 pthread_rwlock_t rlseqlock = PTHREAD_RWLOCK_INITIALIZER;
