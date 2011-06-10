@@ -91,8 +91,7 @@ int olsr_drop_errors(dessert_msg_t* msg, size_t len,
     return DESSERT_MSG_KEEP;
 }
 
-int olsr_handle_hello(dessert_msg_t* msg, size_t len,
-        dessert_msg_proc_t *proc, const dessert_meshif_t *iface, dessert_frameid_t id){
+int olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, const dessert_meshif_t *iface, dessert_frameid_t id){
     dessert_ext_t* ext;
 
     if (dessert_msg_getext(msg, &ext, HELLO_EXT_TYPE, 0) != 0) {
@@ -315,8 +314,8 @@ int olsr_fwd2dest(dessert_msg_t* msg, size_t len,
         if (rl_data->hop_count != 255) rl_hop_count = ++rl_data->hop_count;
     }
 
-    if (proc->lflags & DESSERT_LFLAG_DST_BROADCAST ||
-        proc->lflags & DESSERT_LFLAG_DST_MULTICAST) { // BROADCAST
+    if (proc->lflags & DESSERT_RX_FLAG_L25_BROADCAST ||
+        proc->lflags & DESSERT_RX_FLAG_L25_MULTICAST) { // BROADCAST
         dessert_ext_t* ext;
         if (dessert_msg_getext(msg, &ext, BROADCAST_ID_EXT_TYPE, 0) != 0) {
             u_int8_t prev_hop_main_addr[ETH_ALEN];
@@ -431,8 +430,8 @@ int olsr_sys2rp (dessert_msg_t *msg, size_t len, dessert_msg_proc_t *proc,
 int rp2sys(dessert_msg_t* msg, size_t len,
         dessert_msg_proc_t *proc, const dessert_meshif_t *iface, dessert_frameid_t id) {
     if((proc->lflags & DESSERT_LFLAG_DST_SELF && !(proc->lflags & DESSERT_LFLAG_DST_SELF_OVERHEARD)) ||
-        proc->lflags & DESSERT_LFLAG_DST_BROADCAST ||
-        proc->lflags & DESSERT_LFLAG_DST_MULTICAST ) {
+        proc->lflags & DESSERT_RX_FLAG_L25_BROADCAST ||
+        proc->lflags & DESSERT_RX_FLAG_L25_MULTICAST ) {
         struct ether_header* l25h = dessert_msg_getl25ether(msg);
         dessert_ext_t* rl_ext;
         u_int32_t rl_seq_num = 0;
@@ -445,7 +444,7 @@ int rp2sys(dessert_msg_t* msg, size_t len,
             rl_seq_num = rl_data->seq_num;
             rl_hop_count = rl_data->hop_count;
         }
-        if (routing_log_file != NULL && !(proc->lflags & DESSERT_LFLAG_DST_BROADCAST) && !(proc->lflags & DESSERT_LFLAG_DST_MULTICAST))
+        if (routing_log_file != NULL && !(proc->lflags & DESSERT_RX_FLAG_L25_BROADCAST) && !(proc->lflags & DESSERT_RX_FLAG_L25_MULTICAST))
             _rlfile_log(l25h->ether_shost, l25h->ether_dhost, rl_seq_num, rl_hop_count, iface->hwaddr, NULL, NULL);
         dessert_syssend_msg(msg);
     }
