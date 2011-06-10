@@ -35,9 +35,9 @@ uint32_t broadcast_id;
 pthread_rwlock_t rlflock = PTHREAD_RWLOCK_INITIALIZER;
 pthread_rwlock_t rlseqlock = PTHREAD_RWLOCK_INITIALIZER;
 
-void _rlfile_log(const u_int8_t src_addr[ETH_ALEN], const u_int8_t dest_addr[ETH_ALEN],
-        const u_int32_t seq_num, const u_int8_t hop_count, const u_int8_t in_iface[ETH_ALEN],
-        const u_int8_t out_iface[ETH_ALEN], const u_int8_t next_hop_addr[ETH_ALEN]) {
+void _rlfile_log(const uint8_t src_addr[ETH_ALEN], const uint8_t dest_addr[ETH_ALEN],
+        const uint32_t seq_num, const uint8_t hop_count, const uint8_t in_iface[ETH_ALEN],
+        const uint8_t out_iface[ETH_ALEN], const uint8_t next_hop_addr[ETH_ALEN]) {
     pthread_rwlock_wrlock(&rlflock);
     FILE* f = fopen(routing_log_file, "a+");
     if (f == NULL) {
@@ -107,7 +107,7 @@ int olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, 
         expired_time.tv_usec = curr_time.tv_usec;
 
         float hello_inf_f = hf_parce_time(hdr->hello_interval);
-        dessert_debug("get HELLO with hello_inf = %f", hello_inf_f);
+        dessert_debug("got HELLO with hello_inf = %f", hello_inf_f);
 
         float hello_hold_time_f = hello_inf_f * (LINK_HOLD_TIME_COEFF + 1);
         struct timeval hold_time;
@@ -138,9 +138,9 @@ int olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, 
             struct olsr_msg_hello_niface* neighbor_iface = pointer;
             pointer += sizeof (struct olsr_msg_hello_niface);
 
-            if (((neighbor_iface->link_code & LINK_MASK) != LOST_LINK) &&
-                (olsr_db_lis_islocaliface(neighbor_iface->n_iface_addr)) == TRUE &&
-                memcmp(iface->hwaddr, neighbor_iface->n_iface_addr, ETH_ALEN) == 0) {
+            if ((neighbor_iface->link_code & LINK_MASK) != LOST_LINK
+                && olsr_db_lis_islocaliface(neighbor_iface->n_iface_addr) == TRUE
+                && memcmp(iface->hwaddr, neighbor_iface->n_iface_addr, ETH_ALEN) == 0) {
                 // HELLO generator is in SYM neighborhood
                 link_neigh->SYM_time.tv_sec = hold_time.tv_sec;
                 link_neigh->SYM_time.tv_usec = hold_time.tv_usec;
@@ -148,11 +148,10 @@ int olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, 
                 // update link quality from neighbor to current neighbor interface
                 olsr_sw_addsn(link_neigh->sw, hdr->seq_num);
                 // update best link to current neighbor
-                u_int8_t quality;
+                uint8_t quality;
                 if (rc_metric == RC_METRIC_ETX) {
-                    u_int8_t quality_from_neighbor =
-                            olsr_sw_getquality(link_neigh->sw);
-                    u_int8_t quality_to_neighbor = neighbor_iface->quality_from_neighbor;
+                    uint8_t quality_from_neighbor = olsr_sw_getquality(link_neigh->sw);
+                    uint8_t quality_to_neighbor = neighbor_iface->quality_from_neighbor;
                     // (1 / ETX) * 100 %
                     quality = (quality_from_neighbor * quality_to_neighbor) / 100;
                 }
@@ -189,7 +188,7 @@ int olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, 
         // parse neighbor description section
         dessert_ext_t* ndesc_ext;
         dessert_msg_getext(msg, &ndesc_ext, HELLO_NEIGH_DESRC_TYPE, 0);
-        u_int8_t n_count = ndesc_ext->len / sizeof(struct olsr_msg_hello_ndescr);
+        uint8_t n_count = ndesc_ext->len / sizeof(struct olsr_msg_hello_ndescr);
         pointer = ndesc_ext->data;
         while (n_count-- > 0) {
             struct olsr_msg_hello_ndescr* neighbor_descr = pointer;
@@ -227,7 +226,7 @@ int olsr_handle_tc(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, con
     dessert_ext_t* ext;
 
     if (dessert_msg_getext(msg, &ext, TC_EXT_TYPE, 0) != 0) {
-        u_int8_t prev_hop_main_addr[ETH_ALEN];
+        uint8_t prev_hop_main_addr[ETH_ALEN];
         struct olsr_msg_tc_hdr* hdr = (struct olsr_msg_tc_hdr*) ext->data;
         void* pointer = ext->data + sizeof(struct olsr_msg_tc_hdr);
 
@@ -272,9 +271,7 @@ int olsr_handle_tc(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, con
         }
         olsr_db_unlock();
 
-        if ((iam_MPR == TRUE)
-            //|| (willingness >= WILL_ALLWAYS)
-            ) {
+        if (iam_MPR == TRUE) {
             dessert_meshsend_fast_randomized(msg);
         }
 
@@ -289,8 +286,8 @@ int olsr_handle_tc(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, con
 int olsr_fwd2dest(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, const dessert_meshif_t *iface, dessert_frameid_t id) {
     struct ether_header* l25h = dessert_msg_getl25ether(msg);
     dessert_ext_t* rl_ext;
-    u_int32_t rl_seq_num = 0;
-    u_int8_t rl_hop_count = 0;
+    uint32_t rl_seq_num = 0;
+    uint8_t rl_hop_count = 0;
     if (dessert_msg_getext(msg, &rl_ext, RL_EXT_TYPE, 0) != 0) {
         struct rl_seq* rl_data = (struct rl_seq*) rl_ext->data;
         rl_seq_num = rl_data->seq_num;
@@ -314,7 +311,7 @@ int olsr_fwd2dest(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, cons
         proc->lflags & DESSERT_RX_FLAG_L25_MULTICAST) { // BROADCAST
         dessert_ext_t* ext;
         if (dessert_msg_getext(msg, &ext, BROADCAST_ID_EXT_TYPE, 0) != 0) {
-            u_int8_t prev_hop_main_addr[ETH_ALEN];
+            uint8_t prev_hop_main_addr[ETH_ALEN];
             struct olsr_msg_brc* brc_data = (struct olsr_msg_brc*) ext->data;
             struct timeval curr_time, hold_time, purge_time;
             gettimeofday(&curr_time, NULL);
@@ -333,9 +330,7 @@ int olsr_fwd2dest(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, cons
                 return DESSERT_MSG_DROP;
             }
             if (result == TRUE) {
-                //if (willingness < WILL_ALLWAYS) {
-                    result = olsr_db_ns_ismprselector(prev_hop_main_addr);
-                //}
+                result = olsr_db_ns_ismprselector(prev_hop_main_addr);
             }
             olsr_db_unlock();
             if (result == TRUE) {
@@ -347,11 +342,11 @@ int olsr_fwd2dest(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, cons
         }
         return DESSERT_MSG_KEEP;
     }
-    else if (((proc->lflags & DESSERT_RX_FLAG_L2_DST && !(proc->lflags & DESSERT_RX_FLAG_L2_OVERHEARD)) ||
-                proc->lflags & DESSERT_RX_FLAG_L2_BROADCAST) &&
-                !(proc->lflags & DESSERT_RX_FLAG_L25_DST)){ // Directed message
-        u_int8_t next_hop[ETH_ALEN];
-        u_int8_t next_hop_iface[ETH_ALEN];
+    else if (((proc->lflags & DESSERT_RX_FLAG_L2_DST && !(proc->lflags & DESSERT_RX_FLAG_L2_OVERHEARD))
+        || proc->lflags & DESSERT_RX_FLAG_L2_BROADCAST)
+        && !(proc->lflags & DESSERT_RX_FLAG_L25_DST)){ // Directed message
+        uint8_t next_hop[ETH_ALEN];
+        uint8_t next_hop_iface[ETH_ALEN];
         const dessert_meshif_t* output_iface;
         // find and set (if found) NEXT HOP towards destination
         olsr_db_rlock();
@@ -388,8 +383,8 @@ int olsr_sys2rp (dessert_msg_t *msg, size_t len, dessert_msg_proc_t *proc, desse
         dessert_meshsend_fast(msg, NULL);
     }
     else {
-        u_int8_t next_hop[ETH_ALEN];
-        u_int8_t next_hop_iface[ETH_ALEN];
+        uint8_t next_hop[ETH_ALEN];
+        uint8_t next_hop_iface[ETH_ALEN];
         const dessert_meshif_t* output_iface;
         // find and set (if found) NEXT HOP towards destination
         olsr_db_rlock();
@@ -399,7 +394,7 @@ int olsr_sys2rp (dessert_msg_t *msg, size_t len, dessert_msg_proc_t *proc, desse
         }
         olsr_db_unlock();
         if (result == TRUE) {
-            u_int32_t seq_num = 0;
+            uint32_t seq_num = 0;
             pthread_rwlock_wrlock(&rlseqlock);
             seq_num = rl_get_nextseq(dessert_l25_defsrc, l25h->ether_dhost);
             pthread_rwlock_unlock(&rlseqlock);
@@ -408,8 +403,9 @@ int olsr_sys2rp (dessert_msg_t *msg, size_t len, dessert_msg_proc_t *proc, desse
             struct rl_seq* rl_data = (struct rl_seq*) rl_ext->data;
             rl_data->seq_num = seq_num;
             rl_data->hop_count = 0;
-            if (routing_log_file != NULL)
+            if (routing_log_file != NULL) {
                 _rlfile_log(dessert_l25_defsrc, l25h->ether_dhost, seq_num, 0, NULL, output_iface->hwaddr, next_hop_iface);
+            }
             memcpy(msg->l2h.ether_dhost, next_hop_iface, ETH_ALEN);
             // forward to the next hop
             dessert_meshsend_fast(msg, output_iface);
@@ -418,10 +414,8 @@ int olsr_sys2rp (dessert_msg_t *msg, size_t len, dessert_msg_proc_t *proc, desse
     return DESSERT_MSG_DROP;
 }
 
-// ----------------- common callbacks ---------------------------------------------------
-
 /**
-* Forward packets addressed to me to tun pipeline
+* Forward packets addressed to me via sysif. The packet is always dropped after handling.
 */
 int rp2sys(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, const dessert_meshif_t *iface, dessert_frameid_t id) {
     if((proc->lflags & DESSERT_RX_FLAG_L25_DST && !(proc->lflags & DESSERT_RX_FLAG_L25_OVERHEARD))
@@ -429,17 +423,20 @@ int rp2sys(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, const desse
         || proc->lflags & DESSERT_RX_FLAG_L25_MULTICAST) {
         struct ether_header* l25h = dessert_msg_getl25ether(msg);
         dessert_ext_t* rl_ext;
-        u_int32_t rl_seq_num = 0;
-        u_int8_t rl_hop_count = 0;
+        uint32_t rl_seq_num = 0;
+        uint8_t rl_hop_count = 0;
         if (dessert_msg_getext(msg, &rl_ext, RL_EXT_TYPE, 0) != 0) {
             struct rl_seq* rl_data = (struct rl_seq*) rl_ext->data;
             pthread_rwlock_wrlock(&rlseqlock);
             rl_add_seq(dessert_l25_defsrc, l25h->ether_shost, rl_data->seq_num);
-            pthread_rwlock_unlock(&rlseqlock);
             rl_seq_num = rl_data->seq_num;
             rl_hop_count = rl_data->hop_count;
+            pthread_rwlock_unlock(&rlseqlock);
         }
-        if (routing_log_file != NULL && !(proc->lflags & DESSERT_RX_FLAG_L25_BROADCAST) && !(proc->lflags & DESSERT_RX_FLAG_L25_MULTICAST)) {
+        // log unicast packets
+        if (routing_log_file != NULL
+            && !(proc->lflags & DESSERT_RX_FLAG_L25_BROADCAST)
+            && !(proc->lflags & DESSERT_RX_FLAG_L25_MULTICAST)) {
             _rlfile_log(l25h->ether_shost, l25h->ether_dhost, rl_seq_num, rl_hop_count, iface->hwaddr, NULL, NULL);
         }
         dessert_syssend_msg(msg);

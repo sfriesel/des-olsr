@@ -36,11 +36,11 @@ For further information and questions please use the web site
 // interfaces connected to current local interface.
 
 struct olsr_msg_hello_hdr {
-    u_int16_t   seq_num;        ///< Sequence number of HELLO message. Needed to compute link quality
-    /*u_int8_t  hold_time;      ///< Hold time of information in this message*/
-    u_int8_t    hello_interval; ///< Interval between two HELLO messages
-    u_int8_t    willingness;    ///< Willingness of router to retransmit broadcast messages
-    u_int8_t    n_iface_count;  ///< Number of neighbor MANET interfaces  introduced in this HELLO message
+    uint16_t   seq_num;        ///< Sequence number of HELLO message. Needed to compute link quality
+    /*uint8_t  hold_time;      ///< Hold time of information in this message*/
+    uint8_t    hello_interval; ///< Interval between two HELLO messages
+    uint8_t    willingness;    ///< Willingness of router to retransmit broadcast messages
+    uint8_t    n_iface_count;  ///< Number of neighbor MANET interfaces  introduced in this HELLO message
 } __attribute__ ((__packed__));
 
 struct olsr_msg_hello_niface {
@@ -52,13 +52,13 @@ struct olsr_msg_hello_niface {
     * where
     * link_t = UNSPEC_LINK | ASYM_LINK | SYM_LINK | LOST_LINK
     */
-    u_int8_t    link_code;
+    uint8_t    link_code;
     /**
     * Ethernet address neighbor interface connected to previous introduced
     * local interface of host that have originated this HELLO message.
     */
-    u_int8_t    n_iface_addr[ETH_ALEN];
-    u_int8_t    quality_from_neighbor;  ///< Link quality by sending data from neighbor to HELLO originator
+    uint8_t    n_iface_addr[ETH_ALEN];
+    uint8_t    quality_from_neighbor;  ///< Link quality by sending data from neighbor to HELLO originator
 } __attribute__ ((__packed__));
 
 /**
@@ -73,16 +73,16 @@ struct olsr_msg_hello_ndescr {
     * where
     * neigh_t = SYM_NEIGH | MPR_NEIGH | NOT_NEIGH
     */
-    u_int8_t    neigh_code;
-    u_int8_t    n_main_addr[ETH_ALEN];  ///< Main address of host
-    u_int8_t    link_quality;           ///< Link quality to neighbor in %
+    uint8_t    neigh_code;
+    uint8_t    n_main_addr[ETH_ALEN];  ///< Main address of host
+    uint8_t    link_quality;           ///< Link quality to neighbor in %
 } __attribute__ ((__packed__));
 
 // ---- TC -----
 
 struct olsr_msg_tc_hdr {
     uint16_t    seq_num;    ///< Sequence number of this TC message to avoid multiple re-sending
-    //u_int8_t  hold_time;  ///< Hold time of information in this message
+    //uint8_t  hold_time;  ///< Hold time of information in this message
     uint8_t     tc_interval;///< Interval between two HELLO messages
     uint8_t     neighbor_count; ///< Number of 1hop neighbors of TC originator introduced in this TC
 } __attribute__ ((__packed__));
@@ -99,8 +99,8 @@ struct olsr_msg_tc_ndescr {
 * Struct for routing log sequence number
 */
 struct rl_seq {
-    u_int32_t   seq_num;
-    u_int8_t    hop_count;
+    uint32_t   seq_num;
+    uint8_t    hop_count;
 } __attribute__ ((__packed__));
 
 // ----------
@@ -111,7 +111,7 @@ extern pthread_rwlock_t pp_rwlock;
 // -------------------- broadcast id ------------------------------------------
 
 struct olsr_msg_brc {
-    u_int32_t   id;
+    uint32_t   id;
 } __attribute__ ((__packed__));
 
 // ------------- pipeline -----------------------------------------------------
@@ -124,7 +124,7 @@ int olsr_fwd2dest(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, cons
 * Encapsulate packets as dessert_msg,
 * sets NEXT HOP if known and send via OLSR routing protocol
 */
-int olsr_sys2rp (dessert_msg_t *msg, size_t len, dessert_msg_proc_t *proc, dessert_sysif_t *tunif, dessert_frameid_t id);
+int olsr_sys2rp(dessert_msg_t *msg, size_t len, dessert_msg_proc_t *proc, dessert_sysif_t *tunif, dessert_frameid_t id);
 
 /** forward packets received via OLSR to tun interface */
 int rp2sys(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, const dessert_meshif_t *iface, dessert_frameid_t id);
