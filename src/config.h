@@ -61,14 +61,16 @@ enum neighbor_types {
     MPR_NEIGH
 };
 
-#define WILL_NEVER                  0
-#define WILL_LOW                    1
-#define WILL_DEFAULT                3
-#define WILL_HIGH                   6
-#define WILL_ALLWAYS                7
+enum olsr_willingness {
+    WILL_NEVER      = 0,
+    WILL_LOW        = 1,
+    WILL_DEFAULT    = 3,
+    WILL_HIGH       = 6,
+    WILL_ALLWAYS    = 7
+};
 
 // build intervals
-#define BUILD_RT_INTERVAL           1000
+#define BUILD_RT_INTERVAL_MS        1000
 
 // link quality
 #define WINDOW_SIZE                 50
@@ -78,6 +80,7 @@ enum neighbor_types {
 
 extern int                          hello_interval;
 extern int                          tc_interval;
+extern uint16_t                     rt_interval_ms;
 extern int                          tc_hold_time_coeff;
 extern int                          willingness;
 extern int                          rc_metric;
@@ -86,6 +89,7 @@ extern int                          hello_size;
 extern int                          tc_size;
 extern dessert_periodic_t*          periodic_send_hello;
 extern dessert_periodic_t*          periodic_send_tc;
+extern dessert_periodic_t*          periodic_rt;
 
 // window size for calculation of PDR or ETX
 extern int                          window_size;

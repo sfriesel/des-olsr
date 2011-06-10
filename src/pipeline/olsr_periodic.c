@@ -4,14 +4,21 @@
 #include "../config.h"
 #include "../helper.h"
 
-u_int16_t	tc_seq_num = 0; // no need to lock, since TC never send parallel
-u_int16_t	hello_seq_num = 0; // no need to lock, since HELLO never send parallel
+u_int16_t tc_seq_num = 0; // no need to lock, since TC never send parallel
+u_int16_t hello_seq_num = 0; // no need to lock, since HELLO never send parallel
 
 pthread_rwlock_t hello_seq_lock = PTHREAD_RWLOCK_INITIALIZER;
 pthread_rwlock_t tc_seq_lock = PTHREAD_RWLOCK_INITIALIZER;
 
-size_t hello_max_links_count = DESSERT_MAXEXTDATALEN / sizeof(struct olsr_msg_hello_niface);
-size_t hello_max_neigths_count = DESSERT_MAXEXTDATALEN / sizeof(struct olsr_msg_hello_ndescr);
+const size_t hello_max_links_count = DESSERT_MAXEXTDATALEN / sizeof(struct olsr_msg_hello_niface);
+const size_t hello_max_neigths_count = DESSERT_MAXEXTDATALEN / sizeof(struct olsr_msg_hello_ndescr);
+
+static void _add_dummy_payload(dessert_msg_t* msg, uint8_t min_size) {
+    void* payload;
+    uint16_t size = max(min_size - sizeof(dessert_msg_t) - sizeof(struct ether_header) - 2, 0);
+    dessert_msg_addpayload(msg, &payload, size);
+    memset(payload, 0xA, size);
+}
 
 int olsr_periodic_send_hello(void *data, struct timeval *scheduled, struct timeval *interval) {
     const dessert_meshif_t* iface = dessert_meshiflist_get();
@@ -102,10 +109,7 @@ int olsr_periodic_send_hello(void *data, struct timeval *scheduled, struct timev
         dessert_msg_addext(msg, &ndesc_ext, HELLO_NEIGH_DESRC_TYPE, neighs_desc_size);
         memcpy(ndesc_ext->data, neighs_desc_pointer, neighs_desc_size);
 
-        void* payload;
-        uint16_t size = max(hello_size - sizeof(dessert_msg_t) - sizeof(struct ether_header) - 2, 0);
-        dessert_msg_addpayload(msg, &payload, size);
-        memset(payload, 0xA, size);
+        _add_dummy_payload(msg, hello_size);
 
         // HELLO message is ready to send
         dessert_meshsend_fast(msg, iface);
@@ -116,8 +120,9 @@ int olsr_periodic_send_hello(void *data, struct timeval *scheduled, struct timev
     hello_seq_num++;
     pthread_rwlock_unlock(&hello_seq_lock);
 
-    if (neighs_desc_size > 0)
+    if (neighs_desc_size > 0) {
         free(neighs_desc_pointer);
+    }
     return 0;
 }
 
@@ -158,10 +163,7 @@ int olsr_periodic_send_tc(void *data, struct timeval *scheduled, struct timeval 
     }
     olsr_db_unlock();
 
-    void* payload;
-    uint16_t size = max(tc_size - sizeof(dessert_msg_t) - sizeof(struct ether_header) - 2, 0);
-    dessert_msg_addpayload(msg, &payload, size);
-    memset(payload, 0xA, size);
+    _add_dummy_payload(msg, tc_size);
 
     dessert_meshsend_fast(msg, NULL);
     dessert_msg_destroy(msg);

@@ -99,6 +99,22 @@ int cli_set_tc_interval(struct cli_def* cli, char* command, char* argv[], int ar
     return CLI_OK;
 }
 
+int cli_set_rt_interval(struct cli_def* cli, char* command, char* argv[], int argc) {
+    if(argc != 1) {
+        cli_print(cli, "usage %s  [interval in ms]\n", command);
+        return CLI_ERROR;
+    }
+
+    rt_interval_ms = strtoul(argv[0], NULL, 10);
+    dessert_periodic_del(periodic_rt);
+    struct timeval rt_interval_tv;
+    rt_interval_tv.tv_sec = rt_interval_ms / 1000;
+    rt_interval_tv.tv_usec = (rt_interval_ms % 1000) * 1000;
+    periodic_rt = dessert_periodic_add(olsr_periodic_build_routingtable, NULL, NULL, &rt_interval_tv);
+    dessert_notice("setting RT interval to %d", rt_interval_ms);
+    return CLI_OK;
+}
+
 int cli_set_validity_coeff(struct cli_def* cli, char* command, char* argv[], int argc) {
     unsigned int mode;
 

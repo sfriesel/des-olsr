@@ -36,13 +36,13 @@ For further information and questions please use the web site
 #include "broadcast_log/broadcast_log.h"
 
 /** Make read lock over database to avoid corrupt read/write */
-void olsr_db_rlock();
+inline void olsr_db_rlock();
 
 /** Make write lock over database to avoid currupt read/write */
-void olsr_db_wlock();
+inline void olsr_db_wlock();
 
 /** Unlock previos locks for this thread */
-void olsr_db_unlock();
+inline void olsr_db_unlock();
 
 /** initialize all tables of routing database */
 int olsr_db_init();
@@ -50,7 +50,7 @@ int olsr_db_init();
 /** cleanup (purge) old entrys from all database tables */
 int olsr_db_cleanup(struct timeval* timestamp);
 
-// ----------------------------------- reporiting -------------------------------------------------------------------------
+// ----------------------------------- reporting -------------------------------------------------------------------------
 
 int olsr_db_view_routing_table(char** str_out);
 #endif

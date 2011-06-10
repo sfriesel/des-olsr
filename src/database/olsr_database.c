@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/ .
 --------------------------------------------------------------------------------
 For further information and questions please use the web site
-       http://www.des-testbed.net
+    http://www.des-testbed.net
 *******************************************************************************/
 
 #include "olsr_database.h"
@@ -28,34 +28,34 @@ For further information and questions please use the web site
 
 pthread_rwlock_t db_rwlock = PTHREAD_RWLOCK_INITIALIZER;
 
-void olsr_db_rlock() {
-	pthread_rwlock_rdlock(&db_rwlock);
+inline void olsr_db_rlock() {
+    pthread_rwlock_rdlock(&db_rwlock);
 }
 
-void olsr_db_wlock() {
-	pthread_rwlock_wrlock(&db_rwlock);
+inline void olsr_db_wlock() {
+    pthread_rwlock_wrlock(&db_rwlock);
 }
 
-void olsr_db_unlock() {
-	pthread_rwlock_unlock(&db_rwlock);
+inline void olsr_db_unlock() {
+    pthread_rwlock_unlock(&db_rwlock);
 }
 
 int olsr_db_init() {
-	if (olsr_db_dt_init() != TRUE) return FALSE;
-	if (olsr_db_ns_init() != TRUE) return FALSE;
-	if (olsr_db_tc_init() != TRUE) return FALSE;
-	if (olsr_db_brct_init() != TRUE) return FALSE;
-	if (rl_table_init() != TRUE) return FALSE;
-	return TRUE;
+    if (olsr_db_dt_init() != TRUE) { return FALSE; }
+    if (olsr_db_ns_init() != TRUE) { return FALSE; }
+    if (olsr_db_tc_init() != TRUE) { return FALSE; }
+    if (olsr_db_brct_init() != TRUE) { return FALSE; }
+    if (rl_table_init() != TRUE) { return FALSE; }
+    return TRUE;
 }
 
 int olsr_db_cleanup(struct timeval* timestamp) {
-	return TRUE;
+    return TRUE;
 }
 
 // --------------------------------------- reporting ---------------------------------------------------------------
 
 int olsr_db_view_routing_table(char** str_out) {
-	//int result =  aodv_db_rt_report(str_out);
-	return FALSE;
+    //int result =  aodv_db_rt_report(str_out);
+    return FALSE;
 }

@@ -34,7 +34,7 @@ u_int16_t rl_get_nextseq(u_int8_t src_addr[ETH_ALEN], u_int8_t dest_addr[ETH_ALE
  * Return TRUE if given seq_num is equals to thin in database
  * (i.e. this packet was already processed)
  */
-int rl_check_seq(u_int8_t src_addr[ETH_ALEN], u_int8_t dest_addr[ETH_ALEN], u_int16_t seq_num);
+uint8_t rl_check_seq(u_int8_t src_addr[ETH_ALEN], u_int8_t dest_addr[ETH_ALEN], u_int16_t seq_num);
 
 void rl_add_seq(u_int8_t src_addr[ETH_ALEN], u_int8_t dest_addr[ETH_ALEN], u_int16_t seq_num);
 

@@ -215,7 +215,7 @@ int olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, 
         }
         olsr_db_unlock();
         pthread_rwlock_wrlock(&pp_rwlock);
-        pending_rtc = TRUE;
+        pending_rtc = TRUE; // schedule re-build of rt everytime a hello is received; rebuilding have a fixed interval to handle other metrics than HC
         pthread_rwlock_unlock(&pp_rwlock);
         return DESSERT_MSG_DROP;
     }
@@ -292,7 +292,7 @@ int olsr_fwd2dest(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, cons
         struct rl_seq* rl_data = (struct rl_seq*) rl_ext->data;
         rl_seq_num = rl_data->seq_num;
         pthread_rwlock_wrlock(&rlseqlock);
-        int pk = rl_check_seq(l25h->ether_shost, l25h->ether_dhost, rl_seq_num);
+        uint8_t pk = rl_check_seq(l25h->ether_shost, l25h->ether_dhost, rl_seq_num);
         pthread_rwlock_unlock(&rlseqlock);
         if (pk == TRUE) {
             // this packet was already processed
@@ -320,7 +320,7 @@ int olsr_fwd2dest(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, cons
             hf_add_tv(&curr_time, &hold_time, &purge_time);
 
             olsr_db_wlock();
-            int result = olsr_db_brct_addid(l25h->ether_shost, brc_data->id, &purge_time);
+            uint8_t result = olsr_db_brct_addid(l25h->ether_shost, brc_data->id, &purge_time);
             if (result == TRUE) {
                 result = olsr_db_ls_getmainaddr(iface, msg->l2h.ether_shost, prev_hop_main_addr);
             }
@@ -342,20 +342,19 @@ int olsr_fwd2dest(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, cons
         }
         return DESSERT_MSG_KEEP;
     }
-    else if (((proc->lflags & DESSERT_RX_FLAG_L2_DST && !(proc->lflags & DESSERT_RX_FLAG_L2_OVERHEARD))
-        || proc->lflags & DESSERT_RX_FLAG_L2_BROADCAST)
+    else if(((proc->lflags & DESSERT_RX_FLAG_L2_DST && !(proc->lflags & DESSERT_RX_FLAG_L2_OVERHEARD)) || proc->lflags & DESSERT_RX_FLAG_L2_BROADCAST)
         && !(proc->lflags & DESSERT_RX_FLAG_L25_DST)){ // Directed message
         uint8_t next_hop[ETH_ALEN];
         uint8_t next_hop_iface[ETH_ALEN];
         const dessert_meshif_t* output_iface;
         // find and set (if found) NEXT HOP towards destination
         olsr_db_rlock();
-        int result = olsr_db_rt_getnexthop(l25h->ether_dhost, next_hop);
-        if (result == TRUE) {
+        uint8_t result = olsr_db_rt_getnexthop(l25h->ether_dhost, next_hop);
+        if(result == TRUE) {
             result = olsr_db_ns_getbestlink(next_hop, &output_iface, next_hop_iface);
         }
         olsr_db_unlock();
-        if (result == TRUE) {
+        if(result == TRUE) {
             memcpy(msg->l2h.ether_dhost, next_hop_iface, ETH_ALEN);
             if (routing_log_file != NULL) {
                 _rlfile_log(l25h->ether_shost, l25h->ether_dhost, rl_seq_num, rl_hop_count, iface->hwaddr, output_iface->hwaddr, next_hop_iface);
@@ -367,11 +366,13 @@ int olsr_fwd2dest(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, cons
     }
     return DESSERT_MSG_KEEP;
 }
-// --------------------------- TUN ----------------------------------------------------------
 
-int olsr_sys2rp (dessert_msg_t *msg, size_t len, dessert_msg_proc_t *proc, dessert_sysif_t *tunif, dessert_frameid_t id) {
+// --------------------------- sysif handling ----------------------------------------------------------
+
+int olsr_sys2rp(dessert_msg_t *msg, size_t len, dessert_msg_proc_t *proc, dessert_sysif_t *tunif, dessert_frameid_t id) {
     struct ether_header* l25h = dessert_msg_getl25ether(msg);
-    if (memcmp(l25h->ether_dhost, ether_broadcast, ETH_ALEN) == 0) { // next hop broadcast
+    // L25 destination is broadcast; TODO what about multicast?
+    if(memcmp(l25h->ether_dhost, ether_broadcast, ETH_ALEN) == 0) { // next hop broadcast
         // add broadcast id to prevent unlimited circulation
         dessert_ext_t* ext;
         dessert_msg_addext(msg, &ext, BROADCAST_ID_EXT_TYPE, sizeof(struct olsr_msg_brc));
@@ -379,16 +380,16 @@ int olsr_sys2rp (dessert_msg_t *msg, size_t len, dessert_msg_proc_t *proc, desse
         pthread_rwlock_wrlock(&pp_rwlock);
         brc_data->id = broadcast_id++;
         pthread_rwlock_unlock(&pp_rwlock);
-        // send out
         dessert_meshsend_fast(msg, NULL);
     }
+    // L25 destination is unicast
     else {
         uint8_t next_hop[ETH_ALEN];
         uint8_t next_hop_iface[ETH_ALEN];
         const dessert_meshif_t* output_iface;
         // find and set (if found) NEXT HOP towards destination
         olsr_db_rlock();
-        int result = olsr_db_rt_getnexthop(l25h->ether_dhost, next_hop);
+        uint8_t result = olsr_db_rt_getnexthop(l25h->ether_dhost, next_hop);
         if (result == TRUE) {
             result = olsr_db_ns_getbestlink(next_hop, &output_iface, next_hop_iface);
         }

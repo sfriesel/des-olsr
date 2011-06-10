@@ -27,6 +27,7 @@ int cli_set_hello_size(struct cli_def* cli, char* command, char* argv[], int arg
 int cli_set_hello_interval(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_set_tc_size(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_set_tc_interval(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_set_rt_interval(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_set_validity_coeff(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_set_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_set_willingness(struct cli_def* cli, char* command, char* argv[], int argc);
