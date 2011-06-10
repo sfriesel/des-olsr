@@ -29,11 +29,13 @@ For further information and questions please use the web site
 
 enum bool {TRUE = 1, FALSE = 0};
 
-#define HELLO_EXT_TYPE              DESSERT_EXT_USER
-#define HELLO_NEIGH_DESRC_TYPE      DESSERT_EXT_USER + 1
-#define TC_EXT_TYPE                 DESSERT_EXT_USER + 2
-#define BROADCAST_ID_EXT_TYPE       DESSERT_EXT_USER + 3
-#define RL_EXT_TYPE                 DESSERT_EXT_USER + 4
+enum extension_types {
+    HELLO_EXT_TYPE = DESSERT_EXT_USER,
+    HELLO_NEIGH_DESRC_TYPE,
+    TC_EXT_TYPE,
+    BROADCAST_ID_EXT_TYPE,
+    RL_EXT_TYPE
+};
 
 #define SEQNO_MAX                   (1 << 16) - 1
 
@@ -53,10 +55,11 @@ enum bool {TRUE = 1, FALSE = 0};
 #define LOST_LINK                   3
 #define LINK_MASK                   3
 
-// neighbor types
-#define NOT_NEIGH                   0
-#define SYM_NEIGH                   1
-#define MPR_NEIGH                   2
+enum neighbor_types {
+    NOT_NEIGH = 0,
+    SYM_NEIGH,
+    MPR_NEIGH
+};
 
 #define WILL_NEVER                  0
 #define WILL_LOW                    1
