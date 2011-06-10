@@ -25,7 +25,7 @@
 			<Item value="HC"/>
 			<Item value="ETX"/>
 			<Item value="ETX-ADD"/>
-		</ListOption>	
+		</ListOption>
 	</Command>
 	<Command description="PLR/ETX Window Size">
 		<CommandLine value="set windowsize %value%" mode="CONFIG"/>
@@ -43,7 +43,7 @@
 		<GetterCommand>
 			<CommandLine value="print rt_so" mode="DEFAULT|PRIVILEGED"/>
 		</GetterCommand>
-	</Property>	
+	</Property>
 	<Command description="Neighbour Table 1-hop">
 		<CommandLine value="print ns" mode="DEFAULT|PRIVILEGED"/>
 	</Command>
@@ -60,8 +60,8 @@
 		<CommandLine value="print tc" mode="DEFAULT|PRIVILEGED"/>
 	</Command>
 
-	
-	<Spacer description="Interface Settings"/>		
+
+	<Spacer description="Interface Settings"/>
 	<Property description="Mesh Interfaces">
 		<GetterCommand>
 			<CommandLine value="show meshifs" mode="DEFAULT|PRIVILEGED"/>
@@ -84,14 +84,6 @@
 		</SetterCommand>
 	</Property>
 
-	
-	<Spacer description="Miscellaneous"/>
-	<Command description="Verbose Messages">
-		<CommandLine value="set verbose %value%" mode="CONFIG"/>
-		<BooleanOption name="value" falseValue="0" trueValue="1" description="Use Verbose Messages"/>
-	</Command>	
-
-	
 	<Spacer description="Logging"/>
 	<Command description="Show Logging">
 		<CommandLine value="show logging" mode="DEFAULT|PRIVILEGED"/>
@@ -110,7 +102,7 @@
 				<Item value="error"/>
 				<Item value="critical"/>
 				<Item value="mergency"/>	<!-- full name is not used at all instead the first character counts -->
-			</ListOption>				
+			</ListOption>
 		</SetterCommand>
 	</Property>
 	<Command description="Disable Ringbuffer Logging">
@@ -122,10 +114,10 @@
 	</Command>
 
 
-	<Spacer description="Informational"/>	
+	<Spacer description="Informational"/>
 	<Command description="Show Dessert-Info">
 		<CommandLine value="show dessert-info" mode="DEFAULT|PRIVILEGED"/>
-	</Command>		
+	</Command>
 	<Command description="Command History">
 		<CommandLine value="history" mode="DEFAULT|PRIVILEGED|CONFIG"/>
 	</Command>

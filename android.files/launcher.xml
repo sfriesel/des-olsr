@@ -13,9 +13,6 @@
 	</List>
 	<Integer name="windowsize" default="50" minValue="1" description="PLR/ETX Window Size" />
 
-	<Spacer description="Miscellaneous"/>
-	<Boolean name="verbose" default="false" trueValue="1" falseValue="0" description="Verbose Messages" />
-
 	<Spacer description="Logging"/>
 	<List name="loglevel" default="info" description="Log Level">
 		<Item value="debug"/>
