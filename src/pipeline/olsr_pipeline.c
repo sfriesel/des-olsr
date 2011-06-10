@@ -79,13 +79,13 @@ void _rlfile_log(const u_int8_t src_addr[ETH_ALEN], const u_int8_t dest_addr[ETH
 
 // ---------------------------- pipeline callbacks ---------------------------------------------
 
-int olsr_drop_errors(dessert_msg_t* msg, size_t len,
-        dessert_msg_proc_t *proc, const dessert_meshif_t *iface, dessert_frameid_t id){
-    // drop packets sent by myself.
-    if (proc->lflags & DESSERT_RX_FLAG_L2_SRC) {
-        return DESSERT_MSG_DROP;
-    }
-    if (proc->lflags & DESSERT_RX_FLAG_L25_SRC) {
+int olsr_drop_errors(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, const dessert_meshif_t *iface, dessert_frameid_t id){
+    if (proc->lflags & DESSERT_RX_FLAG_L2_SRC
+        || proc->lflags & DESSERT_RX_FLAG_L25_SRC) {
+        struct ether_header* l25h = dessert_msg_getl25ether(msg);
+        if(l25h) {
+            dessert_debug("dropping looping packet: L25 dst=" MAC, l25h->ether_dhost);
+        }
         return DESSERT_MSG_DROP;
     }
     return DESSERT_MSG_KEEP;
@@ -107,8 +107,8 @@ int olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, 
         expired_time.tv_usec = curr_time.tv_usec;
 
         float hello_inf_f = hf_parce_time(hdr->hello_interval);
-        if (verbose == TRUE)
-            dessert_debug("get HELLO with hello_inf = %f", hello_inf_f);
+        dessert_debug("get HELLO with hello_inf = %f", hello_inf_f);
+
         float hello_hold_time_f = hello_inf_f * (LINK_HOLD_TIME_COEFF + 1);
         struct timeval hold_time;
         hold_time.tv_sec = hello_hold_time_f;
@@ -123,8 +123,7 @@ int olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, 
         // be careful while setting link status to ASYN. It may be SYN before.
         // therefore don't make DB unlock, before finish setting link status
         olsr_db_linkset_ltuple_t* link_iface = olsr_db_ls_getif(iface);
-        olsr_db_linkset_nl_entry_t* link_neigh = olsr_db_ls_getneigh(link_iface,
-                msg->l2h.ether_shost, l25h->ether_shost);
+        olsr_db_linkset_nl_entry_t* link_neigh = olsr_db_ls_getneigh(link_iface, msg->l2h.ether_shost, l25h->ether_shost);
         olsr_db_ns_tuple_t* neighbor = NULL;
         link_neigh->SYM_time.tv_sec = expired_time.tv_sec;
         link_neigh->SYM_time.tv_usec = expired_time.tv_usec;
@@ -141,9 +140,8 @@ int olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, 
 
             if (((neighbor_iface->link_code & LINK_MASK) != LOST_LINK) &&
                 (olsr_db_lis_islocaliface(neighbor_iface->n_iface_addr)) == TRUE &&
-                memcmp(iface->hwaddr, neighbor_iface->n_iface_addr, ETH_ALEN) == 0)
+                memcmp(iface->hwaddr, neighbor_iface->n_iface_addr, ETH_ALEN) == 0) {
                 // HELLO generator is in SYM neighborhood
-                {
                 link_neigh->SYM_time.tv_sec = hold_time.tv_sec;
                 link_neigh->SYM_time.tv_usec = hold_time.tv_usec;
                 link_neigh->quality_to_neighbor = neighbor_iface->quality_from_neighbor;
@@ -157,7 +155,8 @@ int olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, 
                     u_int8_t quality_to_neighbor = neighbor_iface->quality_from_neighbor;
                     // (1 / ETX) * 100 %
                     quality = (quality_from_neighbor * quality_to_neighbor) / 100;
-                } else {
+                }
+                else {
                     quality = neighbor_iface->quality_from_neighbor;
                 }
                 // set SYM link type to neighbor and discard MPR protperties
@@ -167,13 +166,12 @@ int olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, 
                 neighbor->willingness = hdr->willingness;
                 // update best link
                 if (neighbor->best_link.local_iface == iface
-                    && memcmp(neighbor->best_link.neighbor_iface_addr, msg->l2h.ether_shost, ETH_ALEN) == 0)
+                    && memcmp(neighbor->best_link.neighbor_iface_addr, msg->l2h.ether_shost, ETH_ALEN) == 0) {
                     // if the same link - update quality
-                {
                     neighbor->best_link.quality = quality;
-                } else if (neighbor->best_link.quality < quality)
+                }
+                else if (neighbor->best_link.quality < quality) {
                     // another best link -> rewrite
-                {
                     neighbor->best_link.quality = quality;
                     neighbor->best_link.local_iface = iface;
                     memcpy(neighbor->best_link.neighbor_iface_addr, msg->l2h.ether_shost, ETH_ALEN);
@@ -213,8 +211,9 @@ int olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, 
                 }
             }
         }
-        if (recalculate_mpr_set == TRUE)
+        if (recalculate_mpr_set == TRUE) {
             olsr_db_rc_chose_mprset();
+        }
         olsr_db_unlock();
         pthread_rwlock_wrlock(&pp_rwlock);
         pending_rtc = TRUE;
@@ -224,8 +223,7 @@ int olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, 
     return DESSERT_MSG_KEEP;
 }
 
-int olsr_handle_tc(dessert_msg_t* msg, size_t len,
-        dessert_msg_proc_t *proc, const dessert_meshif_t *iface, dessert_frameid_t id) {
+int olsr_handle_tc(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, const dessert_meshif_t *iface, dessert_frameid_t id) {
     dessert_ext_t* ext;
 
     if (dessert_msg_getext(msg, &ext, TC_EXT_TYPE, 0) != 0) {
@@ -257,7 +255,8 @@ int olsr_handle_tc(dessert_msg_t* msg, size_t len,
         olsr_db_wlock();
         if (ncount == 0) {
             olsr_db_tc_removetc(l25h->ether_shost);
-        } else {
+        }
+        else {
             // remove all old neighbor entrys for this host;
             olsr_db_tc_removeneighbors(l25h->ether_shost);
             while (ncount-- > 0) {
@@ -268,7 +267,9 @@ int olsr_handle_tc(dessert_msg_t* msg, size_t len,
         }
         // re-send only if previous host has selected me as MPR
         int result = olsr_db_ls_getmainaddr(iface, msg->l2h.ether_shost, prev_hop_main_addr);
-        if (result) iam_MPR = olsr_db_ns_ismprselector(prev_hop_main_addr);
+        if (result) {
+            iam_MPR = olsr_db_ns_ismprselector(prev_hop_main_addr);
+        }
         olsr_db_unlock();
 
         if ((iam_MPR == TRUE)
@@ -285,8 +286,7 @@ int olsr_handle_tc(dessert_msg_t* msg, size_t len,
     return DESSERT_MSG_KEEP;
 }
 
-int olsr_fwd2dest(dessert_msg_t* msg, size_t len,
-        dessert_msg_proc_t *proc, const dessert_meshif_t *iface, dessert_frameid_t id) {
+int olsr_fwd2dest(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, const dessert_meshif_t *iface, dessert_frameid_t id) {
     struct ether_header* l25h = dessert_msg_getl25ether(msg);
     dessert_ext_t* rl_ext;
     u_int32_t rl_seq_num = 0;
@@ -299,19 +299,15 @@ int olsr_fwd2dest(dessert_msg_t* msg, size_t len,
         pthread_rwlock_unlock(&rlseqlock);
         if (pk == TRUE) {
             // this packet was already processed
-            if (verbose == TRUE)
-                dessert_debug("DUP! from %x:%x:%x:%x:%x:%x to %x:%x:%x:%x:%x:%x hops %i",
-                    l25h->ether_shost[0], l25h->ether_shost[1], l25h->ether_shost[2],
-                    l25h->ether_shost[1], l25h->ether_shost[4], l25h->ether_shost[5],
-                    l25h->ether_dhost[0], l25h->ether_dhost[1], l25h->ether_dhost[2],
-                    l25h->ether_dhost[1], l25h->ether_dhost[4], l25h->ether_dhost[5],
-                    rl_data->hop_count + 1);
+            dessert_debug("DUP! from L25 src=" MAC " to dst=" MAC ", hops=%i", EXPLODE_ARRAY6(l25h->ether_shost), EXPLODE_ARRAY6(l25h->ether_dhost), rl_data->hop_count + 1);
             return DESSERT_MSG_DROP;
         }
         pthread_rwlock_wrlock(&rlseqlock);
         rl_add_seq(l25h->ether_shost, l25h->ether_dhost, rl_seq_num);
         pthread_rwlock_unlock(&rlseqlock);
-        if (rl_data->hop_count != 255) rl_hop_count = ++rl_data->hop_count;
+        if (rl_data->hop_count != 255) {
+            rl_hop_count = ++rl_data->hop_count;
+        }
     }
 
     if (proc->lflags & DESSERT_RX_FLAG_L25_BROADCAST ||
@@ -330,11 +326,10 @@ int olsr_fwd2dest(dessert_msg_t* msg, size_t len,
             int result = olsr_db_brct_addid(l25h->ether_shost, brc_data->id, &purge_time);
             if (result == TRUE) {
                 result = olsr_db_ls_getmainaddr(iface, msg->l2h.ether_shost, prev_hop_main_addr);
-            } else {
+            }
+            else {
                 olsr_db_unlock();
-                if (verbose == TRUE) {
-                    dessert_debug("drop broadcast %i duplicate", brc_data->id);
-                }
+                dessert_debug("drop broadcast %i duplicate", brc_data->id);
                 return DESSERT_MSG_DROP;
             }
             if (result == TRUE) {
@@ -351,7 +346,8 @@ int olsr_fwd2dest(dessert_msg_t* msg, size_t len,
             }
         }
         return DESSERT_MSG_KEEP;
-    } else if (((proc->lflags & DESSERT_RX_FLAG_L2_DST && !(proc->lflags & DESSERT_RX_FLAG_L2_OVERHEARD)) ||
+    }
+    else if (((proc->lflags & DESSERT_RX_FLAG_L2_DST && !(proc->lflags & DESSERT_RX_FLAG_L2_OVERHEARD)) ||
                 proc->lflags & DESSERT_RX_FLAG_L2_BROADCAST) &&
                 !(proc->lflags & DESSERT_RX_FLAG_L25_DST)){ // Directed message
         u_int8_t next_hop[ETH_ALEN];
@@ -378,8 +374,7 @@ int olsr_fwd2dest(dessert_msg_t* msg, size_t len,
 }
 // --------------------------- TUN ----------------------------------------------------------
 
-int olsr_sys2rp (dessert_msg_t *msg, size_t len, dessert_msg_proc_t *proc,
-        dessert_sysif_t *tunif, dessert_frameid_t id) {
+int olsr_sys2rp (dessert_msg_t *msg, size_t len, dessert_msg_proc_t *proc, dessert_sysif_t *tunif, dessert_frameid_t id) {
     struct ether_header* l25h = dessert_msg_getl25ether(msg);
     if (memcmp(l25h->ether_dhost, ether_broadcast, ETH_ALEN) == 0) { // next hop broadcast
         // add broadcast id to prevent unlimited circulation
@@ -391,7 +386,8 @@ int olsr_sys2rp (dessert_msg_t *msg, size_t len, dessert_msg_proc_t *proc,
         pthread_rwlock_unlock(&pp_rwlock);
         // send out
         dessert_meshsend_fast(msg, NULL);
-    } else {
+    }
+    else {
         u_int8_t next_hop[ETH_ALEN];
         u_int8_t next_hop_iface[ETH_ALEN];
         const dessert_meshif_t* output_iface;
@@ -427,11 +423,10 @@ int olsr_sys2rp (dessert_msg_t *msg, size_t len, dessert_msg_proc_t *proc,
 /**
 * Forward packets addressed to me to tun pipeline
 */
-int rp2sys(dessert_msg_t* msg, size_t len,
-        dessert_msg_proc_t *proc, const dessert_meshif_t *iface, dessert_frameid_t id) {
-    if((proc->lflags & DESSERT_RX_FLAG_L25_DST && !(proc->lflags & DESSERT_RX_FLAG_L25_OVERHEARD)) ||
-        proc->lflags & DESSERT_RX_FLAG_L25_BROADCAST ||
-        proc->lflags & DESSERT_RX_FLAG_L25_MULTICAST ) {
+int rp2sys(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, const dessert_meshif_t *iface, dessert_frameid_t id) {
+    if((proc->lflags & DESSERT_RX_FLAG_L25_DST && !(proc->lflags & DESSERT_RX_FLAG_L25_OVERHEARD))
+        || proc->lflags & DESSERT_RX_FLAG_L25_BROADCAST
+        || proc->lflags & DESSERT_RX_FLAG_L25_MULTICAST) {
         struct ether_header* l25h = dessert_msg_getl25ether(msg);
         dessert_ext_t* rl_ext;
         u_int32_t rl_seq_num = 0;
@@ -444,8 +439,9 @@ int rp2sys(dessert_msg_t* msg, size_t len,
             rl_seq_num = rl_data->seq_num;
             rl_hop_count = rl_data->hop_count;
         }
-        if (routing_log_file != NULL && !(proc->lflags & DESSERT_RX_FLAG_L25_BROADCAST) && !(proc->lflags & DESSERT_RX_FLAG_L25_MULTICAST))
+        if (routing_log_file != NULL && !(proc->lflags & DESSERT_RX_FLAG_L25_BROADCAST) && !(proc->lflags & DESSERT_RX_FLAG_L25_MULTICAST)) {
             _rlfile_log(l25h->ether_shost, l25h->ether_dhost, rl_seq_num, rl_hop_count, iface->hwaddr, NULL, NULL);
+        }
         dessert_syssend_msg(msg);
     }
     return DESSERT_MSG_DROP;
