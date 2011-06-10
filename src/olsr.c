@@ -37,7 +37,6 @@ int     hello_size           = HELLO_SIZE;
 int     hello_interval       = HELLO_INTERVAL;
 int     tc_size              = TC_SIZE;
 int     tc_interval          = TC_INTERVAL;
-int     verbose              = VERBOSE;
 int     window_size          = WINDOW_SIZE;
 int     tc_hold_time_coeff   = TC_HOLD_TIME_COEFF;
 int     willingness          = WILL_DEFAULT;
@@ -100,7 +99,6 @@ int main(int argc, char** argv) {
 	cli_register_command(dessert_cli, cli_cfg_set, "hello_interval", cli_set_hello_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set HELLO interval");
 	cli_register_command(dessert_cli, cli_cfg_set, "tc_size", cli_set_tc_size, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set TC packet size");
 	cli_register_command(dessert_cli, cli_cfg_set, "tc_interval", cli_set_tc_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set TC interval");
-	cli_register_command(dessert_cli, cli_cfg_set, "verbose", cli_set_verbose, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "be more verbose");
 	cli_register_command(dessert_cli, cli_cfg_set, "window_size", cli_set_window_size, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set window size for calculation of link quality (PDR or ETX)");
 	cli_register_command(dessert_cli, cli_cfg_set, "validity_coeff", cli_set_validity_coeff, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set validity time coefficient");
 	cli_register_command(dessert_cli, cli_cfg_set, "willingness", cli_set_willingness, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set willingness of host to re-send broadcast messages");

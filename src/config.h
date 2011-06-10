@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License along with
 this program. If not, see http://www.gnu.org/licenses/ .
 --------------------------------------------------------------------------------
 For further information and questions please use the web site
-       http://www.des-testbed.net
+    http://www.des-testbed.net
 *******************************************************************************/
 
 #ifndef OLSR_CONFIG
@@ -29,72 +29,73 @@ For further information and questions please use the web site
 
 enum bool {TRUE = 1, FALSE = 0};
 
-#define HELLO_EXT_TYPE 				DESSERT_EXT_USER
-#define HELLO_NEIGH_DESRC_TYPE		DESSERT_EXT_USER + 1
-#define TC_EXT_TYPE					DESSERT_EXT_USER + 2
-#define BROADCAST_ID_EXT_TYPE		DESSERT_EXT_USER + 3
-#define RL_EXT_TYPE					DESSERT_EXT_USER + 4
+#define HELLO_EXT_TYPE              DESSERT_EXT_USER
+#define HELLO_NEIGH_DESRC_TYPE      DESSERT_EXT_USER + 1
+#define TC_EXT_TYPE                 DESSERT_EXT_USER + 2
+#define BROADCAST_ID_EXT_TYPE       DESSERT_EXT_USER + 3
+#define RL_EXT_TYPE                 DESSERT_EXT_USER + 4
 
-#define SEQNO_MAX					(1 << 16) - 1
+#define SEQNO_MAX                   (1 << 16) - 1
 
 // emission intervals
-#define HELLO_INTERVAL				2000
-#define TC_INTERVAL					5000
+#define HELLO_INTERVAL              2000
+#define TC_INTERVAL                 5000
 
 // holding times
-#define LINK_HOLD_TIME_COEFF		7
-#define TC_HOLD_TIME_COEFF			20
-#define BRCLOG_HOLD_TIME			3
+#define LINK_HOLD_TIME_COEFF        7
+#define TC_HOLD_TIME_COEFF          20
+#define BRCLOG_HOLD_TIME            3
 
 // link types
-#define UNSPEC_LINK					0
-#define ASYM_LINK					1
-#define SYM_LINK					2
-#define LOST_LINK					3
-#define LINK_MASK					3
+#define UNSPEC_LINK                 0
+#define ASYM_LINK                   1
+#define SYM_LINK                    2
+#define LOST_LINK                   3
+#define LINK_MASK                   3
 
 // neighbor types
-#define NOT_NEIGH					0
-#define SYM_NEIGH					1
-#define MPR_NEIGH					2
+#define NOT_NEIGH                   0
+#define SYM_NEIGH                   1
+#define MPR_NEIGH                   2
 
-#define WILL_NEVER					0
-#define WILL_LOW					1
-#define WILL_DEFAULT				3
-#define WILL_HIGH					6
-#define WILL_ALLWAYS				7
+#define WILL_NEVER                  0
+#define WILL_LOW                    1
+#define WILL_DEFAULT                3
+#define WILL_HIGH                   6
+#define WILL_ALLWAYS                7
 
 // build intervals
-#define BUILD_RT_INTERVAL			1000
+#define BUILD_RT_INTERVAL           1000
 
 // link quality
-#define WINDOW_SIZE					50
-#define MPR_QUALITY_THRESHOLD		75
+#define WINDOW_SIZE                 50
+#define MPR_QUALITY_THRESHOLD       75
 
-#define C_INV_COEFF					64
+#define C_INV_COEFF                 64
 
-#define VERBOSE					FALSE
-
-extern int 							verbose;
-extern int							hello_interval;
-extern int							tc_interval;
-extern int							tc_hold_time_coeff;
-extern int							willingness;
-extern int							rc_metric;
-extern char*						routing_log_file;
-extern int 							hello_size;
-extern int 							tc_size;
-extern dessert_periodic_t*			periodic_send_hello;
-extern dessert_periodic_t*			periodic_send_tc;
+extern int                          hello_interval;
+extern int                          tc_interval;
+extern int                          tc_hold_time_coeff;
+extern int                          willingness;
+extern int                          rc_metric;
+extern char*                        routing_log_file;
+extern int                          hello_size;
+extern int                          tc_size;
+extern dessert_periodic_t*          periodic_send_hello;
+extern dessert_periodic_t*          periodic_send_tc;
 
 // window size for calculation of PDR or ETX
-extern int							window_size;
-#define RC_METRIC_PLR				1
-#define RC_METRIC_HC				2
-#define RC_METRIC_ETX				3
-#define RC_METRIC_ETX_ADD			4
-#define HELLO_SIZE					128
-#define TC_SIZE						128
+extern int                          window_size;
+
+enum olsr_metric {
+    RC_METRIC_PLR = 1,
+    RC_METRIC_HC,
+    RC_METRIC_ETX,
+    RC_METRIC_ETX_ADD
+};
+
+#define HELLO_SIZE                  128
+#define TC_SIZE                     128
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #define max(a, b) (((a) > (b)) ? (a) : (b))

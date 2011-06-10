@@ -23,7 +23,6 @@ For further information and questions please use the web site
 
 #include <libcli.h>
 
-int cli_set_verbose(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_set_hello_size(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_set_hello_interval(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_set_tc_size(struct cli_def* cli, char* command, char* argv[], int argc);
