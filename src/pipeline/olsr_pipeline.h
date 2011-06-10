@@ -81,18 +81,18 @@ struct olsr_msg_hello_ndescr {
 // ---- TC -----
 
 struct olsr_msg_tc_hdr {
-    u_int16_t   seq_num;    ///< Sequence number of this TC message to avoid multiple re-sending
+    uint16_t    seq_num;    ///< Sequence number of this TC message to avoid multiple re-sending
     //u_int8_t  hold_time;  ///< Hold time of information in this message
-    u_int8_t    tc_interval;///< Interval between two HELLO messages
-    u_int8_t    neighbor_count; ///< Number of 1hop neighbors of TC originator introduced in this TC
+    uint8_t     tc_interval;///< Interval between two HELLO messages
+    uint8_t     neighbor_count; ///< Number of 1hop neighbors of TC originator introduced in this TC
 } __attribute__ ((__packed__));
 
 /**
 * Neighbor description
 */
 struct olsr_msg_tc_ndescr {
-    u_int8_t    link_quality;           ///< quality of link between originator and this neighbor
-    u_int8_     n_main_addr[ETH_ALEN];  ///< main address of host
+    uint8_t     link_quality;           ///< quality of link between originator and this neighbor
+    uint8_t     n_main_addr[ETH_ALEN];  ///< main address of host
 } __attribute__ ((__packed__));
 
 /**

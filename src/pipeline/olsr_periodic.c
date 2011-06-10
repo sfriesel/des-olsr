@@ -121,7 +121,7 @@ int olsr_periodic_send_hello(void *data, struct timeval *scheduled, struct timev
     return 0;
 }
 
-u_int8_t max_tc_neigh_count = ((DESSERT_MAXEXTDATALEN) - sizeof(struct olsr_msg_tc_hdr)) / sizeof(struct olsr_msg_tc_ndescr);
+const u_int8_t max_tc_neigh_count = ((DESSERT_MAXEXTDATALEN) - sizeof(struct olsr_msg_tc_hdr)) / sizeof(struct olsr_msg_tc_ndescr);
 
 int olsr_periodic_send_tc(void *data, struct timeval *scheduled, struct timeval *interval) {
     dessert_msg_t* msg;
