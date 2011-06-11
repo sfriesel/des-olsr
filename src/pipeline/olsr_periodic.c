@@ -4,8 +4,8 @@
 #include "../config.h"
 #include "../helper.h"
 
-u_int16_t tc_seq_num = 0; // no need to lock, since TC never send parallel
-u_int16_t hello_seq_num = 0; // no need to lock, since HELLO never send parallel
+uint16_t tc_seq_num = 0; // no need to lock, since TC never send parallel
+uint16_t hello_seq_num = 0; // no need to lock, since HELLO never send parallel
 
 pthread_rwlock_t hello_seq_lock = PTHREAD_RWLOCK_INITIALIZER;
 pthread_rwlock_t tc_seq_lock = PTHREAD_RWLOCK_INITIALIZER;
@@ -55,7 +55,7 @@ int olsr_periodic_send_hello(void *data, struct timeval *scheduled, struct timev
         size_t ext_length = sizeof(struct olsr_msg_hello_hdr);
         olsr_db_wlock();
         olsr_db_linkset_nl_entry_t* link_list = olsr_db_ls_getlinkset(iface);
-        u_int8_t link_count = HASH_COUNT(link_list);
+        uint8_t link_count = HASH_COUNT(link_list);
         link_count = (link_count > hello_max_links_count)? hello_max_links_count : link_count;
         ext_length += sizeof(struct olsr_msg_hello_niface) * link_count;
 
@@ -125,7 +125,7 @@ int olsr_periodic_send_hello(void *data, struct timeval *scheduled, struct timev
     return 0;
 }
 
-const u_int8_t max_tc_neigh_count = ((DESSERT_MAXEXTDATALEN) - sizeof(struct olsr_msg_tc_hdr)) / sizeof(struct olsr_msg_tc_ndescr);
+const uint8_t max_tc_neigh_count = ((DESSERT_MAXEXTDATALEN) - sizeof(struct olsr_msg_tc_hdr)) / sizeof(struct olsr_msg_tc_ndescr);
 
 int olsr_periodic_send_tc(void *data, struct timeval *scheduled, struct timeval *interval) {
     dessert_msg_t* msg;
@@ -142,8 +142,8 @@ int olsr_periodic_send_tc(void *data, struct timeval *scheduled, struct timeval 
     // add TC extension
     olsr_db_wlock();
     olsr_db_ns_tuple_t* neighbors = olsr_db_ns_getneighset();
-    u_int8_t neighbor_count = HASH_COUNT(neighbors);
-    u_int8_t tc_neigh_count = (neighbor_count > max_tc_neigh_count)? max_tc_neigh_count : neighbor_count;
+    uint8_t neighbor_count = HASH_COUNT(neighbors);
+    uint8_t tc_neigh_count = (neighbor_count > max_tc_neigh_count)? max_tc_neigh_count : neighbor_count;
     dessert_msg_addext(msg, &ext, TC_EXT_TYPE, sizeof(struct olsr_msg_tc_hdr) + tc_neigh_count * sizeof(struct olsr_msg_tc_ndescr));
     struct olsr_msg_tc_hdr* hdr = (struct olsr_msg_tc_hdr*)ext->data;
     hdr->tc_interval = hf_sparce_time(tc_interval);
