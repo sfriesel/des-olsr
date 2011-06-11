@@ -50,7 +50,9 @@ void purge_tcs(struct timeval* curr_time, void* src_object, void* object) {
 
 olsr_db_tc_tcs_t* create_tcs(u_int8_t tc_orig_addr[ETH_ALEN]) {
 	olsr_db_tc_tcs_t* entry = malloc(sizeof(olsr_db_tc_tcs_t));
-	if (entry == NULL) return NULL;
+	if (entry == NULL) {
+        return NULL;
+    }
 	memcpy(entry->tc_orig_addr, tc_orig_addr, ETH_ALEN);
 	entry->orig_neighbors = NULL;
 	entry->seq_num = 0;
@@ -59,7 +61,9 @@ olsr_db_tc_tcs_t* create_tcs(u_int8_t tc_orig_addr[ETH_ALEN]) {
 
 olsr_db_tc_tcsentry_t* create_tcs_entry(u_int8_t tc_neigh_addr[ETH_ALEN], u_int8_t link_quality) {
 	olsr_db_tc_tcsentry_t* entry = malloc(sizeof(olsr_db_tc_tcsentry_t));
-	if (entry == NULL) return NULL;
+	if (entry == NULL) {
+        return NULL;
+    }
 	entry->link_quality = link_quality;
 	memcpy(entry->neighbor_main_addr, tc_neigh_addr, ETH_ALEN);
 	return entry;
@@ -69,21 +73,24 @@ int olsr_db_tc_init() {
 	return timeslot_create(&tc_ts, NULL, purge_tcs);
 }
 
-int olsr_db_tc_settuple(u_int8_t tc_orig_addr[ETH_ALEN], u_int8_t orig_neigh_addr[ETH_ALEN],
-		u_int8_t link_quality, struct timeval* purge_time) {
+int olsr_db_tc_settuple(u_int8_t tc_orig_addr[ETH_ALEN], u_int8_t orig_neigh_addr[ETH_ALEN], u_int8_t link_quality, struct timeval* purge_time) {
 	olsr_db_tc_tcs_t* tcs = NULL;
 	olsr_db_tc_tcsentry_t* tcs_entry = NULL;
 	HASH_FIND(hh, tc_set, tc_orig_addr, ETH_ALEN, tcs);
 	if (tcs == NULL) {
 		tcs = create_tcs(tc_orig_addr);
-		if (tcs == NULL) return false;
+		if (tcs == NULL) {
+            return false;
+        }
 		HASH_ADD_KEYPTR(hh, tc_set, tcs->tc_orig_addr, ETH_ALEN, tcs);
 	}
 	timeslot_addobject(tc_ts, purge_time, tcs);
 	HASH_FIND(hh, tcs->orig_neighbors, orig_neigh_addr, ETH_ALEN, tcs_entry);
 	if (tcs_entry == NULL) {
 		tcs_entry = create_tcs_entry(orig_neigh_addr, link_quality);
-		if (tcs_entry == NULL) return false;
+		if (tcs_entry == NULL) {
+            return false;
+        }
 		HASH_ADD_KEYPTR(hh, tcs->orig_neighbors, tcs_entry->neighbor_main_addr, ETH_ALEN, tcs_entry);
 	}
 	tcs_entry->link_quality = link_quality;
@@ -126,7 +133,9 @@ int olsr_db_tc_updateseqnum(u_int8_t tc_orig_addr[ETH_ALEN], u_int16_t seq_num, 
 	HASH_FIND(hh, tc_set, tc_orig_addr, ETH_ALEN, tcs);
 	if (tcs == NULL) {
 		tcs = create_tcs(tc_orig_addr);
-		if (tcs == NULL) return false;
+		if (tcs == NULL) {
+            return false;
+        }
 		HASH_ADD_KEYPTR(hh, tc_set, tcs->tc_orig_addr, ETH_ALEN, tcs);
 		tcs->seq_num = seq_num - 1;
 	}
@@ -143,7 +152,9 @@ olsr_db_tc_tcsentry_t* olsr_db_tc_getneighbors(u_int8_t tc_orig_addr[ETH_ALEN]) 
 	timeslot_purgeobjects(tc_ts);
 	olsr_db_tc_tcs_t* tcs = NULL;
 	HASH_FIND(hh, tc_set, tc_orig_addr, ETH_ALEN, tcs);
-	if (tcs == NULL) return NULL;
+	if (tcs == NULL) {
+        return NULL;
+    }
 	return tcs->orig_neighbors;
 }
 
@@ -164,7 +175,9 @@ int olsr_db_tc_report(char** str_out) {
 	current_entry = tc_set;
 
 	output = malloc(sizeof (char) * report_str_len * (3 + str_count) + 1);
-	if (output == NULL) return false;
+	if (output == NULL) {
+        return false;
+    }
 
 	// initialize first byte to \0 to mark output as empty
 	*output = '\0';
@@ -176,21 +189,12 @@ int olsr_db_tc_report(char** str_out) {
 		olsr_db_tc_tcsentry_t* neigbors = current_entry->orig_neighbors;
 		while(neigbors != NULL) {
 			if (flag == false) {
-				snprintf(entry_str, report_str_len + 1, "| %02x:%02x:%02x:%02x:%02x:%02x | %02x:%02x:%02x:%02x:%02x:%02x | %12i |\n",
-					current_entry->tc_orig_addr[0], current_entry->tc_orig_addr[1],
-					current_entry->tc_orig_addr[2], current_entry->tc_orig_addr[3],
-					current_entry->tc_orig_addr[4], current_entry->tc_orig_addr[5],
-					neigbors->neighbor_main_addr[0], neigbors->neighbor_main_addr[1],
-					neigbors->neighbor_main_addr[2], neigbors->neighbor_main_addr[3],
-					neigbors->neighbor_main_addr[4], neigbors->neighbor_main_addr[5],
-					neigbors->link_quality);
+				snprintf(entry_str, report_str_len + 1, "| " MAC " | " MAC " | %12i |\n",
+                    EXPLODE_ARRAY6(current_entry->tc_orig_addr), EXPLODE_ARRAY6(neigbors->neighbor_main_addr), neigbors->link_quality);
 				flag = true;
 			} else {
-				snprintf(entry_str, report_str_len + 1, "|                   | %02x:%02x:%02x:%02x:%02x:%02x | %12i |\n",
-					neigbors->neighbor_main_addr[0], neigbors->neighbor_main_addr[1],
-					neigbors->neighbor_main_addr[2], neigbors->neighbor_main_addr[3],
-					neigbors->neighbor_main_addr[4], neigbors->neighbor_main_addr[5],
-					neigbors->link_quality);
+				snprintf(entry_str, report_str_len + 1, "|                   | " MAC " | %12i |\n",
+                    EXPLODE_ARRAY6(neigbors->neighbor_main_addr), neigbors->link_quality);
 			}
 			strcat(output, entry_str);
 			neigbors = neigbors->hh.next;

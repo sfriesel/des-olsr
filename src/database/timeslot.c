@@ -31,8 +31,9 @@ int create_new_ts_element(timeslot_element_t** ts_el_out, struct timeval* timest
 	timeslot_element_t* new_el;
 
 	new_el = malloc(sizeof(timeslot_element_t));
-	if (new_el == NULL)
+	if (new_el == NULL) {
 		return false;
+    }
 	new_el->next = NULL;
 	new_el->prev = NULL;
 	new_el->purge_time.tv_sec = timestamp->tv_sec;
@@ -78,7 +79,9 @@ int timeslot_purgeobjects(timeslot_t* ts) {
 	while(tail != NULL && hf_compare_tv(&ts->tail->purge_time, &curr_time) <= 0) {
 		search_el = ts->tail->next;
 		HASH_DEL(ts->elements_hash, ts->tail);
-		if (search_el != NULL) search_el->prev = NULL;
+		if (search_el != NULL) {
+            search_el->prev = NULL;
+        }
 		tail = ts->tail;
 		if (ts->tail == ts->head) {
 			ts->tail = ts->head = NULL;
@@ -102,8 +105,9 @@ int timeslot_addobject(timeslot_t* ts, struct timeval* purge_time, void* object)
 	// first find element with *object pointer and delete this element
 	timeslot_deleteobject(ts, object);
 
-	if (create_new_ts_element(&new_el, purge_time, object) == false)
+	if (create_new_ts_element(&new_el, purge_time, object) == false) {
 		return false;
+    }
 
 	HASH_ADD_KEYPTR(hh, ts->elements_hash, &new_el->object, sizeof(void*), new_el);
 
@@ -125,15 +129,23 @@ int timeslot_addobject(timeslot_t* ts, struct timeval* purge_time, void* object)
 		new_el->prev = search_el;
 		new_el->next = search_el->next;
 		search_el->next = new_el;
-		if (new_el->next != NULL) new_el->next->prev = new_el;
-		if (ts->head == search_el) ts->head = new_el;
+		if (new_el->next != NULL) {
+            new_el->next->prev = new_el;
+        }
+		if (ts->head == search_el) {
+            ts->head = new_el;
+        }
 	} else {
 		// insert new element bevor search element
 		new_el->prev = search_el->prev;
 		new_el->next = search_el;
 		search_el->prev = new_el;
-		if (new_el->prev != NULL) new_el->prev->next = new_el;
-		if (ts->tail == search_el) ts->tail = new_el;
+		if (new_el->prev != NULL) {
+            new_el->prev->next = new_el;
+        }
+		if (ts->tail == search_el) {
+            ts->tail = new_el;
+        }
 	}
 	ts->size++;
 
@@ -147,10 +159,18 @@ int timeslot_deleteobject(timeslot_t* ts, void* object) {
 	HASH_FIND(hh, ts->elements_hash, &object, sizeof(void*), old_el);
 	// then delete if found
 	if (old_el != NULL) {
-		if (old_el->prev != NULL) old_el->prev->next = old_el->next;
-		if (old_el->next != NULL) old_el->next->prev = old_el->prev;
-		if (ts->tail == old_el) ts->tail = ts->tail->next;
-		if (ts->head == old_el) ts->head = ts->head->prev;
+		if (old_el->prev != NULL) {
+            old_el->prev->next = old_el->next;
+        }
+		if (old_el->next != NULL) {
+            old_el->next->prev = old_el->prev;
+        }
+		if (ts->tail == old_el) {
+            ts->tail = ts->tail->next;
+        }
+		if (ts->head == old_el) {
+            ts->head = ts->head->prev;
+        }
 		HASH_DEL(ts->elements_hash, old_el);
 		free(old_el);
 		ts->size--;
