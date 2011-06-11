@@ -209,7 +209,7 @@ int cli_show_ns(struct cli_def* cli, char* command, char* argv[], int argc){
     olsr_db_wlock();
     int result = olsr_db_ns_report(&report);
     olsr_db_unlock();
-    if (result == TRUE) {
+    if (result == true) {
         cli_print(cli, "\n%s\n", report);
         free(report);
     }
@@ -224,7 +224,7 @@ int cli_show_ns_so(struct cli_def* cli, char* command, char* argv[], int argc){
     olsr_db_wlock();
     int result = olsr_db_ns_report_so(&report);
     olsr_db_unlock();
-    if (result == TRUE) {
+    if (result == true) {
         cli_print(cli, "\n%s\n", report);
         free(report);
     }
@@ -239,7 +239,7 @@ int cli_show_ls(struct cli_def* cli, char* command, char* argv[], int argc){
     olsr_db_wlock();
     int result = olsr_db_ls_report(&report);
     olsr_db_unlock();
-    if (result == TRUE) {
+    if (result == true) {
         cli_print(cli, "\n%s\n", report);
         free(report);
     }
@@ -254,7 +254,7 @@ int cli_show_2hns(struct cli_def* cli, char* command, char* argv[], int argc){
     olsr_db_wlock();
     int result = olsr_db_2hns_report(&report);
     olsr_db_unlock();
-    if (result == TRUE) {
+    if (result == true) {
         cli_print(cli, "\n%s\n", report);
         free(report);
     }
@@ -269,7 +269,7 @@ int cli_show_tc(struct cli_def* cli, char* command, char* argv[], int argc){
     olsr_db_wlock();
     int result = olsr_db_tc_report(&report);
     olsr_db_unlock();
-    if (result == TRUE) {
+    if (result == true) {
         cli_print(cli, "\n%s\n", report);
         free(report);
     }
@@ -284,7 +284,7 @@ int cli_show_rt(struct cli_def* cli, char* command, char* argv[], int argc){
     olsr_db_rlock();
     int result = olsr_db_rt_report(&report);
     olsr_db_unlock();
-    if (result == TRUE) {
+    if (result == true) {
         cli_print(cli, "\n%s\n", report);
         free(report);
     }
@@ -299,7 +299,7 @@ int cli_show_rt_so(struct cli_def* cli, char* command, char* argv[], int argc){
     olsr_db_rlock();
     int result = olsr_db_rt_report_so(&report);
     olsr_db_unlock();
-    if (result == TRUE) {
+    if (result == true) {
         cli_print(cli, "\n%s\n", report);
         free(report);
     }

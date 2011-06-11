@@ -27,8 +27,6 @@ For further information and questions please use the web site
 #include <stdlib.h>
 #include <dessert.h>
 
-enum bool {TRUE = 1, FALSE = 0};
-
 enum extension_types {
     HELLO_EXT_TYPE = DESSERT_EXT_USER,
     HELLO_NEIGH_DESRC_TYPE,

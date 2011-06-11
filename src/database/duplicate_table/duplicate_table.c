@@ -48,26 +48,26 @@ int	olsr_db_dt_init() {
 
 int dtuple_create(dtuple_t** tuple_out, u_int8_t ether_addr[ETH_ALEN], u_int16_t seq_num, u_int8_t retransmitted) {
 	dtuple_t* tuple = malloc(sizeof(dtuple_t));
-	if (tuple == NULL) return FALSE;
+	if (tuple == NULL) return false;
 	memcpy(tuple->addr, ether_addr, ETH_ALEN);
 	tuple->seq_num = seq_num;
 	tuple->retransmitted = retransmitted;
 	*tuple_out = tuple;
-	return TRUE;
+	return true;
 }
 
 int olsr_db_dt_settuple(u_int8_t ether_addr[ETH_ALEN], u_int16_t seq_num, u_int8_t retransmitted, struct timeval* purge_time) {
 	dtuple_t* tuple;
 	HASH_FIND(hh, dupl_table, ether_addr, ETH_ALEN, tuple);
 	if (tuple == NULL) {
-		if (dtuple_create(&tuple, ether_addr, seq_num, retransmitted) == FALSE) return FALSE;
+		if (dtuple_create(&tuple, ether_addr, seq_num, retransmitted) == false) return false;
 		HASH_ADD_KEYPTR(hh, dupl_table, tuple->addr, ETH_ALEN, tuple);
 	}
 	tuple->seq_num = seq_num;
 	tuple->retransmitted = retransmitted;
 
 	timeslot_addobject(dt_ts, purge_time, tuple);
-	return TRUE;
+	return true;
 }
 
 int olsr_db_dt_gettuple(u_int8_t ether_addr[ETH_ALEN], u_int8_t* retransmitted_out) {
@@ -75,7 +75,7 @@ int olsr_db_dt_gettuple(u_int8_t ether_addr[ETH_ALEN], u_int8_t* retransmitted_o
 
 	dtuple_t* tuple;
 	HASH_FIND(hh, dupl_table, ether_addr, ETH_ALEN, tuple);
-	if (tuple == NULL) return FALSE;
+	if (tuple == NULL) return false;
 	*retransmitted_out = tuple->retransmitted;
-	return TRUE;
+	return true;
 }

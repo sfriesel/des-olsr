@@ -41,21 +41,21 @@ inline void olsr_db_unlock() {
 }
 
 int olsr_db_init() {
-    if (olsr_db_dt_init() != TRUE) { return FALSE; }
-    if (olsr_db_ns_init() != TRUE) { return FALSE; }
-    if (olsr_db_tc_init() != TRUE) { return FALSE; }
-    if (olsr_db_brct_init() != TRUE) { return FALSE; }
-    if (rl_table_init() != TRUE) { return FALSE; }
-    return TRUE;
+    if (olsr_db_dt_init() != true) { return false; }
+    if (olsr_db_ns_init() != true) { return false; }
+    if (olsr_db_tc_init() != true) { return false; }
+    if (olsr_db_brct_init() != true) { return false; }
+    if (rl_table_init() != true) { return false; }
+    return true;
 }
 
 int olsr_db_cleanup(struct timeval* timestamp) {
-    return TRUE;
+    return true;
 }
 
 // --------------------------------------- reporting ---------------------------------------------------------------
 
 int olsr_db_view_routing_table(char** str_out) {
     //int result =  aodv_db_rt_report(str_out);
-    return FALSE;
+    return false;
 }

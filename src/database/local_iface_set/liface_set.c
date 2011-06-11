@@ -30,9 +30,9 @@ int olsr_db_lis_islocaliface(u_int8_t iface_addr[ETH_ALEN]) {
 	dessert_meshif_t* iface = dessert_meshiflist_get();
 	while (iface != NULL) {
 		if (memcmp(iface->hwaddr, iface_addr, ETH_ALEN) == 0) {
-			return TRUE;
+			return true;
 		}
 		iface = iface->next;
 	}
-	return FALSE;
+	return false;
 }

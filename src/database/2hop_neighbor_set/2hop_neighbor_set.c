@@ -71,32 +71,32 @@ void purge_2h_neighbor(struct timeval* timestamp, void* src_object, void* object
 
 int neighbor_entry_create(olsr_2hns_neighbor_t** entry_out, u_int8_t ether_addr[ETH_ALEN]) {
 	olsr_2hns_neighbor_t* entry = malloc(sizeof(olsr_2hns_neighbor_t));
-	if (entry == NULL) return FALSE;
+	if (entry == NULL) return false;
 	memcpy(entry->ether_addr, ether_addr, ETH_ALEN);
 	*entry_out = entry;
-	return TRUE;
+	return true;
 }
 
 int _1hop_to_2hop_entry_create(_1hopn_to_2hopns_t** entry_out, u_int8_t _1hop_neighbor_addr[ETH_ALEN]) {
 	_1hopn_to_2hopns_t* entry = malloc(sizeof(_1hopn_to_2hopns_t));
-	if (entry == NULL) return FALSE;
+	if (entry == NULL) return false;
 	memcpy(entry->_1hop_neighbor, _1hop_neighbor_addr, ETH_ALEN);
 	entry->_2hop_neighbors = NULL;
 	*entry_out = entry;
-	if (timeslot_create(&entry->ts, entry, purge_2h_neighbor) == FALSE) {
+	if (timeslot_create(&entry->ts, entry, purge_2h_neighbor) == false) {
 		free(entry);
-		return FALSE;
+		return false;
 	}
-	return TRUE;
+	return true;
 }
 
 int _2hop_to_1hop_entry_create(_2hopn_to_1hopns_t** entry_out, u_int8_t _2hop_neighbor_addr[ETH_ALEN]) {
 	_2hopn_to_1hopns_t* entry = malloc(sizeof(_2hopn_to_1hopns_t));
-	if (entry == NULL) return FALSE;
+	if (entry == NULL) return false;
 	memcpy(entry->_2hop_neighbor, _2hop_neighbor_addr, ETH_ALEN);
 	entry->_1hop_neighbors = NULL;
 	*entry_out = entry;
-	return TRUE;
+	return true;
 }
 
 int olsr_db_2hns_add2hneighbor(u_int8_t _1hop_neighbor_addr[ETH_ALEN],
@@ -108,29 +108,29 @@ int olsr_db_2hns_add2hneighbor(u_int8_t _1hop_neighbor_addr[ETH_ALEN],
 
 	HASH_FIND(hh, _1hset_entrys, _1hop_neighbor_addr, ETH_ALEN, _1hset_entry);
 	if (_1hset_entry == NULL) {
-		if (_1hop_to_2hop_entry_create(&_1hset_entry, _1hop_neighbor_addr) == FALSE) return FALSE;
+		if (_1hop_to_2hop_entry_create(&_1hset_entry, _1hop_neighbor_addr) == false) return false;
 		HASH_ADD_KEYPTR(hh, _1hset_entrys, _1hset_entry->_1hop_neighbor, ETH_ALEN, _1hset_entry);
 	}
 	HASH_FIND(hh, _1hset_entry->_2hop_neighbors, _2hop_neighbor_addr, ETH_ALEN, _2h_neighbor);
 	if (_2h_neighbor == NULL) {
-		if (neighbor_entry_create(&_2h_neighbor, _2hop_neighbor_addr) == FALSE) return FALSE;
+		if (neighbor_entry_create(&_2h_neighbor, _2hop_neighbor_addr) == false) return false;
 		HASH_ADD_KEYPTR(hh, _1hset_entry->_2hop_neighbors, _2h_neighbor->ether_addr, ETH_ALEN, _2h_neighbor);
 	}
 	_2h_neighbor->link_quality = link_quality;
 	timeslot_addobject(_1hset_entry->ts, purge_time, _2h_neighbor);
 	HASH_FIND(hh, _2hset_entrys, _2hop_neighbor_addr, ETH_ALEN, _2hset_entry);
 	if (_2hset_entry == NULL) {
-		if (_2hop_to_1hop_entry_create(&_2hset_entry, _2hop_neighbor_addr) == FALSE) return FALSE;
+		if (_2hop_to_1hop_entry_create(&_2hset_entry, _2hop_neighbor_addr) == false) return false;
 		HASH_ADD_KEYPTR(hh, _2hset_entrys, _2hset_entry->_2hop_neighbor, ETH_ALEN, _2hset_entry);
 	}
 	HASH_FIND(hh, _2hset_entry->_1hop_neighbors, _1hop_neighbor_addr, ETH_ALEN, _1h_neighbor);
 	if (_1h_neighbor == NULL) {
-		if (neighbor_entry_create(&_1h_neighbor, _1hop_neighbor_addr) == FALSE) return FALSE;
+		if (neighbor_entry_create(&_1h_neighbor, _1hop_neighbor_addr) == false) return false;
 		HASH_ADD_KEYPTR(hh, _2hset_entry->_1hop_neighbors, _1h_neighbor->ether_addr, ETH_ALEN, _1h_neighbor);
 	}
 	_1h_neighbor->link_quality = link_quality;
 	timeslot_purgeobjects(_1hset_entry->ts);
-	return TRUE;
+	return true;
 }
 
 olsr_2hns_neighbor_t* olsr_db_2hns_get2hneighbors(u_int8_t _1hop_neighbor_addr[ETH_ALEN]) {
@@ -285,7 +285,7 @@ int olsr_db_2hns_report1hto2h(char** str_out) {
 	current_entry = _1hset_entrys;
 
 	output = malloc(sizeof (char) * report_str_len * (3 + str_count) + 1);
-	if (output == NULL) return FALSE;
+	if (output == NULL) return false;
 
 	// initialize first byte to \0 to mark output as empty
 	*output = '\0';
@@ -294,9 +294,9 @@ int olsr_db_2hns_report1hto2h(char** str_out) {
 	strcat(output, "+-------------------+-------------------+\n");
 	while(current_entry != NULL) {
 		olsr_2hns_neighbor_t* neigbors = current_entry->_2hop_neighbors;
-		int flag = FALSE;
+		int flag = false;
 		while(neigbors != NULL) {
-			if (flag == FALSE) {
+			if (flag == false) {
 				snprintf(entry_str, report_str_len + 1, "| %02x:%02x:%02x:%02x:%02x:%02x | %02x:%02x:%02x:%02x:%02x:%02x |\n",
 					current_entry->_1hop_neighbor[0], current_entry->_1hop_neighbor[1],
 					current_entry->_1hop_neighbor[2], current_entry->_1hop_neighbor[3],
@@ -304,7 +304,7 @@ int olsr_db_2hns_report1hto2h(char** str_out) {
 					neigbors->ether_addr[0], neigbors->ether_addr[1],
 					neigbors->ether_addr[2], neigbors->ether_addr[3],
 					neigbors->ether_addr[4], neigbors->ether_addr[5]);
-				flag = TRUE;
+				flag = true;
 			} else {
 				snprintf(entry_str, report_str_len + 1, "|                   | %02x:%02x:%02x:%02x:%02x:%02x |\n",
 					neigbors->ether_addr[0], neigbors->ether_addr[1],
@@ -335,7 +335,7 @@ int olsr_db_2hns_report2hto1h(char** str_out) {
 	current_entry = _2hset_entrys;
 
 	output = malloc(sizeof (char) * report_str_len * (3 + str_count) + 1);
-	if (output == NULL) return FALSE;
+	if (output == NULL) return false;
 
 	// initialize first byte to \0 to mark output as empty
 	*output = '\0';
@@ -344,9 +344,9 @@ int olsr_db_2hns_report2hto1h(char** str_out) {
 	strcat(output, "+-------------------+-------------------+\n");
 	while(current_entry != NULL) {
 		olsr_2hns_neighbor_t* neigbors = current_entry->_1hop_neighbors;
-		int flag = FALSE;
+		int flag = false;
 		while(neigbors != NULL) {
-			if (flag == FALSE) {
+			if (flag == false) {
 				snprintf(entry_str, report_str_len + 1, "| %02x:%02x:%02x:%02x:%02x:%02x | %02x:%02x:%02x:%02x:%02x:%02x |\n",
 					current_entry->_2hop_neighbor[0], current_entry->_2hop_neighbor[1],
 					current_entry->_2hop_neighbor[2], current_entry->_2hop_neighbor[3],
@@ -354,7 +354,7 @@ int olsr_db_2hns_report2hto1h(char** str_out) {
 					neigbors->ether_addr[0], neigbors->ether_addr[1],
 					neigbors->ether_addr[2], neigbors->ether_addr[3],
 					neigbors->ether_addr[4], neigbors->ether_addr[5]);
-				flag = TRUE;
+				flag = true;
 			} else {
 				snprintf(entry_str, report_str_len + 1, "|                   | %02x:%02x:%02x:%02x:%02x:%02x |\n",
 					neigbors->ether_addr[0], neigbors->ether_addr[1],
@@ -379,7 +379,7 @@ int olsr_db_2hns_report(char** str_out) {
 	if (_1hstr_count == 0 || _2hstr_count == 0) {
 		if (_2hstr_count == 0) free(_2hto1h);
 		if (_1hstr_count == 0) free(_1hto2h);
-		return FALSE;
+		return false;
 	}
 
 	int report_str_len = 41 + 41 + 2 + 1;
@@ -390,7 +390,7 @@ int olsr_db_2hns_report(char** str_out) {
 	if (output == NULL) {
 		free(_1hto2h);
 		free(_2hto1h);
-		return FALSE;
+		return false;
 	}
 
 	int i = 0;
@@ -423,6 +423,6 @@ int olsr_db_2hns_report(char** str_out) {
 	free(_1hto2h);
 	free(_2hto1h);
 	*str_out = output;
-	return TRUE;
+	return true;
 }
 

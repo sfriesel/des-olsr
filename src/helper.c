@@ -69,7 +69,7 @@ int hf_add_tv(const struct timeval* tv1, const struct timeval* tv2, struct timev
 	} else {
 		sum->tv_usec = usec_sum;
 	}
-	return TRUE;
+	return true;
 }
 
 int hf_diff_tv(const struct timeval* tv1, const struct timeval* tv2, struct timeval* diff) {
@@ -81,11 +81,11 @@ int hf_diff_tv(const struct timeval* tv1, const struct timeval* tv2, struct time
 	} else {
 		diff->tv_usec = usec_diff;
 	}
-	return TRUE;
+	return true;
 }
 
 int hf_mul_tv(const struct timeval* tv, float x, struct timeval* mul) {
 	mul->tv_sec = tv->tv_sec * x + ((int32_t)(tv->tv_usec * x)) % 1000000;
 	mul->tv_usec = (tv->tv_usec * x) - ((int32_t)(tv->tv_usec * x)) % 1000000;
-	return TRUE;
+	return true;
 }

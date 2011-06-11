@@ -46,7 +46,7 @@ olsr_db_rc_1hn_t* get_1hnwset() {
 	u_int8_t is_MPR, is_MRP_SEL, will;
 	while (_1hnset != NULL) {
 		olsr_2hns_neighbor_t* _1hn = _1hnset;
-		if (olsr_db_ns_getneigh(_1hn->ether_addr, &is_MPR, &is_MRP_SEL, &will) == TRUE) {
+		if (olsr_db_ns_getneigh(_1hn->ether_addr, &is_MPR, &is_MRP_SEL, &will) == true) {
 			olsr_db_rc_1hn_t* _1hnw = malloc(sizeof(olsr_db_rc_1hn_t));
 			if (_1hnw != NULL) {
 				memcpy(_1hnw->ether_main_addr, _1hn->ether_addr, ETH_ALEN);
@@ -62,7 +62,7 @@ olsr_db_rc_1hn_t* get_1hnwset() {
 }
 
 void select_as_mpr(u_int8_t mpr_ether_addr[ETH_ALEN], olsr_db_rc_1hn_t** _1hop_wneighbors, olsr_2hns_neighbor_t** _2hop_neighbors) {
-	olsr_db_ns_setneigh_mprstatus(mpr_ether_addr, TRUE);
+	olsr_db_ns_setneigh_mprstatus(mpr_ether_addr, true);
 	u_int8_t _1hop_quality = olsr_db_ns_getlinkquality(mpr_ether_addr);
 	olsr_2hns_neighbor_t* _2hn = olsr_db_2hns_get2hneighbors(mpr_ether_addr);
 	while(_2hn != NULL) {
@@ -138,7 +138,7 @@ void olsr_db_rc_chose_mprset() {
 	// clear rest of copied 1hop neighbors
 	while (_1hop_wneighbors != NULL) {
 		if (_1hop_wneighbors->willingness >= WILL_ALLWAYS) {
-			olsr_db_ns_setneigh_mprstatus(_1hop_wneighbors->ether_main_addr, TRUE);
+			olsr_db_ns_setneigh_mprstatus(_1hop_wneighbors->ether_main_addr, true);
 		}
 		olsr_db_rc_1hn_t* curr_el = _1hop_wneighbors;
 		HASH_DEL(_1hop_wneighbors, curr_el);
@@ -240,7 +240,7 @@ void olsr_db_rc_dijkstra() {
 		//add neighbors of best_candidate to candidates
 		olsr_db_tc_tcsentry_t* bc_neighbors = olsr_db_tc_getneighbors(best_candidate->ether_addr);
 		while(bc_neighbors != NULL) {
-			if ((olsr_db_rt_getnexthop(bc_neighbors->neighbor_main_addr, next_hop) != TRUE) &&
+			if ((olsr_db_rt_getnexthop(bc_neighbors->neighbor_main_addr, next_hop) != true) &&
 				(memcmp(bc_neighbors->neighbor_main_addr, dessert_l25_defsrc, ETH_ALEN) != 0)) {
 
 				// if PLR or probabilistic path ETX metric:

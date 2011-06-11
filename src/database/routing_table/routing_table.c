@@ -65,7 +65,7 @@ int olsr_db_rt_addroute(u_int8_t dest_addr[ETH_ALEN], u_int8_t next_hop[ETH_ALEN
 	HASH_FIND(hh, rt_set, dest_addr, ETH_ALEN, entry);
 	if (entry == NULL) {
 		entry = create_rtentry(dest_addr, next_hop, precursor_addr, hop_count, link_quality);
-		if (entry == NULL) return FALSE;
+		if (entry == NULL) return false;
 		HASH_ADD_KEYPTR(hh, rt_set, entry->dest_addr, ETH_ALEN, entry);
 	} else {
 		memcpy(entry->next_hop, next_hop, ETH_ALEN);
@@ -73,15 +73,15 @@ int olsr_db_rt_addroute(u_int8_t dest_addr[ETH_ALEN], u_int8_t next_hop[ETH_ALEN
 		entry->hop_count = hop_count;
 		entry->link_quality = link_quality;
 	}
-	return TRUE;
+	return true;
 }
 
 int olsr_db_rt_getnexthop(u_int8_t dest_addr[ETH_ALEN], u_int8_t next_hop_out[ETH_ALEN]) {
 	olsr_db_rt_t* entry = NULL;
 	HASH_FIND(hh, rt_set, dest_addr, ETH_ALEN, entry);
-	if (entry == NULL) return FALSE;
+	if (entry == NULL) return false;
 	memcpy(next_hop_out, entry->next_hop, ETH_ALEN);
-	return TRUE;
+	return true;
 }
 
 // ------------------- reporting -----------------------------------------------
@@ -93,7 +93,7 @@ int olsr_db_rt_report(char** str_out) {
 	char entry_str[report_str_len  + 1];
 
 	output = malloc(sizeof (char) * report_str_len * (4 + HASH_COUNT(rt_set)) + 1);
-	if (output == NULL) return FALSE;
+	if (output == NULL) return false;
 
 	struct timeval curr_time;
 	gettimeofday(&curr_time, NULL);
@@ -120,7 +120,7 @@ int olsr_db_rt_report(char** str_out) {
 	}
 	strcat(output, "+-------------------+-------------------+-------------------+-----------+--------------+\n");
 	*str_out = output;
-	return TRUE;
+	return true;
 }
 
 int olsr_db_rt_report_so(char** str_out) {
@@ -130,7 +130,7 @@ int olsr_db_rt_report_so(char** str_out) {
 	char entry_str[report_str_len  + 1];
 
 	output = malloc(sizeof (char) * report_str_len * (HASH_COUNT(rt_set)) + 1);
-	if (output == NULL) return FALSE;
+	if (output == NULL) return false;
 
 	struct timeval curr_time;
 	gettimeofday(&curr_time, NULL);
@@ -150,5 +150,5 @@ int olsr_db_rt_report_so(char** str_out) {
 		current_entry = current_entry->hh.next;
 	}
 	*str_out = output;
-	return TRUE;
+	return true;
 }

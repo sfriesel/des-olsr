@@ -56,7 +56,7 @@ rl_packet_id_t* create_entry(u_int8_t key[2 * ETH_ALEN]) {
         return NULL;
     }
     sw_t* sw;
-    if (sw_create(&sw, window_size) != TRUE) {
+    if (sw_create(&sw, window_size) != true) {
         free(entry);
     }
     memcpy(entry->src_dest_addr, key, ETH_ALEN * 2);
@@ -100,16 +100,16 @@ uint8_t rl_check_seq(u_int8_t src_addr[ETH_ALEN], u_int8_t dest_addr[ETH_ALEN], 
     rl_packet_id_t* entry;
     HASH_FIND(hh, rl_entrys, key, ETH_ALEN * 2, entry);
     if(entry == NULL) {
-        return FALSE;
+        return false;
     }
     sw_element_t* el = entry->sw->head;
     while(el != NULL) {
         if (el->seq_num == seq_num) {
-            return TRUE;
+            return true;
         }
         el = el->prev;
     }
-    return FALSE;
+    return false;
 }
 
 void rl_add_seq(u_int8_t src_addr[ETH_ALEN], u_int8_t dest_addr[ETH_ALEN], u_int16_t seq_num) {

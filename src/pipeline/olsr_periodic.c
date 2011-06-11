@@ -39,7 +39,7 @@ int olsr_periodic_send_hello(void *data, struct timeval *scheduled, struct timev
             while(neighbors != NULL && neighs_count-- > 0) {
                 struct olsr_msg_hello_ndescr* ndesc = pointer;
                 pointer += sizeof(struct olsr_msg_hello_ndescr);
-                ndesc->neigh_code = (neighbors->mpr == TRUE)? MPR_NEIGH : SYM_NEIGH;
+                ndesc->neigh_code = (neighbors->mpr == true)? MPR_NEIGH : SYM_NEIGH;
                 memcpy(ndesc->n_main_addr, neighbors->neighbor_main_addr, ETH_ALEN);
                 ndesc->link_quality = olsr_db_ns_getlinkquality(neighbors->neighbor_main_addr);
                 neighbors = neighbors->hh.next;
@@ -174,18 +174,18 @@ int olsr_periodic_build_routingtable(void *data, struct timeval *scheduled, stru
     pthread_rwlock_rdlock(&pp_rwlock);
     uint8_t pending = pending_rtc;
     pthread_rwlock_unlock(&pp_rwlock);
-    if(pending != FALSE) {
+    if(pending != false) {
         dessert_debug("re-building routing table");
         olsr_db_wlock();
         olsr_db_rt_destroy();
         olsr_db_rc_dijkstra();
         olsr_db_unlock();
         pthread_rwlock_wrlock(&pp_rwlock);
-        pending_rtc = FALSE;
+        pending_rtc = false;
         pthread_rwlock_unlock(&pp_rwlock);
     }
     else {
-        dessert_debug("routing table not updated: pending is FALSE");
+        dessert_debug("routing table not updated: pending is false");
     }
     return 0;
 }
@@ -193,7 +193,7 @@ int olsr_periodic_build_routingtable(void *data, struct timeval *scheduled, stru
 int olsr_periodic_cleanup_database(void *data, struct timeval *scheduled, struct timeval *interval) {
     struct timeval timestamp;
     gettimeofday(&timestamp, NULL);
-    if (olsr_db_cleanup(&timestamp)== TRUE) {
+    if (olsr_db_cleanup(&timestamp)== true) {
         return 0;
     }
     return 1;

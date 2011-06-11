@@ -39,32 +39,32 @@ void purge_ltuple(struct timeval* timestamp, void* src_object, void* object) {
 
 int ltuple_create(olsr_db_linkset_ltuple_t** ltuple_out, const dessert_meshif_t* local_iface) {
 	olsr_db_linkset_ltuple_t* tuple = malloc(sizeof(olsr_db_linkset_ltuple_t));
-	if (tuple == NULL) return FALSE;
+	if (tuple == NULL) return false;
 	tuple->local_iface = local_iface;
-	if (timeslot_create(&tuple->ts, tuple, purge_ltuple) == FALSE) {
+	if (timeslot_create(&tuple->ts, tuple, purge_ltuple) == false) {
 		free(tuple);
-		return FALSE;
+		return false;
 	}
 	tuple->neighbor_iface_list = NULL;
 	*ltuple_out = tuple;
-	return TRUE;
+	return true;
 }
 
 int nltuple_create(olsr_db_linkset_nl_entry_t** nl_tuple_out, u_int8_t* neighbor_iface_addr) {
 	olsr_db_linkset_nl_entry_t* tuple = malloc(sizeof(olsr_db_linkset_nl_entry_t));
-	if (tuple == NULL) return FALSE;
+	if (tuple == NULL) return false;
 	memcpy(tuple->neighbor_iface_addr, neighbor_iface_addr, ETH_ALEN);
 	olsr_sw_create(&tuple->sw, window_size);
 	tuple->quality_to_neighbor = 0;
 	*nl_tuple_out = tuple;
-	return TRUE;
+	return true;
 }
 
 olsr_db_linkset_ltuple_t* olsr_db_ls_getif(const dessert_meshif_t* local_iface) {
 	olsr_db_linkset_ltuple_t* lf_tuple;
 	HASH_FIND(hh, link_set, &local_iface, sizeof(int), lf_tuple);
 	if (lf_tuple == NULL) {
-		if (ltuple_create(&lf_tuple, local_iface) == FALSE) return FALSE;
+		if (ltuple_create(&lf_tuple, local_iface) == false) return false;
 		HASH_ADD_KEYPTR(hh, link_set, &lf_tuple->local_iface, sizeof(int), lf_tuple);
 	}
 	return lf_tuple;
@@ -75,7 +75,7 @@ olsr_db_linkset_nl_entry_t* olsr_db_ls_getneigh(olsr_db_linkset_ltuple_t* lf_tup
 	olsr_db_linkset_nl_entry_t* nl_tuple;
 	HASH_FIND(hh, lf_tuple->neighbor_iface_list, neighbor_iface_addr, ETH_ALEN, nl_tuple);
 	if (nl_tuple == NULL) {
-		if (nltuple_create(&nl_tuple, neighbor_iface_addr) == FALSE) return FALSE;
+		if (nltuple_create(&nl_tuple, neighbor_iface_addr) == false) return false;
 		HASH_ADD_KEYPTR(hh, lf_tuple->neighbor_iface_list, nl_tuple->neighbor_iface_addr, ETH_ALEN, nl_tuple);
 		memcpy(nl_tuple->neighbor_main_addr, neighbor_main_addr, ETH_ALEN);
 	}
@@ -122,19 +122,19 @@ int olsr_db_ls_updatelinkquality(const dessert_meshif_t* local_iface, u_int8_t n
 	olsr_db_linkset_ltuple_t* lf_tuple;
 	olsr_db_linkset_nl_entry_t* nl_tuple;
 	HASH_FIND(hh, link_set, &local_iface, sizeof(int), lf_tuple);
-	if (lf_tuple == NULL) return FALSE;
+	if (lf_tuple == NULL) return false;
 
 	timeslot_purgeobjects(lf_tuple->ts);
 
 	// search one more time since entry can be deleted
 	HASH_FIND(hh, link_set, &local_iface, sizeof(int), lf_tuple);
-	if (lf_tuple == NULL) return FALSE;
+	if (lf_tuple == NULL) return false;
 
 	HASH_FIND(hh, lf_tuple->neighbor_iface_list, neighbor_iface_addr, ETH_ALEN, nl_tuple);
-	if (nl_tuple == NULL) return FALSE;
+	if (nl_tuple == NULL) return false;
 
 	olsr_sw_addsn(nl_tuple->sw, hello_seq_num);
-	return TRUE;
+	return true;
 }
 
 int olsr_db_ls_gettuple(const dessert_meshif_t* local_iface, u_int8_t neighbor_iface_addr[ETH_ALEN],
@@ -142,23 +142,23 @@ int olsr_db_ls_gettuple(const dessert_meshif_t* local_iface, u_int8_t neighbor_i
 	olsr_db_linkset_ltuple_t* lf_tuple;
 	olsr_db_linkset_nl_entry_t* nl_tuple;
 	HASH_FIND(hh, link_set, &local_iface, sizeof(void*), lf_tuple);
-	if (lf_tuple == NULL) return FALSE;
+	if (lf_tuple == NULL) return false;
 
 	timeslot_purgeobjects(lf_tuple->ts);
 
 	// search one more time since entry can be deleted
 	HASH_FIND(hh, link_set, &local_iface, sizeof(void*), lf_tuple);
-	if (lf_tuple == NULL) return FALSE;
+	if (lf_tuple == NULL) return false;
 
 	HASH_FIND(hh, lf_tuple->neighbor_iface_list, neighbor_iface_addr, ETH_ALEN, nl_tuple);
-	if (nl_tuple == NULL) return FALSE;
+	if (nl_tuple == NULL) return false;
 
 	SYM_time_out->tv_sec = nl_tuple->SYM_time.tv_sec;
 	SYM_time_out->tv_usec = nl_tuple->SYM_time.tv_usec;
 	ASYM_time_out->tv_sec = nl_tuple->ASYM_time.tv_sec;
 	ASYM_time_out->tv_usec = nl_tuple->ASYM_time.tv_usec;
 
-	return TRUE;
+	return true;
 }
 
 olsr_db_linkset_nl_entry_t* olsr_db_ls_getlinkset(const dessert_meshif_t* local_iface) {
@@ -180,11 +180,11 @@ int olsr_db_ls_getmainaddr(const dessert_meshif_t* local_iface, u_int8_t neighbo
 	olsr_db_linkset_ltuple_t* lf_tuple;
 	olsr_db_linkset_nl_entry_t* nl_tuple;
 	HASH_FIND(hh, link_set, &local_iface, sizeof(void*), lf_tuple);
-	if (lf_tuple == NULL) return FALSE;
+	if (lf_tuple == NULL) return false;
 	HASH_FIND(hh, lf_tuple->neighbor_iface_list, neighbor_iface_addr, ETH_ALEN, nl_tuple);
-	if (nl_tuple == NULL) return FALSE;
+	if (nl_tuple == NULL) return false;
 	memcpy(neighbor_main_addr_out, nl_tuple->neighbor_main_addr, ETH_ALEN);
-	return TRUE;
+	return true;
 }
 
 // ------------------- reporting -----------------------------------------------
@@ -203,7 +203,7 @@ int olsr_db_ls_report(char** str_out) {
 	current_entry = link_set;
 
 	output = malloc(sizeof (char) * report_str_len * (4 + str_count) + 1);
-	if (output == NULL) return FALSE;
+	if (output == NULL) return false;
 
 	struct timeval curr_time;
 	gettimeofday(&curr_time, NULL);
@@ -221,8 +221,8 @@ int olsr_db_ls_report(char** str_out) {
 				neigbors->neighbor_iface_addr[0], neigbors->neighbor_iface_addr[1],
 				neigbors->neighbor_iface_addr[2], neigbors->neighbor_iface_addr[3],
 				neigbors->neighbor_iface_addr[4], neigbors->neighbor_iface_addr[5],
-				(hf_compare_tv(&neigbors->SYM_time, &curr_time) >= 0)? "TRUE" : "FALSE",
-				(hf_compare_tv(&neigbors->ASYM_time, &curr_time) >= 0)? "TRUE" : "FALSE");
+				(hf_compare_tv(&neigbors->SYM_time, &curr_time) >= 0)? "true" : "false",
+				(hf_compare_tv(&neigbors->ASYM_time, &curr_time) >= 0)? "true" : "false");
 			strcat(output, entry_str);
 			neigbors = neigbors->hh.next;
 		}
@@ -230,5 +230,5 @@ int olsr_db_ls_report(char** str_out) {
 	}
 	strcat(output, "+---------------+-------------------+-------+-------+\n");
 	*str_out = output;
-	return TRUE;
+	return true;
 }

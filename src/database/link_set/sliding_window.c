@@ -30,26 +30,26 @@ int olsr_create_new_sw_element(olsr_sw_element_t** sw_el_out, u_int16_t seq_num)
 
 	new_el = malloc(sizeof(olsr_sw_element_t));
 	if (new_el == NULL)
-		return FALSE;
+		return false;
 	new_el->next = NULL;
 	new_el->prev = NULL;
 	new_el->seq_num = seq_num;
 	*sw_el_out = new_el;
-	return TRUE;
+	return true;
 }
 
 int olsr_sw_create(olsr_sw_t** swout, u_int8_t max_window_size){
 	olsr_sw_t* sw;
 	sw = malloc(sizeof(olsr_sw_t));
 	if (sw == NULL) {
-		return FALSE;
+		return false;
 	}
 	sw->head = NULL;
 	sw->tail = NULL;
 	sw->size = 0;
 	sw->max_size = max_window_size;
 	*swout = sw;
-	return TRUE;
+	return true;
 }
 
 int olsr_sw_destroy(olsr_sw_t* sw) {
@@ -61,7 +61,7 @@ int olsr_sw_destroy(olsr_sw_t* sw) {
 		free(temp_el);
 	}
 	free(sw);
-	return TRUE;
+	return true;
 };
 
 int olsr_sw_dropsn(olsr_sw_t* sw, u_int16_t seq_num) {
@@ -77,7 +77,7 @@ int olsr_sw_dropsn(olsr_sw_t* sw, u_int16_t seq_num) {
 		}
 		sw->size--;
 	}
-	return TRUE;
+	return true;
 }
 
 int olsr_sw_addsn(olsr_sw_t* sw, u_int16_t seq_num){
@@ -85,25 +85,25 @@ int olsr_sw_addsn(olsr_sw_t* sw, u_int16_t seq_num){
 
 	if ((sw->head != NULL) &&
 			(hf_seq_comp_i_j(sw->head->seq_num, seq_num + sw->max_size) >= 0 ))
-		return TRUE;
+		return true;
 	if (sw->size == 0) {
-		if (olsr_create_new_sw_element(&new_el, seq_num) == FALSE)
-			return FALSE;
+		if (olsr_create_new_sw_element(&new_el, seq_num) == false)
+			return false;
 		sw->head = sw->tail = new_el;
 		sw->size = 1;
-		return TRUE;
+		return true;
 	}
 
 	// insert new element to appropriate place
 	olsr_sw_element_t* search_el = sw->head;
 	while(search_el->prev != NULL && hf_seq_comp_i_j(search_el->seq_num, seq_num) >= 0) {
-		if (search_el->seq_num == seq_num) return TRUE;
+		if (search_el->seq_num == seq_num) return true;
 		// we search for an smaller element
 		search_el = search_el->prev;
 	}
-	if (search_el->seq_num == seq_num) return TRUE;
-	if (olsr_create_new_sw_element(&new_el, seq_num) == FALSE)
-		return FALSE;
+	if (search_el->seq_num == seq_num) return true;
+	if (olsr_create_new_sw_element(&new_el, seq_num) == false)
+		return false;
 	if (hf_seq_comp_i_j(search_el->seq_num, seq_num) < 0) {
 		// insert new element after search element
 		new_el->prev = search_el;
@@ -124,7 +124,7 @@ int olsr_sw_addsn(olsr_sw_t* sw, u_int16_t seq_num){
 	// drop all elements out of WINDOW_SIZE range
 	olsr_sw_dropsn(sw, sw->head->seq_num);
 
-	return TRUE;
+	return true;
 }
 
 u_int8_t olsr_sw_getquality(olsr_sw_t* sw) {

@@ -53,17 +53,17 @@ int olsr_db_brct_addid(u_int8_t shost_ether[ETH_ALEN], u_int32_t brc_id, struct 
 	HASH_FIND(hh, brclog_set, shost_ether, ETH_ALEN, entry);
 	if (entry == NULL) {
 		entry = malloc(sizeof(olsr_brclog_entry_t));
-		if (entry == NULL) return FALSE;
+		if (entry == NULL) return false;
 		memcpy(entry->shost_ether, shost_ether, ETH_ALEN);
 		HASH_ADD_KEYPTR(hh, brclog_set, entry->shost_ether, ETH_ALEN, entry);
 		entry->brc_id = brc_id;
 		timeslot_addobject(brclog_ts, purge_time, entry);
-		return TRUE;
+		return true;
 	}
 	if (entry->brc_id < brc_id) {
 		entry->brc_id = brc_id;
 		timeslot_addobject(brclog_ts, purge_time, entry);
-		return TRUE;
+		return true;
 	}
-	return FALSE;
+	return false;
 }
