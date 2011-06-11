@@ -28,14 +28,14 @@ For further information and questions please use the web site
 
 int rl_table_init();
 
-u_int16_t rl_get_nextseq(u_int8_t src_addr[ETH_ALEN], u_int8_t dest_addr[ETH_ALEN]);
+uint16_t rl_get_nextseq(uint8_t src_addr[ETH_ALEN], uint8_t dest_addr[ETH_ALEN]);
 
 /**
  * Return true if given seq_num is equals to thin in database
  * (i.e. this packet was already processed)
  */
-uint8_t rl_check_seq(u_int8_t src_addr[ETH_ALEN], u_int8_t dest_addr[ETH_ALEN], u_int16_t seq_num);
+uint8_t rl_check_seq(uint8_t src_addr[ETH_ALEN], uint8_t dest_addr[ETH_ALEN], uint16_t seq_num);
 
-void rl_add_seq(u_int8_t src_addr[ETH_ALEN], u_int8_t dest_addr[ETH_ALEN], u_int16_t seq_num);
+void rl_add_seq(uint8_t src_addr[ETH_ALEN], uint8_t dest_addr[ETH_ALEN], uint16_t seq_num);
 
 #endif

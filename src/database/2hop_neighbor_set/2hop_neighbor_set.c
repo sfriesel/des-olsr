@@ -27,14 +27,14 @@ For further information and questions please use the web site
 #include "2hop_neighbor_set.h"
 
 typedef struct _1hopn_to_2hopns {
-    u_int8_t                _1hop_neighbor[ETH_ALEN]; // key
+    uint8_t                _1hop_neighbor[ETH_ALEN]; // key
     olsr_2hns_neighbor_t*   _2hop_neighbors;
     timeslot_t*             ts;
     UT_hash_handle          hh;
 } _1hopn_to_2hopns_t;
 
 typedef struct _2hopn_to_1hopns {
-    u_int8_t                _2hop_neighbor[ETH_ALEN]; // key
+    uint8_t                _2hop_neighbor[ETH_ALEN]; // key
     olsr_2hns_neighbor_t*   _1hop_neighbors;
     UT_hash_handle          hh;
 } _2hopn_to_1hopns_t;
@@ -69,7 +69,7 @@ void purge_2h_neighbor(struct timeval* timestamp, void* src_object, void* object
 	}
 }
 
-int neighbor_entry_create(olsr_2hns_neighbor_t** entry_out, u_int8_t ether_addr[ETH_ALEN]) {
+int neighbor_entry_create(olsr_2hns_neighbor_t** entry_out, uint8_t ether_addr[ETH_ALEN]) {
 	olsr_2hns_neighbor_t* entry = malloc(sizeof(olsr_2hns_neighbor_t));
 	if (entry == NULL) {
         return false;
@@ -79,7 +79,7 @@ int neighbor_entry_create(olsr_2hns_neighbor_t** entry_out, u_int8_t ether_addr[
 	return true;
 }
 
-int _1hop_to_2hop_entry_create(_1hopn_to_2hopns_t** entry_out, u_int8_t _1hop_neighbor_addr[ETH_ALEN]) {
+int _1hop_to_2hop_entry_create(_1hopn_to_2hopns_t** entry_out, uint8_t _1hop_neighbor_addr[ETH_ALEN]) {
 	_1hopn_to_2hopns_t* entry = malloc(sizeof(_1hopn_to_2hopns_t));
 	if (entry == NULL) {
         return false;
@@ -94,7 +94,7 @@ int _1hop_to_2hop_entry_create(_1hopn_to_2hopns_t** entry_out, u_int8_t _1hop_ne
 	return true;
 }
 
-int _2hop_to_1hop_entry_create(_2hopn_to_1hopns_t** entry_out, u_int8_t _2hop_neighbor_addr[ETH_ALEN]) {
+int _2hop_to_1hop_entry_create(_2hopn_to_1hopns_t** entry_out, uint8_t _2hop_neighbor_addr[ETH_ALEN]) {
 	_2hopn_to_1hopns_t* entry = malloc(sizeof(_2hopn_to_1hopns_t));
 	if (entry == NULL) {
         return false;
@@ -105,8 +105,8 @@ int _2hop_to_1hop_entry_create(_2hopn_to_1hopns_t** entry_out, u_int8_t _2hop_ne
 	return true;
 }
 
-int olsr_db_2hns_add2hneighbor(u_int8_t _1hop_neighbor_addr[ETH_ALEN],
-		u_int8_t _2hop_neighbor_addr[ETH_ALEN], u_int8_t link_quality, struct timeval* purge_time) {
+int olsr_db_2hns_add2hneighbor(uint8_t _1hop_neighbor_addr[ETH_ALEN],
+		uint8_t _2hop_neighbor_addr[ETH_ALEN], uint8_t link_quality, struct timeval* purge_time) {
 	_1hopn_to_2hopns_t* 	_1hset_entry;
 	_2hopn_to_1hopns_t*		_2hset_entry;
 	olsr_2hns_neighbor_t*	_1h_neighbor;
@@ -147,7 +147,7 @@ int olsr_db_2hns_add2hneighbor(u_int8_t _1hop_neighbor_addr[ETH_ALEN],
 	return true;
 }
 
-olsr_2hns_neighbor_t* olsr_db_2hns_get2hneighbors(u_int8_t _1hop_neighbor_addr[ETH_ALEN]) {
+olsr_2hns_neighbor_t* olsr_db_2hns_get2hneighbors(uint8_t _1hop_neighbor_addr[ETH_ALEN]) {
 	_1hopn_to_2hopns_t* _1hset_entry;
 	HASH_FIND(hh, _1hset_entrys, _1hop_neighbor_addr, ETH_ALEN, _1hset_entry);
 	if (_1hset_entry == NULL) {
@@ -165,7 +165,7 @@ olsr_2hns_neighbor_t* olsr_db_2hns_get2hneighbors(u_int8_t _1hop_neighbor_addr[E
 	return _1hset_entry->_2hop_neighbors;
 }
 
-olsr_2hns_neighbor_t* olsr_db_2hns_get1hneighbors(u_int8_t _2hop_neighbor_addr[ETH_ALEN]) {
+olsr_2hns_neighbor_t* olsr_db_2hns_get1hneighbors(uint8_t _2hop_neighbor_addr[ETH_ALEN]) {
 	_2hopn_to_1hopns_t* _2hset_entry;
 	HASH_FIND(hh, _2hset_entrys, _2hop_neighbor_addr, ETH_ALEN, _2hset_entry);
 	if (_2hset_entry == NULL) {
@@ -198,7 +198,7 @@ olsr_2hns_neighbor_t* olsr_db_2hns_get2hnset() {
 	return _2hn_set;
 }
 
-void olsr_db_2hns_del1hneighbor(u_int8_t _1hop_neighbor_addr[ETH_ALEN]) {
+void olsr_db_2hns_del1hneighbor(uint8_t _1hop_neighbor_addr[ETH_ALEN]) {
 	_1hopn_to_2hopns_t* _1hset_entry;
 	HASH_FIND(hh, _1hset_entrys, _1hop_neighbor_addr, ETH_ALEN, _1hset_entry);
 	if (_1hset_entry == NULL) {
@@ -230,7 +230,7 @@ void olsr_db_2hns_del1hneighbor(u_int8_t _1hop_neighbor_addr[ETH_ALEN]) {
 	free(_1hset_entry);
 }
 
-void olsr_db_2hns_del2hneighbor(u_int8_t _2hop_neighbor_addr[ETH_ALEN]) {
+void olsr_db_2hns_del2hneighbor(uint8_t _2hop_neighbor_addr[ETH_ALEN]) {
 	_2hopn_to_1hopns_t* _2hset_entry;
 	HASH_FIND(hh, _2hset_entrys, _2hop_neighbor_addr, ETH_ALEN, _2hset_entry);
 	if (_2hset_entry == NULL) {
@@ -266,7 +266,7 @@ void olsr_db_2hns_del2hneighbor(u_int8_t _2hop_neighbor_addr[ETH_ALEN]) {
 /**
  * Drops all of old associated 2hop neighbors from this 1hop host
  */
-void olsr_db_2hns_clear1hn(u_int8_t _1hop_neighbor_addr[ETH_ALEN]) {
+void olsr_db_2hns_clear1hn(uint8_t _1hop_neighbor_addr[ETH_ALEN]) {
 	_1hopn_to_2hopns_t* _1hset_entry;
 	HASH_FIND(hh, _1hset_entrys, _1hop_neighbor_addr, ETH_ALEN, _1hset_entry);
 	if (_1hset_entry == NULL) {
@@ -275,8 +275,8 @@ void olsr_db_2hns_clear1hn(u_int8_t _1hop_neighbor_addr[ETH_ALEN]) {
 	timeslot_purgeobjects(_1hset_entry->ts);
 }
 
-u_int8_t olsr_db_2hns_getlinkquality(u_int8_t _1hop_neighbor_addr[ETH_ALEN],
-		u_int8_t _2hop_neighbor_addr[ETH_ALEN]) {
+uint8_t olsr_db_2hns_getlinkquality(uint8_t _1hop_neighbor_addr[ETH_ALEN],
+		uint8_t _2hop_neighbor_addr[ETH_ALEN]) {
 	_1hopn_to_2hopns_t* _1hset_entry;
 	HASH_FIND(hh, _1hset_entrys, _1hop_neighbor_addr, ETH_ALEN, _1hset_entry);
 	if (_1hset_entry == NULL) {

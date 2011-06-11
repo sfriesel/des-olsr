@@ -27,9 +27,9 @@ For further information and questions please use the web site
 
 
 typedef struct dtuple {
-	u_int8_t 		addr[ETH_ALEN];		// key
-	u_int16_t		seq_num;
-	u_int8_t		retransmitted;
+	uint8_t 		addr[ETH_ALEN];		// key
+	uint16_t		seq_num;
+	uint8_t		retransmitted;
 	UT_hash_handle	hh;
 } dtuple_t;
 
@@ -46,7 +46,7 @@ int	olsr_db_dt_init() {
 	return timeslot_create(&dt_ts, NULL, purge_dtuple);
 }
 
-int dtuple_create(dtuple_t** tuple_out, u_int8_t ether_addr[ETH_ALEN], u_int16_t seq_num, u_int8_t retransmitted) {
+int dtuple_create(dtuple_t** tuple_out, uint8_t ether_addr[ETH_ALEN], uint16_t seq_num, uint8_t retransmitted) {
 	dtuple_t* tuple = malloc(sizeof(dtuple_t));
 	if (tuple == NULL) {
         return false;
@@ -58,7 +58,7 @@ int dtuple_create(dtuple_t** tuple_out, u_int8_t ether_addr[ETH_ALEN], u_int16_t
 	return true;
 }
 
-int olsr_db_dt_settuple(u_int8_t ether_addr[ETH_ALEN], u_int16_t seq_num, u_int8_t retransmitted, struct timeval* purge_time) {
+int olsr_db_dt_settuple(uint8_t ether_addr[ETH_ALEN], uint16_t seq_num, uint8_t retransmitted, struct timeval* purge_time) {
 	dtuple_t* tuple;
 	HASH_FIND(hh, dupl_table, ether_addr, ETH_ALEN, tuple);
 	if (tuple == NULL) {
@@ -74,7 +74,7 @@ int olsr_db_dt_settuple(u_int8_t ether_addr[ETH_ALEN], u_int16_t seq_num, u_int8
 	return true;
 }
 
-int olsr_db_dt_gettuple(u_int8_t ether_addr[ETH_ALEN], u_int8_t* retransmitted_out) {
+int olsr_db_dt_gettuple(uint8_t ether_addr[ETH_ALEN], uint8_t* retransmitted_out) {
 	timeslot_purgeobjects(dt_ts);
 
 	dtuple_t* tuple;

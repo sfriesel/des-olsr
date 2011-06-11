@@ -29,31 +29,31 @@ For further information and questions please use the web site
 #include <linux/if_ether.h>
 
 typedef struct olsr_2hns_neighbor {
-	u_int8_t		ether_addr[ETH_ALEN];
-	u_int8_t		link_quality;
+	uint8_t		ether_addr[ETH_ALEN];
+	uint8_t		link_quality;
 	UT_hash_handle	hh;
 } olsr_2hns_neighbor_t;
 
-int olsr_db_2hns_add2hneighbor(u_int8_t _1hop_neighbor_addr[ETH_ALEN],
-		u_int8_t _2hop_neighbor_addr[ETH_ALEN], u_int8_t link_quality, struct timeval* purge_time);
+int olsr_db_2hns_add2hneighbor(uint8_t _1hop_neighbor_addr[ETH_ALEN],
+		uint8_t _2hop_neighbor_addr[ETH_ALEN], uint8_t link_quality, struct timeval* purge_time);
 
-olsr_2hns_neighbor_t* olsr_db_2hns_get2hneighbors(u_int8_t _1hop_neighbor_addr[ETH_ALEN]);
+olsr_2hns_neighbor_t* olsr_db_2hns_get2hneighbors(uint8_t _1hop_neighbor_addr[ETH_ALEN]);
 
-olsr_2hns_neighbor_t* olsr_db_2hns_get1hneighbors(u_int8_t _2hop_neighbor_addr[ETH_ALEN]);
+olsr_2hns_neighbor_t* olsr_db_2hns_get1hneighbors(uint8_t _2hop_neighbor_addr[ETH_ALEN]);
 
 olsr_2hns_neighbor_t* olsr_db_2hns_get1hnset();
 
 olsr_2hns_neighbor_t* olsr_db_2hns_get2hnset();
 
 
-void olsr_db_2hns_del1hneighbor(u_int8_t _1hop_neighbor_addr[ETH_ALEN]);
+void olsr_db_2hns_del1hneighbor(uint8_t _1hop_neighbor_addr[ETH_ALEN]);
 
-void olsr_db_2hns_del2hneighbor(u_int8_t _2hop_neighbor_addr[ETH_ALEN]);
+void olsr_db_2hns_del2hneighbor(uint8_t _2hop_neighbor_addr[ETH_ALEN]);
 
-void olsr_db_2hns_clear1hn(u_int8_t _1hop_neighbor_addr[ETH_ALEN]);
+void olsr_db_2hns_clear1hn(uint8_t _1hop_neighbor_addr[ETH_ALEN]);
 
-u_int8_t olsr_db_2hns_getlinkquality(u_int8_t _1hop_neghbor_addr[ETH_ALEN],
-		u_int8_t _2hop_neghbor_addr[ETH_ALEN]);
+uint8_t olsr_db_2hns_getlinkquality(uint8_t _1hop_neghbor_addr[ETH_ALEN],
+		uint8_t _2hop_neghbor_addr[ETH_ALEN]);
 
 int olsr_db_2hns_report(char** str_out);
 

@@ -25,13 +25,14 @@ For further information and questions please use the web site
 #define OLSR_DUPLICATE_TABLE
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <linux/if_ether.h>
 #include "../../android.h"
 
 int	olsr_db_dt_init();
 
-int olsr_db_dt_settuple(u_int8_t ether_addr[ETH_ALEN], u_int16_t seq_num, u_int8_t retransmitted, struct timeval* purge_time);
+int olsr_db_dt_settuple(uint8_t ether_addr[ETH_ALEN], uint16_t seq_num, uint8_t retransmitted, struct timeval* purge_time);
 
-int olsr_db_dt_gettuple(u_int8_t ether_addr[ETH_ALEN], u_int8_t* retransmitted_out);
+int olsr_db_dt_gettuple(uint8_t ether_addr[ETH_ALEN], uint8_t* retransmitted_out);
 
 #endif

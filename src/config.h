@@ -25,6 +25,7 @@ For further information and questions please use the web site
 #define OLSR_CONFIG
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <dessert.h>
 
 enum extension_types {

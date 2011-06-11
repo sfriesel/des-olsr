@@ -25,6 +25,7 @@ For further information and questions please use the web site
 #define AODV_RREQID_T
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <linux/if_ether.h>
 #include "../../android.h"
 
@@ -33,6 +34,6 @@ int olsr_db_brct_init();
 /**
  * Returns true if broadcast id is newer then that of entry in database
  */
-int olsr_db_brct_addid(u_int8_t shost_ether[ETH_ALEN], u_int32_t brc_id, struct timeval* purge_time);
+int olsr_db_brct_addid(uint8_t shost_ether[ETH_ALEN], uint32_t brc_id, struct timeval* purge_time);
 
 #endif

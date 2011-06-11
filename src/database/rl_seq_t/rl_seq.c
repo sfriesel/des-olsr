@@ -31,7 +31,7 @@ For further information and questions please use the web site
 #include "../../helper.h"
 
 typedef struct rl_packet_id {
-    u_int8_t src_dest_addr[ETH_ALEN * 2]; // key
+    uint8_t src_dest_addr[ETH_ALEN * 2]; // key
     sw_t* sw;
     UT_hash_handle hh;
 } rl_packet_id_t;
@@ -50,7 +50,7 @@ int rl_table_init() {
     return timeslot_create(&rl_ts, NULL, on_rl_timeout);
 }
 
-rl_packet_id_t* create_entry(u_int8_t key[2 * ETH_ALEN]) {
+rl_packet_id_t* create_entry(uint8_t key[2 * ETH_ALEN]) {
     rl_packet_id_t* entry = malloc(sizeof(rl_packet_id_t));
     if (entry == NULL) {
         return NULL;
@@ -64,13 +64,13 @@ rl_packet_id_t* create_entry(u_int8_t key[2 * ETH_ALEN]) {
     return entry;
 }
 
-u_int16_t rl_get_nextseq(u_int8_t src_addr[ETH_ALEN], u_int8_t dest_addr[ETH_ALEN]) {
-    u_int8_t key[ETH_ALEN * 2];
+uint16_t rl_get_nextseq(uint8_t src_addr[ETH_ALEN], uint8_t dest_addr[ETH_ALEN]) {
+    uint8_t key[ETH_ALEN * 2];
     memcpy(key, src_addr, ETH_ALEN);
     memcpy(key + ETH_ALEN, dest_addr, ETH_ALEN);
     rl_packet_id_t* entry;
     HASH_FIND(hh, rl_entrys, key, ETH_ALEN * 2, entry);
-    u_int16_t packet_seq = 0;
+    uint16_t packet_seq = 0;
     if (entry == NULL) {
         entry = create_entry(key);
         if (entry == NULL) {
@@ -92,9 +92,9 @@ u_int16_t rl_get_nextseq(u_int8_t src_addr[ETH_ALEN], u_int8_t dest_addr[ETH_ALE
     return packet_seq;
 }
 
-uint8_t rl_check_seq(u_int8_t src_addr[ETH_ALEN], u_int8_t dest_addr[ETH_ALEN], u_int16_t seq_num) {
+uint8_t rl_check_seq(uint8_t src_addr[ETH_ALEN], uint8_t dest_addr[ETH_ALEN], uint16_t seq_num) {
     timeslot_purgeobjects(rl_ts);
-    u_int8_t key[ETH_ALEN * 2];
+    uint8_t key[ETH_ALEN * 2];
     memcpy(key, src_addr, ETH_ALEN);
     memcpy(key + ETH_ALEN, dest_addr, ETH_ALEN);
     rl_packet_id_t* entry;
@@ -112,8 +112,8 @@ uint8_t rl_check_seq(u_int8_t src_addr[ETH_ALEN], u_int8_t dest_addr[ETH_ALEN], 
     return false;
 }
 
-void rl_add_seq(u_int8_t src_addr[ETH_ALEN], u_int8_t dest_addr[ETH_ALEN], u_int16_t seq_num) {
-    u_int8_t key[ETH_ALEN * 2];
+void rl_add_seq(uint8_t src_addr[ETH_ALEN], uint8_t dest_addr[ETH_ALEN], uint16_t seq_num) {
+    uint8_t key[ETH_ALEN * 2];
     memcpy(key, src_addr, ETH_ALEN);
     memcpy(key + ETH_ALEN, dest_addr, ETH_ALEN);
     rl_packet_id_t* entry = NULL;

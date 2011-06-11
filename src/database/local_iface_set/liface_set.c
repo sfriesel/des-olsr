@@ -26,7 +26,7 @@ For further information and questions please use the web site
 #include "../../config.h"
 #include "../../android.h"
 
-int olsr_db_lis_islocaliface(u_int8_t iface_addr[ETH_ALEN]) {
+int olsr_db_lis_islocaliface(uint8_t iface_addr[ETH_ALEN]) {
     dessert_meshif_t* iface = dessert_meshiflist_get();
     while (iface != NULL) {
         if (memcmp(iface->hwaddr, iface_addr, ETH_ALEN) == 0) {

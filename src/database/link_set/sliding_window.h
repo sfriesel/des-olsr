@@ -25,26 +25,27 @@ For further information and questions please use the web site
 #define SLIDING_WINDOW
 
 #include <stdlib.h>
+#include <stdint.h>
 
 typedef struct olsr_sw_element {
 	struct olsr_sw_element*	prev;
 	struct olsr_sw_element*	next;
-	u_int16_t				seq_num;
+	uint16_t				seq_num;
 } olsr_sw_element_t;
 
 typedef struct olsr_sw {
 	olsr_sw_element_t*	head;
 	olsr_sw_element_t*	tail;
-	u_int8_t			size;
-	u_int8_t			max_size;
+	uint8_t			size;
+	uint8_t			max_size;
 } olsr_sw_t;
 
-int olsr_sw_create(olsr_sw_t** sw_out, u_int8_t max_window_size);
+int olsr_sw_create(olsr_sw_t** sw_out, uint8_t max_window_size);
 
 int olsr_sw_destroy(olsr_sw_t* sw);
 
-int olsr_sw_addsn(olsr_sw_t* sw, u_int16_t seq_num);
+int olsr_sw_addsn(olsr_sw_t* sw, uint16_t seq_num);
 
-u_int8_t olsr_sw_getquality(olsr_sw_t* sw);
+uint8_t olsr_sw_getquality(olsr_sw_t* sw);
 
 #endif

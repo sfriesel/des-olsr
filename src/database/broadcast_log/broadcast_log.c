@@ -27,8 +27,8 @@ For further information and questions please use the web site
 
 
 typedef struct aodv_brclog_entry {
-	u_int8_t 		shost_ether[ETH_ALEN];
-	u_int32_t		brc_id;
+	uint8_t 		shost_ether[ETH_ALEN];
+	uint32_t		brc_id;
 	UT_hash_handle	hh;
 } olsr_brclog_entry_t;
 
@@ -45,7 +45,7 @@ int olsr_db_brct_init() {
 	return timeslot_create(&brclog_ts, NULL, purge_brcid_entry);
 }
 
-int olsr_db_brct_addid(u_int8_t shost_ether[ETH_ALEN], u_int32_t brc_id, struct timeval* purge_time) {
+int olsr_db_brct_addid(uint8_t shost_ether[ETH_ALEN], uint32_t brc_id, struct timeval* purge_time) {
 	olsr_brclog_entry_t* entry;
 	timeslot_purgeobjects(brclog_ts);
 	HASH_FIND(hh, brclog_set, shost_ether, ETH_ALEN, entry);

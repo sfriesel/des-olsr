@@ -26,7 +26,7 @@ For further information and questions please use the web site
 #include "../../config.h"
 #include "../../helper.h"
 
-int batman_create_new_sw_element(sw_element_t** sw_el_out, u_int16_t seq_num){
+int batman_create_new_sw_element(sw_element_t** sw_el_out, uint16_t seq_num){
 	sw_element_t* new_el;
 
 	new_el = malloc(sizeof(sw_element_t));
@@ -40,7 +40,7 @@ int batman_create_new_sw_element(sw_element_t** sw_el_out, u_int16_t seq_num){
 	return true;
 }
 
-int sw_create(sw_t** swout, u_int8_t ws){
+int sw_create(sw_t** swout, uint8_t ws){
 	sw_t* sw;
 	sw = malloc(sizeof(sw_t));
 	if (sw == NULL) {
@@ -66,7 +66,7 @@ int sw_destroy(sw_t* sw) {
 	return true;
 };
 
-int sw_dropsn(sw_t* sw, u_int16_t seq_num) {
+int sw_dropsn(sw_t* sw, uint16_t seq_num) {
 	sw_element_t* search_el = sw->tail;
 	while(search_el != NULL && hf_seq_comp_i_j(seq_num, search_el->seq_num + sw->window_size) >= 0  ) {
 		search_el = search_el->next;
@@ -84,7 +84,7 @@ int sw_dropsn(sw_t* sw, u_int16_t seq_num) {
 	return true;
 }
 
-int sw_addsn(sw_t* sw, u_int16_t seq_num){
+int sw_addsn(sw_t* sw, uint16_t seq_num){
 	sw_element_t* new_el;
 
 	if ((sw->head != NULL)

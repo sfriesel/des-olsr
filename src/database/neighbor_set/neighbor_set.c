@@ -44,7 +44,7 @@ int	olsr_db_ns_init() {
     return timeslot_create(&ns_ts, NULL, purge_nstuple);
 }
 
-int ntuple_create(olsr_db_ns_tuple_t** tuple_out, u_int8_t neighbor_main_addr[ETH_ALEN]) {
+int ntuple_create(olsr_db_ns_tuple_t** tuple_out, uint8_t neighbor_main_addr[ETH_ALEN]) {
     olsr_db_ns_tuple_t* tuple = malloc(sizeof(olsr_db_ns_tuple_t));
     if (tuple == NULL) {
         return false;
@@ -59,7 +59,7 @@ int ntuple_create(olsr_db_ns_tuple_t** tuple_out, u_int8_t neighbor_main_addr[ET
     return true;
 }
 
-olsr_db_ns_tuple_t* olsr_db_ns_gcneigh(u_int8_t neighbor_main_addr[ETH_ALEN]) {
+olsr_db_ns_tuple_t* olsr_db_ns_gcneigh(uint8_t neighbor_main_addr[ETH_ALEN]) {
     olsr_db_ns_tuple_t* tuple;
     HASH_FIND(hh, neighbor_set, neighbor_main_addr, ETH_ALEN, tuple);
     if (tuple == NULL) {
@@ -75,7 +75,7 @@ void olsr_db_ns_updatetimeslot(olsr_db_ns_tuple_t* tuple, struct timeval* purget
     timeslot_addobject(ns_ts, purgetime, tuple);
 }
 
-int olsr_db_ns_getneigh(u_int8_t neighbor_main_addr[ETH_ALEN], u_int8_t* mpr_out, u_int8_t* mpr_selector_out, u_int8_t* willingness_out) {
+int olsr_db_ns_getneigh(uint8_t neighbor_main_addr[ETH_ALEN], uint8_t* mpr_out, uint8_t* mpr_selector_out, uint8_t* willingness_out) {
     timeslot_purgeobjects(ns_ts);
 
     olsr_db_ns_tuple_t* tuple;
@@ -89,7 +89,7 @@ int olsr_db_ns_getneigh(u_int8_t neighbor_main_addr[ETH_ALEN], u_int8_t* mpr_out
     return true;
 }
 
-int olsr_db_ns_isneigh(u_int8_t neighbor_main_addr[ETH_ALEN]) {
+int olsr_db_ns_isneigh(uint8_t neighbor_main_addr[ETH_ALEN]) {
     timeslot_purgeobjects(ns_ts);
 
     olsr_db_ns_tuple_t* tuple;
@@ -100,7 +100,7 @@ int olsr_db_ns_isneigh(u_int8_t neighbor_main_addr[ETH_ALEN]) {
     return true;
 }
 
-int olsr_db_ns_ismprselector(u_int8_t neighbor_main_addr[ETH_ALEN]) {
+int olsr_db_ns_ismprselector(uint8_t neighbor_main_addr[ETH_ALEN]) {
     timeslot_purgeobjects(ns_ts);
 
     olsr_db_ns_tuple_t* tuple;
@@ -111,7 +111,7 @@ int olsr_db_ns_ismprselector(u_int8_t neighbor_main_addr[ETH_ALEN]) {
     return tuple->mpr_selector;
 }
 
-int olsr_db_ns_setneigh_mprstatus(u_int8_t neighbor_main_addr[ETH_ALEN], u_int8_t is_mpr) {
+int olsr_db_ns_setneigh_mprstatus(uint8_t neighbor_main_addr[ETH_ALEN], uint8_t is_mpr) {
     timeslot_purgeobjects(ns_ts);
 
     olsr_db_ns_tuple_t* tuple;
@@ -137,7 +137,7 @@ olsr_db_ns_tuple_t* olsr_db_ns_getneighset() {
     return neighbor_set;
 }
 
-u_int8_t olsr_db_ns_getlinkquality(u_int8_t neighbor_main_addr[ETH_ALEN]) {
+uint8_t olsr_db_ns_getlinkquality(uint8_t neighbor_main_addr[ETH_ALEN]) {
     timeslot_purgeobjects(ns_ts);
     olsr_db_ns_tuple_t* tuple;
     HASH_FIND(hh, neighbor_set, neighbor_main_addr, ETH_ALEN, tuple);
@@ -150,7 +150,7 @@ u_int8_t olsr_db_ns_getlinkquality(u_int8_t neighbor_main_addr[ETH_ALEN]) {
 /**
 * @hint: read lock
 */
-int olsr_db_ns_getbestlink(u_int8_t neighbor_main_addr[ETH_ALEN], const dessert_meshif_t** output_iface_out, u_int8_t neighbor_iface[ETH_ALEN]) {
+int olsr_db_ns_getbestlink(uint8_t neighbor_main_addr[ETH_ALEN], const dessert_meshif_t** output_iface_out, uint8_t neighbor_iface[ETH_ALEN]) {
     olsr_db_ns_tuple_t* tuple;
     HASH_FIND(hh, neighbor_set, neighbor_main_addr, ETH_ALEN, tuple);
     if (tuple == NULL) {

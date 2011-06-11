@@ -52,7 +52,7 @@ int ltuple_create(olsr_db_linkset_ltuple_t** ltuple_out, const dessert_meshif_t*
 	return true;
 }
 
-int nltuple_create(olsr_db_linkset_nl_entry_t** nl_tuple_out, u_int8_t* neighbor_iface_addr) {
+int nltuple_create(olsr_db_linkset_nl_entry_t** nl_tuple_out, uint8_t* neighbor_iface_addr) {
 	olsr_db_linkset_nl_entry_t* tuple = malloc(sizeof(olsr_db_linkset_nl_entry_t));
 	if (tuple == NULL) {
         return false;
@@ -76,7 +76,7 @@ olsr_db_linkset_ltuple_t* olsr_db_ls_getif(const dessert_meshif_t* local_iface) 
 	return lf_tuple;
 }
 
-olsr_db_linkset_nl_entry_t* olsr_db_ls_getneigh(olsr_db_linkset_ltuple_t* lf_tuple, u_int8_t neighbor_iface_addr[ETH_ALEN], u_int8_t neighbor_main_addr[ETH_ALEN]) {
+olsr_db_linkset_nl_entry_t* olsr_db_ls_getneigh(olsr_db_linkset_ltuple_t* lf_tuple, uint8_t neighbor_iface_addr[ETH_ALEN], uint8_t neighbor_main_addr[ETH_ALEN]) {
 	olsr_db_linkset_nl_entry_t* nl_tuple;
 	HASH_FIND(hh, lf_tuple->neighbor_iface_list, neighbor_iface_addr, ETH_ALEN, nl_tuple);
 	if (nl_tuple == NULL) {
@@ -91,7 +91,7 @@ olsr_db_linkset_nl_entry_t* olsr_db_ls_getneigh(olsr_db_linkset_ltuple_t* lf_tup
 
 
 
-u_int8_t olsr_db_ls_getlinkquality_from_neighbor(const dessert_meshif_t* local_iface, u_int8_t neighbor_iface_addr[ETH_ALEN]) {
+uint8_t olsr_db_ls_getlinkquality_from_neighbor(const dessert_meshif_t* local_iface, uint8_t neighbor_iface_addr[ETH_ALEN]) {
 	olsr_db_linkset_ltuple_t* lf_tuple;
 	olsr_db_linkset_nl_entry_t* nl_tuple;
 	HASH_FIND(hh, link_set, &local_iface, sizeof(int), lf_tuple);
@@ -107,7 +107,7 @@ u_int8_t olsr_db_ls_getlinkquality_from_neighbor(const dessert_meshif_t* local_i
 	return olsr_sw_getquality(nl_tuple->sw);
 }
 
-u_int8_t olsr_db_ls_get_linkmetrik_quality(const dessert_meshif_t* local_iface, u_int8_t neighbor_iface_addr[ETH_ALEN]) {
+uint8_t olsr_db_ls_get_linkmetrik_quality(const dessert_meshif_t* local_iface, uint8_t neighbor_iface_addr[ETH_ALEN]) {
 	olsr_db_linkset_ltuple_t* lf_tuple;
 	olsr_db_linkset_nl_entry_t* nl_tuple;
 	HASH_FIND(hh, link_set, &local_iface, sizeof(int), lf_tuple);
@@ -120,10 +120,10 @@ u_int8_t olsr_db_ls_get_linkmetrik_quality(const dessert_meshif_t* local_iface, 
         return 0;
     }
 
-	u_int8_t quality;
+	uint8_t quality;
 	if (rc_metric == RC_METRIC_ETX) {
-		u_int8_t quality_from_neighbor = olsr_sw_getquality(nl_tuple->sw);
-		u_int8_t quality_to_neighbor = nl_tuple->quality_to_neighbor;
+		uint8_t quality_from_neighbor = olsr_sw_getquality(nl_tuple->sw);
+		uint8_t quality_to_neighbor = nl_tuple->quality_to_neighbor;
 		// (1 / ETX) * 100 %
 		quality = (quality_from_neighbor * quality_to_neighbor) / 100;
 	} else {
@@ -132,7 +132,7 @@ u_int8_t olsr_db_ls_get_linkmetrik_quality(const dessert_meshif_t* local_iface, 
 	return quality;
 }
 
-int olsr_db_ls_updatelinkquality(const dessert_meshif_t* local_iface, u_int8_t neighbor_iface_addr[ETH_ALEN], u_int16_t hello_seq_num) {
+int olsr_db_ls_updatelinkquality(const dessert_meshif_t* local_iface, uint8_t neighbor_iface_addr[ETH_ALEN], uint16_t hello_seq_num) {
 	olsr_db_linkset_ltuple_t* lf_tuple;
 	olsr_db_linkset_nl_entry_t* nl_tuple;
 	HASH_FIND(hh, link_set, &local_iface, sizeof(int), lf_tuple);
@@ -157,7 +157,7 @@ int olsr_db_ls_updatelinkquality(const dessert_meshif_t* local_iface, u_int8_t n
 	return true;
 }
 
-int olsr_db_ls_gettuple(const dessert_meshif_t* local_iface, u_int8_t neighbor_iface_addr[ETH_ALEN], struct timeval* SYM_time_out, struct timeval* ASYM_time_out) {
+int olsr_db_ls_gettuple(const dessert_meshif_t* local_iface, uint8_t neighbor_iface_addr[ETH_ALEN], struct timeval* SYM_time_out, struct timeval* ASYM_time_out) {
 	olsr_db_linkset_ltuple_t* lf_tuple;
 	olsr_db_linkset_nl_entry_t* nl_tuple;
 	HASH_FIND(hh, link_set, &local_iface, sizeof(void*), lf_tuple);
@@ -204,7 +204,7 @@ olsr_db_linkset_nl_entry_t* olsr_db_ls_getlinkset(const dessert_meshif_t* local_
 	return lf_tuple->neighbor_iface_list;
 }
 
-int olsr_db_ls_getmainaddr(const dessert_meshif_t* local_iface, u_int8_t neighbor_iface_addr[ETH_ALEN], u_int8_t neighbor_main_addr_out[ETH_ALEN]) {
+int olsr_db_ls_getmainaddr(const dessert_meshif_t* local_iface, uint8_t neighbor_iface_addr[ETH_ALEN], uint8_t neighbor_main_addr_out[ETH_ALEN]) {
 	olsr_db_linkset_ltuple_t* lf_tuple;
 	olsr_db_linkset_nl_entry_t* nl_tuple;
 	HASH_FIND(hh, link_set, &local_iface, sizeof(void*), lf_tuple);

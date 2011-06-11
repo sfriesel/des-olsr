@@ -33,17 +33,17 @@ For further information and questions please use the web site
 // ------------------ MPR -----------------------------------------------------
 
 typedef struct olsr_db_rc_1hn {
-	u_int8_t		ether_main_addr[ETH_ALEN];
-	u_int8_t 		willingness;
-	u_int64_t		willing_koeff;
-	u_int8_t		link_quality;
+	uint8_t		ether_main_addr[ETH_ALEN];
+	uint8_t 		willingness;
+	uint64_t		willing_koeff;
+	uint8_t		link_quality;
 	UT_hash_handle	hh;
 } olsr_db_rc_1hn_t;
 
 olsr_db_rc_1hn_t* get_1hnwset() {
 	olsr_2hns_neighbor_t* _1hnset = olsr_db_2hns_get1hnset();
 	olsr_db_rc_1hn_t* 	_1hnwset = NULL;
-	u_int8_t is_MPR, is_MRP_SEL, will;
+	uint8_t is_MPR, is_MRP_SEL, will;
 	while (_1hnset != NULL) {
 		olsr_2hns_neighbor_t* _1hn = _1hnset;
 		if (olsr_db_ns_getneigh(_1hn->ether_addr, &is_MPR, &is_MRP_SEL, &will) == true) {
@@ -61,14 +61,14 @@ olsr_db_rc_1hn_t* get_1hnwset() {
 	return _1hnwset;
 }
 
-void select_as_mpr(u_int8_t mpr_ether_addr[ETH_ALEN], olsr_db_rc_1hn_t** _1hop_wneighbors, olsr_2hns_neighbor_t** _2hop_neighbors) {
+void select_as_mpr(uint8_t mpr_ether_addr[ETH_ALEN], olsr_db_rc_1hn_t** _1hop_wneighbors, olsr_2hns_neighbor_t** _2hop_neighbors) {
 	olsr_db_ns_setneigh_mprstatus(mpr_ether_addr, true);
-	u_int8_t _1hop_quality = olsr_db_ns_getlinkquality(mpr_ether_addr);
+	uint8_t _1hop_quality = olsr_db_ns_getlinkquality(mpr_ether_addr);
 	olsr_2hns_neighbor_t* _2hn = olsr_db_2hns_get2hneighbors(mpr_ether_addr);
 	while(_2hn != NULL) {
 		olsr_2hns_neighbor_t* r_2hn;
 		HASH_FIND(hh, *_2hop_neighbors, _2hn->ether_addr, ETH_ALEN, r_2hn);
-		u_int8_t _2hop_link_quality = _1hop_quality * _2hn->link_quality / 100;
+		uint8_t _2hop_link_quality = _1hop_quality * _2hn->link_quality / 100;
 		if (r_2hn != NULL && _2hop_link_quality >= MPR_QUALITY_THRESHOLD) {
 			HASH_DEL(*_2hop_neighbors, r_2hn);
 			free(r_2hn);
@@ -87,12 +87,12 @@ void set_willing_koeff(olsr_db_rc_1hn_t* _1hwn, olsr_2hns_neighbor_t* unreached_
 	olsr_2hns_neighbor_t* _2hop_neihbors = olsr_db_2hns_get2hneighbors(_1hwn->ether_main_addr);
 	// total number of 2hop neighbors reached over this 1hop neighbor
 	// sum of link qualitys of unreached 2hop neighbors
-	u_int64_t u_qsum = 0;
+	uint64_t u_qsum = 0;
 	// sum of_link qualitys of reached 2hop neighbors
-	u_int64_t qsum = 0;
+	uint64_t qsum = 0;
 
 	while (_2hop_neihbors != NULL) {
-		u_int8_t link_quality = olsr_db_2hns_getlinkquality(_1hwn->ether_main_addr, _2hop_neihbors->ether_addr);
+		uint8_t link_quality = olsr_db_2hns_getlinkquality(_1hwn->ether_main_addr, _2hop_neihbors->ether_addr);
 		olsr_2hns_neighbor_t* unreached_2hop;
 		HASH_FIND(hh, unreached_2hopset, _2hop_neihbors->ether_addr, ETH_ALEN, unreached_2hop);
 		if (unreached_2hop != NULL) {
@@ -149,9 +149,9 @@ void olsr_db_rc_chose_mprset() {
 // --------------- ROUTING TABLE ----------------------------------------
 
 typedef struct rt_el {
-	u_int8_t		ether_addr[ETH_ALEN];
-	u_int8_t		hop_count;
-	u_int8_t		precursor_addr[ETH_ALEN];
+	uint8_t		ether_addr[ETH_ALEN];
+	uint8_t		hop_count;
+	uint8_t		precursor_addr[ETH_ALEN];
 	float			quality; // if PDR or probabilistic ETX :0 - no link, 100 - full link
 							 // if additive ETX : 1 - full link, 65k - no link
 	struct rt_el	*prev, *next;
@@ -159,7 +159,7 @@ typedef struct rt_el {
 
 rt_el_t* candidate_hosts;
 
-rt_el_t* create_rtel(u_int8_t ether_addr[ETH_ALEN], u_int8_t precursor_addr[ETH_ALEN], u_int8_t hop_count, float quality) {
+rt_el_t* create_rtel(uint8_t ether_addr[ETH_ALEN], uint8_t precursor_addr[ETH_ALEN], uint8_t hop_count, float quality) {
 	rt_el_t* entry = malloc(sizeof(rt_el_t));
 	if (entry == NULL) {
         return NULL;
@@ -207,7 +207,7 @@ int compare_candidates_etx_additive(rt_el_t* hostA, rt_el_t* hostB) {
     }
 	return 0;
 }
-float calculate_etx(u_int8_t link_quality) {
+float calculate_etx(uint8_t link_quality) {
 	if (link_quality == 0) {
         return 100;
     }
@@ -246,7 +246,7 @@ void olsr_db_rc_dijkstra() {
 		rt_el_t* best_candidate = candidate_hosts;
 
 		// get hext hop towards best_candidate
-		u_int8_t next_hop[ETH_ALEN];
+		uint8_t next_hop[ETH_ALEN];
 		if (memcmp(best_candidate->precursor_addr, dessert_l25_defsrc, ETH_ALEN) == 0) {
 			memcpy(next_hop, best_candidate->ether_addr, ETH_ALEN);
 		} else {
@@ -278,7 +278,7 @@ void olsr_db_rc_dijkstra() {
 
 		// remove all candidates with ether_addr of this candidate
 		rt_el_t* el = candidate_hosts;
-		u_int8_t best_cand_addr[ETH_ALEN];
+		uint8_t best_cand_addr[ETH_ALEN];
 		memcpy(best_cand_addr, best_candidate->ether_addr, ETH_ALEN);
 		while(el != NULL) {
 			rt_el_t* remove_el = el;

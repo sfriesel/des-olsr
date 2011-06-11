@@ -30,15 +30,15 @@ For further information and questions please use the web site
 
 
 typedef struct olsr_db_tuple {
-	u_int8_t 		neighbor_main_addr[ETH_ALEN];			// key
-	u_int8_t 		mpr;
-	u_int8_t		mpr_selector;
-	u_int8_t 		willingness;
+	uint8_t 		neighbor_main_addr[ETH_ALEN];			// key
+	uint8_t 		mpr;
+	uint8_t		mpr_selector;
+	uint8_t 		willingness;
 	struct {
 		const dessert_meshif_t* 	local_iface;
-		u_int8_t					neighbor_iface_addr[ETH_ALEN];
+		uint8_t					neighbor_iface_addr[ETH_ALEN];
 		// ETX or PLR
-		u_int8_t					quality; // (1 - PLR) * 100 % OR (1 / ETX) * 100 %
+		uint8_t					quality; // (1 - PLR) * 100 % OR (1 / ETX) * 100 %
 	}				best_link;
 	UT_hash_handle	hh;
 } olsr_db_ns_tuple_t;
@@ -48,27 +48,27 @@ int	olsr_db_ns_init();
 /**
  * get or create neighbor
  */
-olsr_db_ns_tuple_t* olsr_db_ns_gcneigh(u_int8_t neighbor_main_addr[ETH_ALEN]);
+olsr_db_ns_tuple_t* olsr_db_ns_gcneigh(uint8_t neighbor_main_addr[ETH_ALEN]);
 
 void olsr_db_ns_updatetimeslot(olsr_db_ns_tuple_t* tuple, struct timeval* purgetime);
 
-int olsr_db_ns_getneigh(u_int8_t neighbor_main_addr[ETH_ALEN], u_int8_t* mpr_out,
-		u_int8_t* mpr_selector_out, u_int8_t* willingness_out);
+int olsr_db_ns_getneigh(uint8_t neighbor_main_addr[ETH_ALEN], uint8_t* mpr_out,
+		uint8_t* mpr_selector_out, uint8_t* willingness_out);
 
-int olsr_db_ns_isneigh(u_int8_t neighbor_main_addr[ETH_ALEN]);
+int olsr_db_ns_isneigh(uint8_t neighbor_main_addr[ETH_ALEN]);
 
-int olsr_db_ns_setneigh_mprstatus(u_int8_t neighbor_main_addr[ETH_ALEN], u_int8_t is_mpr);
+int olsr_db_ns_setneigh_mprstatus(uint8_t neighbor_main_addr[ETH_ALEN], uint8_t is_mpr);
 
-int olsr_db_ns_ismprselector(u_int8_t neighbor_main_addr[ETH_ALEN]);
+int olsr_db_ns_ismprselector(uint8_t neighbor_main_addr[ETH_ALEN]);
 
 olsr_db_ns_tuple_t* olsr_db_ns_getneighset();
 
 void olsr_db_ns_removeallmprs();
 
-u_int8_t olsr_db_ns_getlinkquality(u_int8_t neighbor_main_addr[ETH_ALEN]);
+uint8_t olsr_db_ns_getlinkquality(uint8_t neighbor_main_addr[ETH_ALEN]);
 
-int olsr_db_ns_getbestlink(u_int8_t neighbor_main_addr[ETH_ALEN], const dessert_meshif_t** output_iface_out,
-		u_int8_t neighbor_iface[ETH_ALEN]);
+int olsr_db_ns_getbestlink(uint8_t neighbor_main_addr[ETH_ALEN], const dessert_meshif_t** output_iface_out,
+		uint8_t neighbor_iface[ETH_ALEN]);
 
 int olsr_db_ns_report(char** str_out);
 

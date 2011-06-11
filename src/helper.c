@@ -24,31 +24,31 @@ For further information and questions please use the web site
 #include "helper.h"
 #include "config.h"
 
-int hf_seq_comp_i_j(u_int16_t i, u_int16_t j) {
+int hf_seq_comp_i_j(uint16_t i, uint16_t j) {
 	if (i == j) {
         return 0;
     }
-	u_int16_t diff = i - j;
+	uint16_t diff = i - j;
 	if (diff < ((SEQNO_MAX) >> 1)) {
 		return 1;
     }
 	return -1;
 }
 
-u_int8_t hf_sparce_time(float time) {
+uint8_t hf_sparce_time(float time) {
 	float af = time * C_INV_COEFF;
-	u_int8_t b = 0;
+	uint8_t b = 0;
 	while (af >= (1 << 4)) {
 		af /= 2;
 		b += 1;
 	}
-	u_int8_t a = af - 1;
+	uint8_t a = af - 1;
 	return (a << 4) | b;
 }
 
-float hf_parce_time(u_int8_t time) {
+float hf_parce_time(uint8_t time) {
 	float a = (time >> 4) & ((1 << 4) -1);
-	u_int8_t b = time & ((1 << 4) - 1);
+	uint8_t b = time & ((1 << 4) - 1);
 	float x = (1 + a) * (1 << b);
 	return x / C_INV_COEFF;
 }

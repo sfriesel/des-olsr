@@ -25,7 +25,7 @@ For further information and questions please use the web site
 #include "../../helper.h"
 #include "../../config.h"
 
-int olsr_create_new_sw_element(olsr_sw_element_t** sw_el_out, u_int16_t seq_num){
+int olsr_create_new_sw_element(olsr_sw_element_t** sw_el_out, uint16_t seq_num){
 	olsr_sw_element_t* new_el;
 
 	new_el = malloc(sizeof(olsr_sw_element_t));
@@ -39,7 +39,7 @@ int olsr_create_new_sw_element(olsr_sw_element_t** sw_el_out, u_int16_t seq_num)
 	return true;
 }
 
-int olsr_sw_create(olsr_sw_t** swout, u_int8_t max_window_size){
+int olsr_sw_create(olsr_sw_t** swout, uint8_t max_window_size){
 	olsr_sw_t* sw;
 	sw = malloc(sizeof(olsr_sw_t));
 	if (sw == NULL) {
@@ -65,7 +65,7 @@ int olsr_sw_destroy(olsr_sw_t* sw) {
 	return true;
 };
 
-int olsr_sw_dropsn(olsr_sw_t* sw, u_int16_t seq_num) {
+int olsr_sw_dropsn(olsr_sw_t* sw, uint16_t seq_num) {
 	olsr_sw_element_t* search_el = sw->tail;
 	while(search_el != NULL && hf_seq_comp_i_j(seq_num, search_el->seq_num + sw->max_size) >= 0  ) {
 		search_el = search_el->next;
@@ -83,7 +83,7 @@ int olsr_sw_dropsn(olsr_sw_t* sw, u_int16_t seq_num) {
 	return true;
 }
 
-int olsr_sw_addsn(olsr_sw_t* sw, u_int16_t seq_num){
+int olsr_sw_addsn(olsr_sw_t* sw, uint16_t seq_num){
 	olsr_sw_element_t* new_el;
 
 	if ((sw->head != NULL)
@@ -145,7 +145,7 @@ int olsr_sw_addsn(olsr_sw_t* sw, u_int16_t seq_num){
 	return true;
 }
 
-u_int8_t olsr_sw_getquality(olsr_sw_t* sw) {
+uint8_t olsr_sw_getquality(olsr_sw_t* sw) {
 	return (100 * sw->size) / (sw->max_size);
 }
 

@@ -28,9 +28,9 @@ For further information and questions please use the web site
 #include "../../helper.h"
 
 typedef struct olsr_db_tc_tcs {
-	u_int8_t				tc_orig_addr[ETH_ALEN];
+	uint8_t				tc_orig_addr[ETH_ALEN];
 	olsr_db_tc_tcsentry_t*	orig_neighbors;
-	u_int16_t				seq_num;
+	uint16_t				seq_num;
 	UT_hash_handle			hh;
 } olsr_db_tc_tcs_t;
 
@@ -48,7 +48,7 @@ void purge_tcs(struct timeval* curr_time, void* src_object, void* object) {
 	free(tcs);
 }
 
-olsr_db_tc_tcs_t* create_tcs(u_int8_t tc_orig_addr[ETH_ALEN]) {
+olsr_db_tc_tcs_t* create_tcs(uint8_t tc_orig_addr[ETH_ALEN]) {
 	olsr_db_tc_tcs_t* entry = malloc(sizeof(olsr_db_tc_tcs_t));
 	if (entry == NULL) {
         return NULL;
@@ -59,7 +59,7 @@ olsr_db_tc_tcs_t* create_tcs(u_int8_t tc_orig_addr[ETH_ALEN]) {
 	return entry;
 }
 
-olsr_db_tc_tcsentry_t* create_tcs_entry(u_int8_t tc_neigh_addr[ETH_ALEN], u_int8_t link_quality) {
+olsr_db_tc_tcsentry_t* create_tcs_entry(uint8_t tc_neigh_addr[ETH_ALEN], uint8_t link_quality) {
 	olsr_db_tc_tcsentry_t* entry = malloc(sizeof(olsr_db_tc_tcsentry_t));
 	if (entry == NULL) {
         return NULL;
@@ -73,7 +73,7 @@ int olsr_db_tc_init() {
 	return timeslot_create(&tc_ts, NULL, purge_tcs);
 }
 
-int olsr_db_tc_settuple(u_int8_t tc_orig_addr[ETH_ALEN], u_int8_t orig_neigh_addr[ETH_ALEN], u_int8_t link_quality, struct timeval* purge_time) {
+int olsr_db_tc_settuple(uint8_t tc_orig_addr[ETH_ALEN], uint8_t orig_neigh_addr[ETH_ALEN], uint8_t link_quality, struct timeval* purge_time) {
 	olsr_db_tc_tcs_t* tcs = NULL;
 	olsr_db_tc_tcsentry_t* tcs_entry = NULL;
 	HASH_FIND(hh, tc_set, tc_orig_addr, ETH_ALEN, tcs);
@@ -97,7 +97,7 @@ int olsr_db_tc_settuple(u_int8_t tc_orig_addr[ETH_ALEN], u_int8_t orig_neigh_add
 	return true;
 }
 
-int olsr_db_tc_removeneighbors(u_int8_t tc_orig_addr[ETH_ALEN]) {
+int olsr_db_tc_removeneighbors(uint8_t tc_orig_addr[ETH_ALEN]) {
 	olsr_db_tc_tcs_t* tcs = NULL;
 	olsr_db_tc_tcsentry_t* tcs_entry = NULL;
 	HASH_FIND(hh, tc_set, tc_orig_addr, ETH_ALEN, tcs);
@@ -111,7 +111,7 @@ int olsr_db_tc_removeneighbors(u_int8_t tc_orig_addr[ETH_ALEN]) {
 	return true;
 }
 
-int olsr_db_tc_removetc(u_int8_t tc_orig_addr[ETH_ALEN]) {
+int olsr_db_tc_removetc(uint8_t tc_orig_addr[ETH_ALEN]) {
 	olsr_db_tc_tcs_t* tcs = NULL;
 	olsr_db_tc_tcsentry_t* tcs_entry = NULL;
 	HASH_FIND(hh, tc_set, tc_orig_addr, ETH_ALEN, tcs);
@@ -128,7 +128,7 @@ int olsr_db_tc_removetc(u_int8_t tc_orig_addr[ETH_ALEN]) {
 	return true;
 }
 
-int olsr_db_tc_updateseqnum(u_int8_t tc_orig_addr[ETH_ALEN], u_int16_t seq_num, struct timeval* purge_time) {
+int olsr_db_tc_updateseqnum(uint8_t tc_orig_addr[ETH_ALEN], uint16_t seq_num, struct timeval* purge_time) {
 	olsr_db_tc_tcs_t* tcs = NULL;
 	HASH_FIND(hh, tc_set, tc_orig_addr, ETH_ALEN, tcs);
 	if (tcs == NULL) {
@@ -148,7 +148,7 @@ int olsr_db_tc_updateseqnum(u_int8_t tc_orig_addr[ETH_ALEN], u_int16_t seq_num, 
 	}
 }
 
-olsr_db_tc_tcsentry_t* olsr_db_tc_getneighbors(u_int8_t tc_orig_addr[ETH_ALEN]) {
+olsr_db_tc_tcsentry_t* olsr_db_tc_getneighbors(uint8_t tc_orig_addr[ETH_ALEN]) {
 	timeslot_purgeobjects(tc_ts);
 	olsr_db_tc_tcs_t* tcs = NULL;
 	HASH_FIND(hh, tc_set, tc_orig_addr, ETH_ALEN, tcs);

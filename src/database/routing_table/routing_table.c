@@ -29,10 +29,10 @@ For further information and questions please use the web site
 #include "routing_table.h"
 
 typedef struct olsr_db_rt {
-	u_int8_t 		dest_addr[ETH_ALEN]; // key
-	u_int8_t		next_hop[ETH_ALEN];
-	u_int8_t		precursor_addr[ETH_ALEN];
-	u_int8_t		hop_count;
+	uint8_t 		dest_addr[ETH_ALEN]; // key
+	uint8_t		next_hop[ETH_ALEN];
+	uint8_t		precursor_addr[ETH_ALEN];
+	uint8_t		hop_count;
 	float			link_quality;
 	UT_hash_handle	hh;
 } olsr_db_rt_t;
@@ -47,7 +47,7 @@ void olsr_db_rt_destroy() {
 	}
 }
 
-olsr_db_rt_t* create_rtentry(u_int8_t dest_addr[ETH_ALEN], u_int8_t next_hop[ETH_ALEN], u_int8_t precursor_addr[ETH_ALEN], u_int8_t hop_count, float link_quality) {
+olsr_db_rt_t* create_rtentry(uint8_t dest_addr[ETH_ALEN], uint8_t next_hop[ETH_ALEN], uint8_t precursor_addr[ETH_ALEN], uint8_t hop_count, float link_quality) {
 	olsr_db_rt_t* entry = malloc(sizeof(olsr_db_rt_t));
 	if (entry == NULL) {
         return NULL;
@@ -60,7 +60,7 @@ olsr_db_rt_t* create_rtentry(u_int8_t dest_addr[ETH_ALEN], u_int8_t next_hop[ETH
 	return entry;
 }
 
-int olsr_db_rt_addroute(u_int8_t dest_addr[ETH_ALEN], u_int8_t next_hop[ETH_ALEN], u_int8_t precursor_addr[ETH_ALEN], u_int8_t hop_count, float link_quality) {
+int olsr_db_rt_addroute(uint8_t dest_addr[ETH_ALEN], uint8_t next_hop[ETH_ALEN], uint8_t precursor_addr[ETH_ALEN], uint8_t hop_count, float link_quality) {
 	olsr_db_rt_t* entry = NULL;
 	HASH_FIND(hh, rt_set, dest_addr, ETH_ALEN, entry);
 	if (entry == NULL) {
@@ -78,7 +78,7 @@ int olsr_db_rt_addroute(u_int8_t dest_addr[ETH_ALEN], u_int8_t next_hop[ETH_ALEN
 	return true;
 }
 
-int olsr_db_rt_getnexthop(u_int8_t dest_addr[ETH_ALEN], u_int8_t next_hop_out[ETH_ALEN]) {
+int olsr_db_rt_getnexthop(uint8_t dest_addr[ETH_ALEN], uint8_t next_hop_out[ETH_ALEN]) {
 	olsr_db_rt_t* entry = NULL;
 	HASH_FIND(hh, rt_set, dest_addr, ETH_ALEN, entry);
 	if (entry == NULL) {
