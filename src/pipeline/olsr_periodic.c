@@ -97,8 +97,7 @@ int olsr_periodic_send_hello(void *data, struct timeval *scheduled, struct timev
                 neighbor_iface->link_code = LOST_LINK;
             }
 
-            neighbor_iface->quality_from_neighbor =
-                    olsr_db_ls_getlinkquality_from_neighbor(iface, link_list->neighbor_iface_addr);
+            neighbor_iface->quality_from_neighbor = olsr_db_ls_getlinkquality_from_neighbor(iface, link_list->neighbor_iface_addr);
             memcpy(neighbor_iface->n_iface_addr, link_list->neighbor_iface_addr, ETH_ALEN);
             link_list = link_list->hh.next;
         }

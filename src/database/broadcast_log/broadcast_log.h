@@ -31,7 +31,7 @@ For further information and questions please use the web site
 int olsr_db_brct_init();
 
 /**
- * Returns TRUE if broadcast id is newer then that of entry in database
+ * Returns true if broadcast id is newer then that of entry in database
  */
 int olsr_db_brct_addid(u_int8_t shost_ether[ETH_ALEN], u_int32_t brc_id, struct timeval* purge_time);
 

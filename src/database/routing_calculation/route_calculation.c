@@ -92,9 +92,7 @@ void set_willing_koeff(olsr_db_rc_1hn_t* _1hwn, olsr_2hns_neighbor_t* unreached_
 	u_int64_t qsum = 0;
 
 	while (_2hop_neihbors != NULL) {
-		u_int8_t link_quality =
-				olsr_db_2hns_getlinkquality(_1hwn->ether_main_addr, _2hop_neihbors->ether_addr);
-
+		u_int8_t link_quality = olsr_db_2hns_getlinkquality(_1hwn->ether_main_addr, _2hop_neihbors->ether_addr);
 		olsr_2hns_neighbor_t* unreached_2hop;
 		HASH_FIND(hh, unreached_2hopset, _2hop_neihbors->ether_addr, ETH_ALEN, unreached_2hop);
 		if (unreached_2hop != NULL) {
@@ -117,8 +115,9 @@ void olsr_db_rc_chose_mprset() {
 		olsr_db_rc_1hn_t* best_kandidate = _1hwn;
 		while(_1hwn != NULL) {
 			set_willing_koeff(_1hwn, _2hop_neighbors);
-			if (_1hwn->willing_koeff > best_kandidate->willing_koeff)
+			if (_1hwn->willing_koeff > best_kandidate->willing_koeff) {
 				best_kandidate = _1hwn;
+            }
 			_1hwn = _1hwn->hh.next;
 		}
 		if (best_kandidate != NULL) {
@@ -162,7 +161,9 @@ rt_el_t* candidate_hosts;
 
 rt_el_t* create_rtel(u_int8_t ether_addr[ETH_ALEN], u_int8_t precursor_addr[ETH_ALEN], u_int8_t hop_count, float quality) {
 	rt_el_t* entry = malloc(sizeof(rt_el_t));
-	if (entry == NULL) return NULL;
+	if (entry == NULL) {
+        return NULL;
+    }
 	memcpy(entry->ether_addr, ether_addr, ETH_ALEN);
 	memcpy(entry->precursor_addr, precursor_addr, ETH_ALEN);
 	entry->hop_count = hop_count;
@@ -172,26 +173,44 @@ rt_el_t* create_rtel(u_int8_t ether_addr[ETH_ALEN], u_int8_t precursor_addr[ETH_
 
 
 int compare_candidates_plr(rt_el_t* hostA, rt_el_t* hostB) {
-	if (hostA->quality > hostB->quality) return -1;
-	if (hostA->quality < hostB->quality) return 1;
-	if (hostA->hop_count > hostB->hop_count) return 1;
-	if (hostA->hop_count < hostB->hop_count) return -1;
+	if (hostA->quality > hostB->quality) {
+        return -1;
+    }
+	if (hostA->quality < hostB->quality) {
+        return 1;
+    }
+	if (hostA->hop_count > hostB->hop_count) {
+        return 1;
+    }
+	if (hostA->hop_count < hostB->hop_count) {
+        return -1;
+    }
 	return 0;
 }
 
 int compare_candidates_hc(rt_el_t* hostA, rt_el_t* hostB) {
-	if (hostA->hop_count > hostB->hop_count) return 1;
-	if (hostA->hop_count < hostB->hop_count) return -1;
+	if (hostA->hop_count > hostB->hop_count) {
+        return 1;
+    }
+	if (hostA->hop_count < hostB->hop_count) {
+        return -1;
+    }
 	return 0;
 }
 
 int compare_candidates_etx_additive(rt_el_t* hostA, rt_el_t* hostB) {
-	if (hostA->quality > hostB->quality) return 1;
-	if (hostA->quality < hostB->quality) return -1;
+	if (hostA->quality > hostB->quality) {
+        return 1;
+    }
+	if (hostA->quality < hostB->quality) {
+        return -1;
+    }
 	return 0;
 }
 float calculate_etx(u_int8_t link_quality) {
-	if (link_quality == 0) return 100;
+	if (link_quality == 0) {
+        return 100;
+    }
 	float x = 100;
 	x = x / link_quality;
 	return x;
@@ -205,8 +224,9 @@ void olsr_db_rc_dijkstra() {
 	// initialize candidate set
 	while(source_neighbors != NULL) {
 		float link_quality = source_neighbors->best_link.quality;
-		if (rc_metric == RC_METRIC_ETX_ADD)
+		if (rc_metric == RC_METRIC_ETX_ADD) {
 			link_quality = calculate_etx(link_quality);
+        }
 		rt_el_t* candidate = create_rtel(source_neighbors->neighbor_main_addr, dessert_l25_defsrc,
 				1, link_quality);
 		if (candidate != NULL) {
@@ -234,8 +254,7 @@ void olsr_db_rc_dijkstra() {
 		}
 
 		// capture_route;
-		olsr_db_rt_addroute(best_candidate->ether_addr, next_hop, best_candidate->precursor_addr,
-				best_candidate->hop_count, best_candidate->quality);
+		olsr_db_rt_addroute(best_candidate->ether_addr, next_hop, best_candidate->precursor_addr, best_candidate->hop_count, best_candidate->quality);
 
 		//add neighbors of best_candidate to candidates
 		olsr_db_tc_tcsentry_t* bc_neighbors = olsr_db_tc_getneighbors(best_candidate->ether_addr);
@@ -246,11 +265,10 @@ void olsr_db_rc_dijkstra() {
 				// if PLR or probabilistic path ETX metric:
 				float total_link_quality = (best_candidate->quality * bc_neighbors->link_quality) / 100;
 				// if additive ETX metric
-				if (rc_metric == RC_METRIC_ETX_ADD)
+				if (rc_metric == RC_METRIC_ETX_ADD) {
 					total_link_quality = best_candidate->quality + calculate_etx(bc_neighbors->link_quality);
-
-				rt_el_t* candidate = create_rtel(bc_neighbors->neighbor_main_addr, best_candidate->ether_addr,
-						best_candidate->hop_count + 1, total_link_quality);
+                }
+				rt_el_t* candidate = create_rtel(bc_neighbors->neighbor_main_addr, best_candidate->ether_addr, best_candidate->hop_count + 1, total_link_quality);
 				if (candidate != NULL) {
 					DL_APPEND(candidate_hosts, candidate);
 				}

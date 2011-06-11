@@ -35,7 +35,6 @@ typedef struct aodv_brclog_entry {
 olsr_brclog_entry_t*	brclog_set = NULL;
 timeslot_t*				brclog_ts;
 
-
 void purge_brcid_entry(struct timeval* timestamp, void* src_object, void* object) {
 	olsr_brclog_entry_t* entry = object;
 	HASH_DEL(brclog_set, entry);
@@ -46,14 +45,15 @@ int olsr_db_brct_init() {
 	return timeslot_create(&brclog_ts, NULL, purge_brcid_entry);
 }
 
-
 int olsr_db_brct_addid(u_int8_t shost_ether[ETH_ALEN], u_int32_t brc_id, struct timeval* purge_time) {
 	olsr_brclog_entry_t* entry;
 	timeslot_purgeobjects(brclog_ts);
 	HASH_FIND(hh, brclog_set, shost_ether, ETH_ALEN, entry);
 	if (entry == NULL) {
 		entry = malloc(sizeof(olsr_brclog_entry_t));
-		if (entry == NULL) return false;
+		if (entry == NULL) {
+            return false;
+        }
 		memcpy(entry->shost_ether, shost_ether, ETH_ALEN);
 		HASH_ADD_KEYPTR(hh, brclog_set, entry->shost_ether, ETH_ALEN, entry);
 		entry->brc_id = brc_id;

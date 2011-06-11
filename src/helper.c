@@ -25,10 +25,13 @@ For further information and questions please use the web site
 #include "config.h"
 
 int hf_seq_comp_i_j(u_int16_t i, u_int16_t j) {
-	if (i == j) return 0;
+	if (i == j) {
+        return 0;
+    }
 	u_int16_t diff = i - j;
-	if (diff < ((SEQNO_MAX) >> 1))
+	if (diff < ((SEQNO_MAX) >> 1)) {
 		return 1;
+    }
 	return -1;
 }
 
@@ -51,13 +54,21 @@ float hf_parce_time(u_int8_t time) {
 }
 
 int hf_compare_tv(const struct timeval* tv1, const struct timeval* tv2) {
-	if ((tv1->tv_sec == tv2->tv_sec) && (tv1->tv_usec == tv2->tv_usec)) return 0;
-	if (tv1->tv_sec > tv2->tv_sec) return 1;
-	if (tv2->tv_sec > tv1->tv_sec) return -1;
-	if (tv1->tv_usec > tv2->tv_usec)
+	if ((tv1->tv_sec == tv2->tv_sec) && (tv1->tv_usec == tv2->tv_usec)) {
+        return 0;
+    }
+	if (tv1->tv_sec > tv2->tv_sec) {
+        return 1;
+    }
+	if (tv2->tv_sec > tv1->tv_sec) {
+        return -1;
+    }
+	if (tv1->tv_usec > tv2->tv_usec) {
 		return 1;
-	else
+    }
+	else {
 		return -1;
+    }
 }
 
 int hf_add_tv(const struct timeval* tv1, const struct timeval* tv2, struct timeval* sum) {

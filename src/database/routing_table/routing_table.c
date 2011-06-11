@@ -47,10 +47,11 @@ void olsr_db_rt_destroy() {
 	}
 }
 
-olsr_db_rt_t* create_rtentry(u_int8_t dest_addr[ETH_ALEN], u_int8_t next_hop[ETH_ALEN],
-		u_int8_t precursor_addr[ETH_ALEN], u_int8_t hop_count, float link_quality) {
+olsr_db_rt_t* create_rtentry(u_int8_t dest_addr[ETH_ALEN], u_int8_t next_hop[ETH_ALEN], u_int8_t precursor_addr[ETH_ALEN], u_int8_t hop_count, float link_quality) {
 	olsr_db_rt_t* entry = malloc(sizeof(olsr_db_rt_t));
-	if (entry == NULL) return NULL;
+	if (entry == NULL) {
+        return NULL;
+    }
 	memcpy(entry->dest_addr, dest_addr, ETH_ALEN);
 	memcpy(entry->next_hop, next_hop, ETH_ALEN);
 	memcpy(entry->precursor_addr, precursor_addr, ETH_ALEN);
@@ -59,13 +60,14 @@ olsr_db_rt_t* create_rtentry(u_int8_t dest_addr[ETH_ALEN], u_int8_t next_hop[ETH
 	return entry;
 }
 
-int olsr_db_rt_addroute(u_int8_t dest_addr[ETH_ALEN], u_int8_t next_hop[ETH_ALEN],
-		u_int8_t precursor_addr[ETH_ALEN], u_int8_t hop_count, float link_quality) {
+int olsr_db_rt_addroute(u_int8_t dest_addr[ETH_ALEN], u_int8_t next_hop[ETH_ALEN], u_int8_t precursor_addr[ETH_ALEN], u_int8_t hop_count, float link_quality) {
 	olsr_db_rt_t* entry = NULL;
 	HASH_FIND(hh, rt_set, dest_addr, ETH_ALEN, entry);
 	if (entry == NULL) {
 		entry = create_rtentry(dest_addr, next_hop, precursor_addr, hop_count, link_quality);
-		if (entry == NULL) return false;
+		if (entry == NULL) {
+            return false;
+        }
 		HASH_ADD_KEYPTR(hh, rt_set, entry->dest_addr, ETH_ALEN, entry);
 	} else {
 		memcpy(entry->next_hop, next_hop, ETH_ALEN);
@@ -79,7 +81,9 @@ int olsr_db_rt_addroute(u_int8_t dest_addr[ETH_ALEN], u_int8_t next_hop[ETH_ALEN
 int olsr_db_rt_getnexthop(u_int8_t dest_addr[ETH_ALEN], u_int8_t next_hop_out[ETH_ALEN]) {
 	olsr_db_rt_t* entry = NULL;
 	HASH_FIND(hh, rt_set, dest_addr, ETH_ALEN, entry);
-	if (entry == NULL) return false;
+	if (entry == NULL) {
+        return false;
+    }
 	memcpy(next_hop_out, entry->next_hop, ETH_ALEN);
 	return true;
 }
@@ -93,7 +97,9 @@ int olsr_db_rt_report(char** str_out) {
 	char entry_str[report_str_len  + 1];
 
 	output = malloc(sizeof (char) * report_str_len * (4 + HASH_COUNT(rt_set)) + 1);
-	if (output == NULL) return false;
+	if (output == NULL) {
+        return false;
+    }
 
 	struct timeval curr_time;
 	gettimeofday(&curr_time, NULL);
@@ -101,20 +107,16 @@ int olsr_db_rt_report(char** str_out) {
 	// initialize first byte to \0 to mark output as empty
 	*output = '\0';
 	strcat(output, "+-------------------+-------------------+-------------------+-----------+--------------+\n");
-	if (rc_metric != RC_METRIC_ETX_ADD)
+	if (rc_metric != RC_METRIC_ETX_ADD) {
 		strcat(output, "|    destination    |     next hop      |     precursor     | hop count | link quality |\n");
-	else
+    }
+	else {
 		strcat(output, "|    destination    |     next hop      |     precursor     | hop count |   ETX-sum    |\n");
+    }
 	strcat(output, "+-------------------+-------------------+-------------------+-----------+--------------+\n");
 	while(current_entry != NULL) {
-		snprintf(entry_str, report_str_len + 1, "| %02x:%02x:%02x:%02x:%02x:%02x | %02x:%02x:%02x:%02x:%02x:%02x | %02x:%02x:%02x:%02x:%02x:%02x | %9i | %12.2f |\n",
-			current_entry->dest_addr[0], current_entry->dest_addr[1], current_entry->dest_addr[2],
-			current_entry->dest_addr[3], current_entry->dest_addr[4], current_entry->dest_addr[5],
-			current_entry->next_hop[0], current_entry->next_hop[1], current_entry->next_hop[2],
-			current_entry->next_hop[3], current_entry->next_hop[4], current_entry->next_hop[5],
-			current_entry->precursor_addr[0], current_entry->precursor_addr[1], current_entry->precursor_addr[2],
-			current_entry->precursor_addr[3], current_entry->precursor_addr[4], current_entry->precursor_addr[5],
-			current_entry->hop_count, current_entry->link_quality);
+		snprintf(entry_str, report_str_len + 1, "| " MAC " | " MAC " | "MAC"  | %9i | %12.2f |\n",
+			EXPLODE_ARRAY6(current_entry->dest_addr), EXPLODE_ARRAY6(current_entry->next_hop), EXPLODE_ARRAY6(current_entry->precursor_addr), current_entry->hop_count, current_entry->link_quality);
 		strcat(output, entry_str);
 		current_entry = current_entry->hh.next;
 	}
@@ -130,7 +132,9 @@ int olsr_db_rt_report_so(char** str_out) {
 	char entry_str[report_str_len  + 1];
 
 	output = malloc(sizeof (char) * report_str_len * (HASH_COUNT(rt_set)) + 1);
-	if (output == NULL) return false;
+	if (output == NULL) {
+        return false;
+    }
 
 	struct timeval curr_time;
 	gettimeofday(&curr_time, NULL);
@@ -138,14 +142,8 @@ int olsr_db_rt_report_so(char** str_out) {
 	// initialize first byte to \0 to mark output as empty
 	*output = '\0';
 	while(current_entry != NULL) {
-		snprintf(entry_str, report_str_len + 1, "%02x:%02x:%02x:%02x:%02x:%02x\t%02x:%02x:%02x:%02x:%02x:%02x\t%02x:%02x:%02x:%02x:%02x:%02x\t%i\t%5.2f\n",
-			current_entry->dest_addr[0], current_entry->dest_addr[1], current_entry->dest_addr[2],
-			current_entry->dest_addr[3], current_entry->dest_addr[4], current_entry->dest_addr[5],
-			current_entry->next_hop[0], current_entry->next_hop[1], current_entry->next_hop[2],
-			current_entry->next_hop[3], current_entry->next_hop[4], current_entry->next_hop[5],
-			current_entry->precursor_addr[0], current_entry->precursor_addr[1], current_entry->precursor_addr[2],
-			current_entry->precursor_addr[3], current_entry->precursor_addr[4], current_entry->precursor_addr[5],
-			current_entry->hop_count, current_entry->link_quality);
+		snprintf(entry_str, report_str_len + 1, MAC "\t" MAC "\t" MAC "\t%i\t%5.2f\n",
+			EXPLODE_ARRAY6(current_entry->dest_addr), EXPLODE_ARRAY6(current_entry->next_hop), EXPLODE_ARRAY6(current_entry->precursor_addr), current_entry->hop_count, current_entry->link_quality);
 		strcat(output, entry_str);
 		current_entry = current_entry->hh.next;
 	}
