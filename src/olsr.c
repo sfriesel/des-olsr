@@ -51,7 +51,7 @@ static void _register_cli_callbacks() {
     /* cli initialization */
     cli_register_command(dessert_cli, dessert_cli_cfg_iface, "sys", dessert_cli_cmd_addsysif, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "initialize sys interface");
     cli_register_command(dessert_cli, dessert_cli_cfg_iface, "mesh", dessert_cli_cmd_addmeshif, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "initialize mesh interface");
-    
+
     struct cli_command* cli_cfg_set = cli_register_command(dessert_cli, NULL, "set", NULL, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set variable");
     cli_register_command(dessert_cli, cli_cfg_set, "hello_size", cli_set_hello_size, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set HELLO packet size");
     cli_register_command(dessert_cli, cli_cfg_set, "hello_interval", cli_set_hello_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set HELLO interval");
@@ -62,7 +62,7 @@ static void _register_cli_callbacks() {
     cli_register_command(dessert_cli, cli_cfg_set, "validity_coeff", cli_set_validity_coeff, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set validity time coefficient");
     cli_register_command(dessert_cli, cli_cfg_set, "willingness", cli_set_willingness, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set willingness of host to re-send broadcast messages");
     cli_register_command(dessert_cli, cli_cfg_set, "metric", cli_set_rc_metric, PRIVILEGE_UNPRIVILEGED, MODE_CONFIG, "set route calculation metric (PLR | HC | ETX | ETX-ADD)");
-    
+
     cli_register_command(dessert_cli, dessert_cli_show, "hello_size", cli_show_hello_size, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show HELLO packet size");
     cli_register_command(dessert_cli, dessert_cli_show, "hello_interval", cli_show_hello_interval, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show HELLO interval");
     cli_register_command(dessert_cli, dessert_cli_show, "tc_size", cli_show_tc_size, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show TC packet size");
@@ -82,16 +82,28 @@ static void _register_periodics() {
     hello_interval_tv.tv_sec = hello_interval / 1000;
     hello_interval_tv.tv_usec = (hello_interval % 1000) * 1000;
     periodic_send_hello = dessert_periodic_add(olsr_periodic_send_hello, NULL, NULL, &hello_interval_tv);
-    
+
     struct timeval tc_interval_tv;
     tc_interval_tv.tv_sec = tc_interval / 1000;
     tc_interval_tv.tv_usec = (tc_interval % 1000) * 1000;
     periodic_send_tc = dessert_periodic_add(olsr_periodic_send_tc, NULL, NULL, &tc_interval_tv);
-    
+
     struct timeval build_rt_interval;
     build_rt_interval.tv_sec = rt_interval_ms / 1000;
     build_rt_interval.tv_usec = (rt_interval_ms % 1000) * 1000;
     periodic_rt = dessert_periodic_add(olsr_periodic_build_routingtable, NULL, NULL, &build_rt_interval);
+}
+
+static void _register_pipeline() {
+    dessert_meshrxcb_add(dessert_msg_check_cb, 10);
+    dessert_meshrxcb_add(dessert_msg_ifaceflags_cb, 20);
+    dessert_meshrxcb_add(olsr_drop_errors, 30);
+    dessert_meshrxcb_add(olsr_handle_hello, 40);
+    dessert_meshrxcb_add(olsr_handle_tc, 45);
+    dessert_meshrxcb_add(dessert_mesh_ipttl, 75);
+    dessert_meshrxcb_add(olsr_fwd2dest, 80);
+    dessert_meshrxcb_add(rp2sys, 100);
+    dessert_sysrxcb_add(olsr_sys2rp, 10);
 }
 
 int main(int argc, char** argv) {
@@ -119,22 +131,9 @@ int main(int argc, char** argv) {
     dessert_logcfg(DESSERT_LOG_STDERR);
 
     _register_cli_callbacks();
-
-    /* register callbacks */
-    dessert_meshrxcb_add(dessert_msg_check_cb, 10);
-    dessert_meshrxcb_add(dessert_msg_ifaceflags_cb, 20);
-    dessert_meshrxcb_add(olsr_drop_errors, 30);
-    dessert_meshrxcb_add(olsr_handle_hello, 40);
-    dessert_meshrxcb_add(olsr_handle_tc, 45);
-    dessert_meshrxcb_add(dessert_mesh_ipttl, 75);
-    dessert_meshrxcb_add(olsr_fwd2dest, 80);
-    dessert_meshrxcb_add(rp2sys, 100);
-
-    dessert_sysrxcb_add(olsr_sys2rp, 10);
-
+    _register_pipeline();
     _register_periodics();
 
-    /* running cli & daemon */
     cli_file(dessert_cli, cfg, PRIVILEGE_PRIVILEGED, MODE_CONFIG);
     dessert_cli_run();
     dessert_run();
