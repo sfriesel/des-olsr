@@ -28,16 +28,16 @@ For further information and questions please use the web site
 #include <stdint.h>
 
 typedef struct batman_sw_element {
-	struct batman_sw_element*	prev;
-	struct batman_sw_element*	next;
-	uint16_t					seq_num;
+    struct batman_sw_element*	prev;
+    struct batman_sw_element*	next;
+    uint16_t					seq_num;
 } sw_element_t;
 
 typedef struct batman_sw {
-	struct batman_sw_element*	head;
-	struct batman_sw_element*	tail;
-	uint16_t					size;
-	uint8_t					window_size;
+    struct batman_sw_element*	head;
+    struct batman_sw_element*	tail;
+    uint16_t					size;
+    uint8_t					window_size;
 } sw_t;
 
 /** Create sliding window */
@@ -51,6 +51,6 @@ int sw_destroy(sw_t* sw);
 int sw_addsn(sw_t* sw, uint16_t value);
 
 /**Drops all sequence numbers out of  {value - WINDOW_SIZE + 1, value} range*/
-int sw_dropsn (sw_t* sw, uint16_t value);
+int sw_dropsn(sw_t* sw, uint16_t value);
 
 #endif

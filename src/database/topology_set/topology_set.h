@@ -30,15 +30,15 @@ For further information and questions please use the web site
 #include "../../android.h"
 
 typedef struct olsr_db_tc_tcsentry {
-	uint8_t		link_quality;
-	uint8_t		neighbor_main_addr[ETH_ALEN];
-	UT_hash_handle	hh;
+    uint8_t		link_quality;
+    uint8_t		neighbor_main_addr[ETH_ALEN];
+    UT_hash_handle	hh;
 } olsr_db_tc_tcsentry_t;
 
 int olsr_db_tc_init();
 
 int olsr_db_tc_settuple(uint8_t tc_orig_addr[ETH_ALEN], uint8_t orig_neigh_addr[ETH_ALEN],
-		uint8_t link_quality, struct timeval* purge_time);
+                        uint8_t link_quality, struct timeval* purge_time);
 
 int olsr_db_tc_removeneighbors(uint8_t tc_orig_addr[ETH_ALEN]);
 

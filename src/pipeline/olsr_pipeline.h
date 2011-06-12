@@ -41,7 +41,7 @@ struct olsr_msg_hello_hdr {
     uint8_t    hello_interval; ///< Interval between two HELLO messages
     uint8_t    willingness;    ///< Willingness of router to retransmit broadcast messages
     uint8_t    n_iface_count;  ///< Number of neighbor MANET interfaces  introduced in this HELLO message
-} __attribute__ ((__packed__));
+} __attribute__((__packed__));
 
 struct olsr_msg_hello_niface {
     /**
@@ -59,7 +59,7 @@ struct olsr_msg_hello_niface {
     */
     uint8_t    n_iface_addr[ETH_ALEN];
     uint8_t    quality_from_neighbor;  ///< Link quality by sending data from neighbor to HELLO originator
-} __attribute__ ((__packed__));
+} __attribute__((__packed__));
 
 /**
 * Neighbor description
@@ -76,7 +76,7 @@ struct olsr_msg_hello_ndescr {
     uint8_t    neigh_code;
     uint8_t    n_main_addr[ETH_ALEN];  ///< Main address of host
     uint8_t    link_quality;           ///< Link quality to neighbor in %
-} __attribute__ ((__packed__));
+} __attribute__((__packed__));
 
 // ---- TC -----
 
@@ -85,7 +85,7 @@ struct olsr_msg_tc_hdr {
     //uint8_t  hold_time;  ///< Hold time of information in this message
     uint8_t     tc_interval;///< Interval between two HELLO messages
     uint8_t     neighbor_count; ///< Number of 1hop neighbors of TC originator introduced in this TC
-} __attribute__ ((__packed__));
+} __attribute__((__packed__));
 
 /**
 * Neighbor description
@@ -93,7 +93,7 @@ struct olsr_msg_tc_hdr {
 struct olsr_msg_tc_ndescr {
     uint8_t     link_quality;           ///< quality of link between originator and this neighbor
     uint8_t     n_main_addr[ETH_ALEN];  ///< main address of host
-} __attribute__ ((__packed__));
+} __attribute__((__packed__));
 
 /**
 * Struct for routing log sequence number
@@ -101,7 +101,7 @@ struct olsr_msg_tc_ndescr {
 struct rl_seq {
     uint32_t   seq_num;
     uint8_t    hop_count;
-} __attribute__ ((__packed__));
+} __attribute__((__packed__));
 
 // ----------
 
@@ -112,36 +112,36 @@ extern pthread_rwlock_t pp_rwlock;
 
 struct olsr_msg_brc {
     uint32_t   id;
-} __attribute__ ((__packed__));
+} __attribute__((__packed__));
 
 // ------------- pipeline -----------------------------------------------------
 
-int olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, const dessert_meshif_t *iface, dessert_frameid_t id);
-int olsr_handle_tc(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, const dessert_meshif_t *iface, dessert_frameid_t id);
-int olsr_fwd2dest(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, const dessert_meshif_t *iface, dessert_frameid_t id);
+int olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, const dessert_meshif_t* iface, dessert_frameid_t id);
+int olsr_handle_tc(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, const dessert_meshif_t* iface, dessert_frameid_t id);
+int olsr_fwd2dest(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, const dessert_meshif_t* iface, dessert_frameid_t id);
 
 /**
 * Encapsulate packets as dessert_msg,
 * sets NEXT HOP if known and send via OLSR routing protocol
 */
-int olsr_sys2rp(dessert_msg_t *msg, size_t len, dessert_msg_proc_t *proc, dessert_sysif_t *tunif, dessert_frameid_t id);
+int olsr_sys2rp(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, dessert_sysif_t* tunif, dessert_frameid_t id);
 
 /** forward packets received via OLSR to tun interface */
-int rp2sys(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, const dessert_meshif_t *iface, dessert_frameid_t id);
+int rp2sys(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, const dessert_meshif_t* iface, dessert_frameid_t id);
 
 /** drop errors (drop corrupt packets, packets from myself and etc.)*/
-int olsr_drop_errors(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, const dessert_meshif_t *iface, dessert_frameid_t id);
+int olsr_drop_errors(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, const dessert_meshif_t* iface, dessert_frameid_t id);
 
 // ----- Pipeline callbacks ---------- //
 
 
 // ------------------------------ periodic ----------------------------------------------------
 
-int olsr_periodic_send_hello(void *data, struct timeval *scheduled, struct timeval *interval);
-int olsr_periodic_send_tc(void *data, struct timeval *scheduled, struct timeval *interval);
-int olsr_periodic_build_routingtable(void *data, struct timeval *scheduled, struct timeval *interval);
+int olsr_periodic_send_hello(void* data, struct timeval* scheduled, struct timeval* interval);
+int olsr_periodic_send_tc(void* data, struct timeval* scheduled, struct timeval* interval);
+int olsr_periodic_build_routingtable(void* data, struct timeval* scheduled, struct timeval* interval);
 
 /** clean up database from old entrys */
-int olsr_periodic_cleanup_database(void *data, struct timeval *scheduled, struct timeval *interval);
+int olsr_periodic_cleanup_database(void* data, struct timeval* scheduled, struct timeval* interval);
 
 #endif

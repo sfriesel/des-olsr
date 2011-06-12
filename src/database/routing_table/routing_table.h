@@ -30,7 +30,7 @@ For further information and questions please use the web site
 void olsr_db_rt_destroy();
 
 int olsr_db_rt_addroute(uint8_t dest_addr[ETH_ALEN], uint8_t next_hop[ETH_ALEN],
-		uint8_t precursor_addr[ETH_ALEN], uint8_t hop_count, float link_quality);
+                        uint8_t precursor_addr[ETH_ALEN], uint8_t hop_count, float link_quality);
 
 int olsr_db_rt_getnexthop(uint8_t dest_addr[ETH_ALEN], uint8_t next_hop_out[ETH_ALEN]);
 

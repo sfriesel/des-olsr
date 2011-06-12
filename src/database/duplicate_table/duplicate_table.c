@@ -27,61 +27,68 @@ For further information and questions please use the web site
 
 
 typedef struct dtuple {
-	uint8_t 		addr[ETH_ALEN];		// key
-	uint16_t		seq_num;
-	uint8_t		retransmitted;
-	UT_hash_handle	hh;
+    uint8_t 		addr[ETH_ALEN];		// key
+    uint16_t		seq_num;
+    uint8_t		retransmitted;
+    UT_hash_handle	hh;
 } dtuple_t;
 
 dtuple_t*		dupl_table = NULL;
 timeslot_t*		dt_ts;
 
 void purge_dtuple(struct timeval* timestamp, void* src_object, void* object) {
-	dtuple_t* tuple = object;
-	HASH_DEL(dupl_table, tuple);
-	free(tuple);
+    dtuple_t* tuple = object;
+    HASH_DEL(dupl_table, tuple);
+    free(tuple);
 }
 
 int	olsr_db_dt_init() {
-	return timeslot_create(&dt_ts, NULL, purge_dtuple);
+    return timeslot_create(&dt_ts, NULL, purge_dtuple);
 }
 
 int dtuple_create(dtuple_t** tuple_out, uint8_t ether_addr[ETH_ALEN], uint16_t seq_num, uint8_t retransmitted) {
-	dtuple_t* tuple = malloc(sizeof(dtuple_t));
-	if (tuple == NULL) {
+    dtuple_t* tuple = malloc(sizeof(dtuple_t));
+
+    if(tuple == NULL) {
         return false;
     }
-	memcpy(tuple->addr, ether_addr, ETH_ALEN);
-	tuple->seq_num = seq_num;
-	tuple->retransmitted = retransmitted;
-	*tuple_out = tuple;
-	return true;
+
+    memcpy(tuple->addr, ether_addr, ETH_ALEN);
+    tuple->seq_num = seq_num;
+    tuple->retransmitted = retransmitted;
+    *tuple_out = tuple;
+    return true;
 }
 
 int olsr_db_dt_settuple(uint8_t ether_addr[ETH_ALEN], uint16_t seq_num, uint8_t retransmitted, struct timeval* purge_time) {
-	dtuple_t* tuple;
-	HASH_FIND(hh, dupl_table, ether_addr, ETH_ALEN, tuple);
-	if (tuple == NULL) {
-		if (dtuple_create(&tuple, ether_addr, seq_num, retransmitted) == false) {
+    dtuple_t* tuple;
+    HASH_FIND(hh, dupl_table, ether_addr, ETH_ALEN, tuple);
+
+    if(tuple == NULL) {
+        if(dtuple_create(&tuple, ether_addr, seq_num, retransmitted) == false) {
             return false;
         }
-		HASH_ADD_KEYPTR(hh, dupl_table, tuple->addr, ETH_ALEN, tuple);
-	}
-	tuple->seq_num = seq_num;
-	tuple->retransmitted = retransmitted;
 
-	timeslot_addobject(dt_ts, purge_time, tuple);
-	return true;
+        HASH_ADD_KEYPTR(hh, dupl_table, tuple->addr, ETH_ALEN, tuple);
+    }
+
+    tuple->seq_num = seq_num;
+    tuple->retransmitted = retransmitted;
+
+    timeslot_addobject(dt_ts, purge_time, tuple);
+    return true;
 }
 
 int olsr_db_dt_gettuple(uint8_t ether_addr[ETH_ALEN], uint8_t* retransmitted_out) {
-	timeslot_purgeobjects(dt_ts);
+    timeslot_purgeobjects(dt_ts);
 
-	dtuple_t* tuple;
-	HASH_FIND(hh, dupl_table, ether_addr, ETH_ALEN, tuple);
-	if (tuple == NULL) {
+    dtuple_t* tuple;
+    HASH_FIND(hh, dupl_table, ether_addr, ETH_ALEN, tuple);
+
+    if(tuple == NULL) {
         return false;
     }
-	*retransmitted_out = tuple->retransmitted;
-	return true;
+
+    *retransmitted_out = tuple->retransmitted;
+    return true;
 }

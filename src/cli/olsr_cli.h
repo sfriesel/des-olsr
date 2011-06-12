@@ -32,7 +32,7 @@ int cli_set_validity_coeff(struct cli_def* cli, char* command, char* argv[], int
 int cli_set_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_set_willingness(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_set_window_size(struct cli_def* cli, char* command, char* argv[], int argc);
-int cli_set_port(struct cli_def *cli, char *command, char *argv[], int argc);
+int cli_set_port(struct cli_def* cli, char* command, char* argv[], int argc);
 
 int cli_show_hello_size(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_show_hello_interval(struct cli_def* cli, char* command, char* argv[], int argc);

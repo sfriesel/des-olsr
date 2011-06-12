@@ -28,16 +28,16 @@ For further information and questions please use the web site
 #include <stdint.h>
 
 typedef struct olsr_sw_element {
-	struct olsr_sw_element*	prev;
-	struct olsr_sw_element*	next;
-	uint16_t				seq_num;
+    struct olsr_sw_element*	prev;
+    struct olsr_sw_element*	next;
+    uint16_t				seq_num;
 } olsr_sw_element_t;
 
 typedef struct olsr_sw {
-	olsr_sw_element_t*	head;
-	olsr_sw_element_t*	tail;
-	uint8_t			size;
-	uint8_t			max_size;
+    olsr_sw_element_t*	head;
+    olsr_sw_element_t*	tail;
+    uint8_t			size;
+    uint8_t			max_size;
 } olsr_sw_t;
 
 int olsr_sw_create(olsr_sw_t** sw_out, uint8_t max_window_size);

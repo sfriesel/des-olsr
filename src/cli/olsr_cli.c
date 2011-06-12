@@ -31,19 +31,21 @@ For further information and questions please use the web site
 
 // -------------------- config ------------------------------------------------------------
 
-int cli_set_hello_size(struct cli_def *cli, char *command, char *argv[], int argc) {
+int cli_set_hello_size(struct cli_def* cli, char* command, char* argv[], int argc) {
     uint16_t min_size = sizeof(dessert_msg_t) + sizeof(struct ether_header) + 2;
 
     if(argc != 1) {
-        label_out_usage:
+    label_out_usage:
         cli_print(cli, "usage %s [%d..1500]\n", command, min_size);
         return CLI_ERROR;
     }
 
     uint16_t psize = (uint16_t) strtoul(argv[0], NULL, 10);
+
     if(psize < min_size || psize > 1500) {
         goto label_out_usage;
     }
+
     hello_size = psize;
     dessert_notice("setting HELLO size to %d", hello_size);
     return CLI_OK;
@@ -65,19 +67,21 @@ int cli_set_hello_interval(struct cli_def* cli, char* command, char* argv[], int
     return CLI_OK;
 }
 
-int cli_set_tc_size(struct cli_def *cli, char *command, char *argv[], int argc) {
+int cli_set_tc_size(struct cli_def* cli, char* command, char* argv[], int argc) {
     uint16_t min_size = sizeof(dessert_msg_t) + sizeof(struct ether_header) + 2;
 
     if(argc != 1) {
-        label_out_usage:
+    label_out_usage:
         cli_print(cli, "usage %s [%d..1500]\n", command, min_size);
         return CLI_ERROR;
     }
 
     uint16_t psize = (uint16_t) strtoul(argv[0], NULL, 10);
+
     if(psize < min_size || psize > 1500) {
         goto label_out_usage;
     }
+
     tc_size = psize;
     dessert_notice("setting TC size to %d", tc_size);
     return CLI_OK;
@@ -118,14 +122,16 @@ int cli_set_rt_interval(struct cli_def* cli, char* command, char* argv[], int ar
 int cli_set_validity_coeff(struct cli_def* cli, char* command, char* argv[], int argc) {
     unsigned int mode;
 
-    if (argc != 1 || sscanf(argv[0], "%u", &mode) != 1) {
+    if(argc != 1 || sscanf(argv[0], "%u", &mode) != 1) {
         cli_print(cli, "usage of %s command [0, 1]\n", command);
         return CLI_ERROR_ARG;
     }
-    if (mode >= LINK_HOLD_TIME_COEFF) {
+
+    if(mode >= LINK_HOLD_TIME_COEFF) {
         tc_hold_time_coeff = (uint8_t) mode;
         dessert_debug("set TC_HOLD_TIME_COEFF to %i", tc_hold_time_coeff);
     }
+
     dessert_debug("TC_HOLD_TIME_COEFF must be greater than LINK_HOLD_TIME_KOEFF");
     return CLI_OK;
 }
@@ -133,10 +139,11 @@ int cli_set_validity_coeff(struct cli_def* cli, char* command, char* argv[], int
 int cli_set_willingness(struct cli_def* cli, char* command, char* argv[], int argc) {
     unsigned int mode;
 
-    if (argc != 1 || sscanf(argv[0], "%u", &mode) != 1) {
+    if(argc != 1 || sscanf(argv[0], "%u", &mode) != 1) {
         cli_print(cli, "usage of %s command [0, 1]\n", command);
         return CLI_ERROR_ARG;
     }
+
     willingness = (uint8_t) mode;
     dessert_debug("set WILLINGNESS to %i", willingness);
     return CLI_OK;
@@ -145,34 +152,40 @@ int cli_set_willingness(struct cli_def* cli, char* command, char* argv[], int ar
 int cli_set_window_size(struct cli_def* cli, char* command, char* argv[], int argc) {
     unsigned int mode;
 
-    if (argc != 1 || sscanf(argv[0], "%u", &mode) != 1) {
+    if(argc != 1 || sscanf(argv[0], "%u", &mode) != 1) {
         cli_print(cli, "usage of %s command [0, 1]\n", command);
         return CLI_ERROR_ARG;
     }
+
     window_size = (uint8_t) mode;
     dessert_debug("set WINDOW_SIZE to %i", window_size);
     return CLI_OK;
 }
 
 int cli_set_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc) {
-    if (argc != 1 || (strcmp(argv[0], "PLR") != 0 && strcmp(argv[0], "HC") != 0 && strcmp(argv[0], "ETX") != 0 && strcmp(argv[0], "ETX-ADD") != 0)) {
+    if(argc != 1 || (strcmp(argv[0], "PLR") != 0 && strcmp(argv[0], "HC") != 0 && strcmp(argv[0], "ETX") != 0 && strcmp(argv[0], "ETX-ADD") != 0)) {
         cli_print(cli, "usage of %s command [PLR, HC, ETX, ETX-ADD]\n", command);
         return CLI_ERROR_ARG;
     }
-    if (strcmp(argv[0], "PLR") == 0
-        || strcmp(argv[0], "PDR") == 0) {
+
+    if(strcmp(argv[0], "PLR") == 0
+       || strcmp(argv[0], "PDR") == 0) {
         rc_metric = RC_METRIC_PLR;
         dessert_debug("set metric to PLR (packet lost rate) where PLR = 1-PDR");
-    } else if (strcmp(argv[0], "HC") == 0) {
+    }
+    else if(strcmp(argv[0], "HC") == 0) {
         rc_metric = RC_METRIC_HC;
         dessert_debug("set metric to HC (hop count)");
-    } else if (strcmp(argv[0], "ETX") == 0) {
+    }
+    else if(strcmp(argv[0], "ETX") == 0) {
         rc_metric = RC_METRIC_ETX;
         dessert_debug("set metric to ETX (probabilistic path ETX)");
-    } else if (strcmp(argv[0], "ETX-ADD") == 0) {
+    }
+    else if(strcmp(argv[0], "ETX-ADD") == 0) {
         rc_metric = RC_METRIC_ETX_ADD;
         dessert_debug("set metric to ETX-ADD (additive path ETX)");
     }
+
     return CLI_OK;
 }
 
@@ -181,22 +194,22 @@ int cli_set_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc
 /**
 * Print hello size
 */
-int cli_show_hello_size(struct cli_def *cli, char *command, char *argv[], int argc) {
+int cli_show_hello_size(struct cli_def* cli, char* command, char* argv[], int argc) {
     cli_print(cli, "Hello size = %d bytes\n", hello_size);
     return CLI_OK;
 }
 
-int cli_show_hello_interval(struct cli_def *cli, char *command, char *argv[], int argc) {
+int cli_show_hello_interval(struct cli_def* cli, char* command, char* argv[], int argc) {
     cli_print(cli, "Hello interval = %d millisec\n", hello_interval);
     return CLI_OK;
 }
 
-int cli_show_tc_size(struct cli_def *cli, char *command, char *argv[], int argc) {
+int cli_show_tc_size(struct cli_def* cli, char* command, char* argv[], int argc) {
     cli_print(cli, "TC size = %d bytes\n", tc_size);
     return CLI_OK;
 }
 
-int cli_show_tc_interval(struct cli_def *cli, char *command, char *argv[], int argc) {
+int cli_show_tc_interval(struct cli_def* cli, char* command, char* argv[], int argc) {
     cli_print(cli, "TC interval = %d millisec\n", tc_interval);
     return CLI_OK;
 }
@@ -204,104 +217,118 @@ int cli_show_tc_interval(struct cli_def *cli, char *command, char *argv[], int a
 /**
 * Print neighbor set table
 */
-int cli_show_ns(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_show_ns(struct cli_def* cli, char* command, char* argv[], int argc) {
     char* report;
     olsr_db_wlock();
     int result = olsr_db_ns_report(&report);
     olsr_db_unlock();
-    if (result == true) {
+
+    if(result == true) {
         cli_print(cli, "\n%s\n", report);
         free(report);
     }
+
     return CLI_OK;
 }
 
 /**
 * Print neighbor set table (simple output)
 */
-int cli_show_ns_so(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_show_ns_so(struct cli_def* cli, char* command, char* argv[], int argc) {
     char* report;
     olsr_db_wlock();
     int result = olsr_db_ns_report_so(&report);
     olsr_db_unlock();
-    if (result == true) {
+
+    if(result == true) {
         cli_print(cli, "\n%s\n", report);
         free(report);
     }
+
     return CLI_OK;
 }
 
 /**
 * Print link set table
 */
-int cli_show_ls(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_show_ls(struct cli_def* cli, char* command, char* argv[], int argc) {
     char* report;
     olsr_db_wlock();
     int result = olsr_db_ls_report(&report);
     olsr_db_unlock();
-    if (result == true) {
+
+    if(result == true) {
         cli_print(cli, "\n%s\n", report);
         free(report);
     }
+
     return CLI_OK;
 }
 
 /**
 * Print 2hop neighbor set table
 */
-int cli_show_2hns(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_show_2hns(struct cli_def* cli, char* command, char* argv[], int argc) {
     char* report;
     olsr_db_wlock();
     int result = olsr_db_2hns_report(&report);
     olsr_db_unlock();
-    if (result == true) {
+
+    if(result == true) {
         cli_print(cli, "\n%s\n", report);
         free(report);
     }
+
     return CLI_OK;
 }
 
 /**
 * Print TC set table
 */
-int cli_show_tc(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_show_tc(struct cli_def* cli, char* command, char* argv[], int argc) {
     char* report;
     olsr_db_wlock();
     int result = olsr_db_tc_report(&report);
     olsr_db_unlock();
-    if (result == true) {
+
+    if(result == true) {
         cli_print(cli, "\n%s\n", report);
         free(report);
     }
+
     return CLI_OK;
 }
 
 /**
 * Print routing table
 */
-int cli_show_rt(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_show_rt(struct cli_def* cli, char* command, char* argv[], int argc) {
     char* report;
     olsr_db_rlock();
     int result = olsr_db_rt_report(&report);
     olsr_db_unlock();
-    if (result == true) {
+
+    if(result == true) {
         cli_print(cli, "\n%s\n", report);
         free(report);
     }
+
     return CLI_OK;
 }
 
 /**
 * Print routing table (simple output)
 */
-int cli_show_rt_so(struct cli_def* cli, char* command, char* argv[], int argc){
+int cli_show_rt_so(struct cli_def* cli, char* command, char* argv[], int argc) {
     char* report;
     olsr_db_rlock();
     int result = olsr_db_rt_report_so(&report);
     olsr_db_unlock();
-    if (result == true) {
+
+    if(result == true) {
         cli_print(cli, "\n%s\n", report);
         free(report);
     }
+
     return CLI_OK;
 }

@@ -41,11 +41,26 @@ inline void olsr_db_unlock() {
 }
 
 int olsr_db_init() {
-    if (olsr_db_dt_init() != true) { return false; }
-    if (olsr_db_ns_init() != true) { return false; }
-    if (olsr_db_tc_init() != true) { return false; }
-    if (olsr_db_brct_init() != true) { return false; }
-    if (rl_table_init() != true) { return false; }
+    if(olsr_db_dt_init() != true) {
+        return false;
+    }
+
+    if(olsr_db_ns_init() != true) {
+        return false;
+    }
+
+    if(olsr_db_tc_init() != true) {
+        return false;
+    }
+
+    if(olsr_db_brct_init() != true) {
+        return false;
+    }
+
+    if(rl_table_init() != true) {
+        return false;
+    }
+
     return true;
 }
 

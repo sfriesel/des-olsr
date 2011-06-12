@@ -46,9 +46,11 @@ int	olsr_db_ns_init() {
 
 int ntuple_create(olsr_db_ns_tuple_t** tuple_out, uint8_t neighbor_main_addr[ETH_ALEN]) {
     olsr_db_ns_tuple_t* tuple = malloc(sizeof(olsr_db_ns_tuple_t));
-    if (tuple == NULL) {
+
+    if(tuple == NULL) {
         return false;
     }
+
     memcpy(tuple->neighbor_main_addr, neighbor_main_addr, ETH_ALEN);
     tuple->mpr = false;
     tuple->mpr_selector = false;
@@ -62,12 +64,15 @@ int ntuple_create(olsr_db_ns_tuple_t** tuple_out, uint8_t neighbor_main_addr[ETH
 olsr_db_ns_tuple_t* olsr_db_ns_gcneigh(uint8_t neighbor_main_addr[ETH_ALEN]) {
     olsr_db_ns_tuple_t* tuple;
     HASH_FIND(hh, neighbor_set, neighbor_main_addr, ETH_ALEN, tuple);
-    if (tuple == NULL) {
-        if (ntuple_create(&tuple, neighbor_main_addr) == false) {
+
+    if(tuple == NULL) {
+        if(ntuple_create(&tuple, neighbor_main_addr) == false) {
             return false;
         }
+
         HASH_ADD_KEYPTR(hh, neighbor_set, tuple->neighbor_main_addr, ETH_ALEN, tuple);
     }
+
     return tuple;
 }
 
@@ -80,9 +85,11 @@ int olsr_db_ns_getneigh(uint8_t neighbor_main_addr[ETH_ALEN], uint8_t* mpr_out, 
 
     olsr_db_ns_tuple_t* tuple;
     HASH_FIND(hh, neighbor_set, neighbor_main_addr, ETH_ALEN, tuple);
-    if (tuple == NULL) {
+
+    if(tuple == NULL) {
         return false;
     }
+
     *mpr_out = tuple->mpr;
     *mpr_selector_out = tuple->mpr_selector;
     *willingness_out = tuple->willingness;
@@ -94,9 +101,11 @@ int olsr_db_ns_isneigh(uint8_t neighbor_main_addr[ETH_ALEN]) {
 
     olsr_db_ns_tuple_t* tuple;
     HASH_FIND(hh, neighbor_set, neighbor_main_addr, ETH_ALEN, tuple);
-    if (tuple == NULL) {
+
+    if(tuple == NULL) {
         return false;
     }
+
     return true;
 }
 
@@ -105,9 +114,11 @@ int olsr_db_ns_ismprselector(uint8_t neighbor_main_addr[ETH_ALEN]) {
 
     olsr_db_ns_tuple_t* tuple;
     HASH_FIND(hh, neighbor_set, neighbor_main_addr, ETH_ALEN, tuple);
-    if (tuple == NULL) {
+
+    if(tuple == NULL) {
         return false;
     }
+
     return tuple->mpr_selector;
 }
 
@@ -116,9 +127,11 @@ int olsr_db_ns_setneigh_mprstatus(uint8_t neighbor_main_addr[ETH_ALEN], uint8_t 
 
     olsr_db_ns_tuple_t* tuple;
     HASH_FIND(hh, neighbor_set, neighbor_main_addr, ETH_ALEN, tuple);
-    if (tuple == NULL) {
+
+    if(tuple == NULL) {
         return false;
     }
+
     tuple->mpr = is_mpr;
     return true;
 }
@@ -126,7 +139,8 @@ int olsr_db_ns_setneigh_mprstatus(uint8_t neighbor_main_addr[ETH_ALEN], uint8_t 
 void olsr_db_ns_removeallmprs() {
     timeslot_purgeobjects(ns_ts);
     olsr_db_ns_tuple_t* entry = neighbor_set;
-    while (entry != NULL) {
+
+    while(entry != NULL) {
         entry->mpr = false;
         entry = entry->hh.next;
     }
@@ -141,9 +155,11 @@ uint8_t olsr_db_ns_getlinkquality(uint8_t neighbor_main_addr[ETH_ALEN]) {
     timeslot_purgeobjects(ns_ts);
     olsr_db_ns_tuple_t* tuple;
     HASH_FIND(hh, neighbor_set, neighbor_main_addr, ETH_ALEN, tuple);
-    if (tuple == NULL) {
+
+    if(tuple == NULL) {
         return 0;
     }
+
     return tuple->best_link.quality;
 }
 
@@ -153,12 +169,15 @@ uint8_t olsr_db_ns_getlinkquality(uint8_t neighbor_main_addr[ETH_ALEN]) {
 int olsr_db_ns_getbestlink(uint8_t neighbor_main_addr[ETH_ALEN], const dessert_meshif_t** output_iface_out, uint8_t neighbor_iface[ETH_ALEN]) {
     olsr_db_ns_tuple_t* tuple;
     HASH_FIND(hh, neighbor_set, neighbor_main_addr, ETH_ALEN, tuple);
-    if (tuple == NULL) {
+
+    if(tuple == NULL) {
         return false;
     }
-    if (tuple->best_link.local_iface == NULL) {
+
+    if(tuple->best_link.local_iface == NULL) {
         return false;
     }
+
     *output_iface_out = tuple->best_link.local_iface;
     memcpy(neighbor_iface, tuple->best_link.neighbor_iface_addr, ETH_ALEN);
     return true;
@@ -172,33 +191,40 @@ int olsr_db_ns_report(char** str_out) {
     char* output;
     char entry_str[report_ns_str_len  + 1];
 
-    output = malloc(sizeof (char) * report_ns_str_len * (4 + HASH_COUNT(current_entry)) + 1);
-    if (output == NULL) return false;
+    output = malloc(sizeof(char) * report_ns_str_len * (4 + HASH_COUNT(current_entry)) + 1);
+
+    if(output == NULL) {
+        return false;
+    }
 
     // initialize first byte to \0 to mark output as empty
     *output = '\0';
     strcat(output, "+-------------------+-------+--------------+-------------+----------------------------+---------+\n");
     strcat(output, "| neighbor address  |  MPR  | MPR selector | willingness |         best link          | quality |\n");
     strcat(output, "+-------------------+-------+--------------+-------------+----------------------------+---------+\n");
+
     while(current_entry != NULL) {
-        if (current_entry->best_link.local_iface == NULL) {
+        if(current_entry->best_link.local_iface == NULL) {
             snprintf(entry_str, report_ns_str_len + 1, "| " MAC " | %5s | %12s | %11i |                       NULL |       - |\n",
-                    EXPLODE_ARRAY6(current_entry->neighbor_main_addr),
-                    (current_entry->mpr == true)? "true" : "false",
-                    (current_entry->mpr_selector == true)? "true" : "false",
-                    current_entry->willingness);
-        } else {
-            snprintf(entry_str, report_ns_str_len + 1, "| " MAC " | %5s | %12s | %11i | (%7s)" MAC " | %7i |\n",
-                    EXPLODE_ARRAY6(current_entry->neighbor_main_addr),
-                    (current_entry->mpr == true)? "true" : "false",
-                    (current_entry->mpr_selector == true)? "true" : "false",
-                    current_entry->willingness, current_entry->best_link.local_iface->if_name,
-                    EXPLODE_ARRAY6(current_entry->best_link.neighbor_iface_addr),
-                    current_entry->best_link.quality);
+                     EXPLODE_ARRAY6(current_entry->neighbor_main_addr),
+                     (current_entry->mpr == true) ? "true" : "false",
+                     (current_entry->mpr_selector == true) ? "true" : "false",
+                     current_entry->willingness);
         }
+        else {
+            snprintf(entry_str, report_ns_str_len + 1, "| " MAC " | %5s | %12s | %11i | (%7s)" MAC " | %7i |\n",
+                     EXPLODE_ARRAY6(current_entry->neighbor_main_addr),
+                     (current_entry->mpr == true) ? "true" : "false",
+                     (current_entry->mpr_selector == true) ? "true" : "false",
+                     current_entry->willingness, current_entry->best_link.local_iface->if_name,
+                     EXPLODE_ARRAY6(current_entry->best_link.neighbor_iface_addr),
+                     current_entry->best_link.quality);
+        }
+
         strcat(output, entry_str);
         current_entry = current_entry->hh.next;
     }
+
     strcat(output, "+-------------------+-------+--------------+-------------+----------------------------+---------+\n");
     *str_out = output;
     return true;
@@ -210,18 +236,21 @@ int olsr_db_ns_report_so(char** str_out) {
     char* output;
     char entry_str[report_ns_str_len  + 1];
 
-    output = malloc(sizeof (char) * report_ns_str_len * (HASH_COUNT(current_entry)) + 1);
-    if (output == NULL) {
+    output = malloc(sizeof(char) * report_ns_str_len * (HASH_COUNT(current_entry)) + 1);
+
+    if(output == NULL) {
         return false;
     }
 
     // initialize first byte to \0 to mark output as empty
     *output = '\0';
+
     while(current_entry != NULL) {
         snprintf(entry_str, report_ns_str_len + 1, MAC "\t%i\n", EXPLODE_ARRAY6(current_entry->neighbor_main_addr), current_entry->best_link.quality);
         strcat(output, entry_str);
         current_entry = current_entry->hh.next;
     }
+
     *str_out = output;
     return true;
 }

@@ -108,17 +108,20 @@ static void _register_pipeline() {
 
 int main(int argc, char** argv) {
     /* initialize daemon with correct parameters */
-    FILE *cfg = NULL;
-    if ((argc == 2) && (strcmp(argv[1], "-nondaemonize") == 0)) {
+    FILE* cfg = NULL;
+
+    if((argc == 2) && (strcmp(argv[1], "-nondaemonize") == 0)) {
         dessert_info("starting OLSR in non daemonize mode");
         dessert_init("OLSR", 0x02, DESSERT_OPT_NODAEMONIZE);
         char cfg_file_name[] = "/etc/des-olsr.conf";
         cfg = fopen(cfg_file_name, "r");
-        if (cfg == NULL) {
+
+        if(cfg == NULL) {
             printf("Config file '%s' not found. Exit ...\n", cfg_file_name);
             return EXIT_FAILURE;
         }
-    } else {
+    }
+    else {
         dessert_info("starting OLSR in daemonize mode");
         cfg = dessert_cli_get_cfg(argc, argv);
         dessert_init("OLSR", 0x02, DESSERT_OPT_DAEMONIZE);

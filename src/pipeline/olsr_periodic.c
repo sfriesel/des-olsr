@@ -20,7 +20,7 @@ static void _add_dummy_payload(dessert_msg_t* msg, uint8_t min_size) {
     memset(payload, 0xA, size);
 }
 
-int olsr_periodic_send_hello(void *data, struct timeval *scheduled, struct timeval *interval) {
+int olsr_periodic_send_hello(void* data, struct timeval* scheduled, struct timeval* interval) {
     const dessert_meshif_t* iface = dessert_meshiflist_get();
     void* neighs_desc_pointer = NULL;
     void* pointer;
@@ -30,22 +30,26 @@ int olsr_periodic_send_hello(void *data, struct timeval *scheduled, struct timev
     olsr_db_wlock();
     olsr_db_ns_tuple_t* neighbors = olsr_db_ns_getneighset();
     size_t neighs_count = HASH_COUNT(neighbors);
-    neighs_count = (neighs_count > hello_max_neigths_count)? hello_max_neigths_count : neighs_count;
+    neighs_count = (neighs_count > hello_max_neigths_count) ? hello_max_neigths_count : neighs_count;
     size_t neighs_desc_size = 0;
-    if (neighs_count > 0) {
+
+    if(neighs_count > 0) {
         neighs_desc_pointer = pointer = malloc(neighs_count * sizeof(struct olsr_msg_hello_ndescr));
-        if (pointer != NULL) {
+
+        if(pointer != NULL) {
             neighs_desc_size = neighs_count * sizeof(struct olsr_msg_hello_ndescr);
+
             while(neighbors != NULL && neighs_count-- > 0) {
                 struct olsr_msg_hello_ndescr* ndesc = pointer;
                 pointer += sizeof(struct olsr_msg_hello_ndescr);
-                ndesc->neigh_code = (neighbors->mpr == true)? MPR_NEIGH : SYM_NEIGH;
+                ndesc->neigh_code = (neighbors->mpr == true) ? MPR_NEIGH : SYM_NEIGH;
                 memcpy(ndesc->n_main_addr, neighbors->neighbor_main_addr, ETH_ALEN);
                 ndesc->link_quality = olsr_db_ns_getlinkquality(neighbors->neighbor_main_addr);
                 neighbors = neighbors->hh.next;
             }
         }
     }
+
     olsr_db_unlock();
 
     dessert_debug("send HELLO with hello_interval = %i", hello_interval);
@@ -56,7 +60,7 @@ int olsr_periodic_send_hello(void *data, struct timeval *scheduled, struct timev
         olsr_db_wlock();
         olsr_db_linkset_nl_entry_t* link_list = olsr_db_ls_getlinkset(iface);
         uint8_t link_count = HASH_COUNT(link_list);
-        link_count = (link_count > hello_max_links_count)? hello_max_links_count : link_count;
+        link_count = (link_count > hello_max_links_count) ? hello_max_links_count : link_count;
         ext_length += sizeof(struct olsr_msg_hello_niface) * link_count;
 
         dessert_msg_t* msg;
@@ -89,11 +93,13 @@ int olsr_periodic_send_hello(void *data, struct timeval *scheduled, struct timev
             pointer += sizeof(struct olsr_msg_hello_niface);
 
             // set LINK_CODE
-            if (hf_compare_tv(&link_list->SYM_time, &curr_time) >= 0) { // SYM link
+            if(hf_compare_tv(&link_list->SYM_time, &curr_time) >= 0) {  // SYM link
                 neighbor_iface->link_code = SYM_LINK;
-            } else if (hf_compare_tv(&link_list->ASYM_time, &curr_time) >= 0) { // ASYM link
+            }
+            else if(hf_compare_tv(&link_list->ASYM_time, &curr_time) >= 0) {    // ASYM link
                 neighbor_iface->link_code = ASYM_LINK;
-            } else { // LOST link
+            }
+            else {   // LOST link
                 neighbor_iface->link_code = LOST_LINK;
             }
 
@@ -101,6 +107,7 @@ int olsr_periodic_send_hello(void *data, struct timeval *scheduled, struct timev
             memcpy(neighbor_iface->n_iface_addr, link_list->neighbor_iface_addr, ETH_ALEN);
             link_list = link_list->hh.next;
         }
+
         olsr_db_unlock();
 
         // add list of 1-Hop neighbors
@@ -115,19 +122,21 @@ int olsr_periodic_send_hello(void *data, struct timeval *scheduled, struct timev
         dessert_msg_destroy(msg);
         iface = iface->next;
     }
+
     pthread_rwlock_wrlock(&hello_seq_lock);
     hello_seq_num++;
     pthread_rwlock_unlock(&hello_seq_lock);
 
-    if (neighs_desc_size > 0) {
+    if(neighs_desc_size > 0) {
         free(neighs_desc_pointer);
     }
+
     return 0;
 }
 
 const uint8_t max_tc_neigh_count = ((DESSERT_MAXEXTDATALEN) - sizeof(struct olsr_msg_tc_hdr)) / sizeof(struct olsr_msg_tc_ndescr);
 
-int olsr_periodic_send_tc(void *data, struct timeval *scheduled, struct timeval *interval) {
+int olsr_periodic_send_tc(void* data, struct timeval* scheduled, struct timeval* interval) {
     dessert_msg_t* msg;
     dessert_ext_t* ext;
     dessert_msg_new(&msg);
@@ -143,7 +152,7 @@ int olsr_periodic_send_tc(void *data, struct timeval *scheduled, struct timeval 
     olsr_db_wlock();
     olsr_db_ns_tuple_t* neighbors = olsr_db_ns_getneighset();
     uint8_t neighbor_count = HASH_COUNT(neighbors);
-    uint8_t tc_neigh_count = (neighbor_count > max_tc_neigh_count)? max_tc_neigh_count : neighbor_count;
+    uint8_t tc_neigh_count = (neighbor_count > max_tc_neigh_count) ? max_tc_neigh_count : neighbor_count;
     dessert_msg_addext(msg, &ext, TC_EXT_TYPE, sizeof(struct olsr_msg_tc_hdr) + tc_neigh_count * sizeof(struct olsr_msg_tc_ndescr));
     struct olsr_msg_tc_hdr* hdr = (struct olsr_msg_tc_hdr*)ext->data;
     hdr->tc_interval = hf_sparce_time(tc_interval);
@@ -160,6 +169,7 @@ int olsr_periodic_send_tc(void *data, struct timeval *scheduled, struct timeval 
         memcpy(neighbor_descr->n_main_addr, neighbors->neighbor_main_addr, ETH_ALEN);
         neighbors = neighbors->hh.next;
     }
+
     olsr_db_unlock();
 
     _add_dummy_payload(msg, tc_size);
@@ -169,10 +179,11 @@ int olsr_periodic_send_tc(void *data, struct timeval *scheduled, struct timeval 
     return 0;
 }
 
-int olsr_periodic_build_routingtable(void *data, struct timeval *scheduled, struct timeval *interval) {
+int olsr_periodic_build_routingtable(void* data, struct timeval* scheduled, struct timeval* interval) {
     pthread_rwlock_rdlock(&pp_rwlock);
     uint8_t pending = pending_rtc;
     pthread_rwlock_unlock(&pp_rwlock);
+
     if(pending != false) {
         dessert_debug("re-building routing table");
         olsr_db_wlock();
@@ -186,14 +197,17 @@ int olsr_periodic_build_routingtable(void *data, struct timeval *scheduled, stru
     else {
         dessert_debug("routing table not updated: pending is false");
     }
+
     return 0;
 }
 
-int olsr_periodic_cleanup_database(void *data, struct timeval *scheduled, struct timeval *interval) {
+int olsr_periodic_cleanup_database(void* data, struct timeval* scheduled, struct timeval* interval) {
     struct timeval timestamp;
     gettimeofday(&timestamp, NULL);
-    if (olsr_db_cleanup(&timestamp)== true) {
+
+    if(olsr_db_cleanup(&timestamp) == true) {
         return 0;
     }
+
     return 1;
 }
