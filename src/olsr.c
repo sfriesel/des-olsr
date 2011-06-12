@@ -42,7 +42,6 @@ int     window_size          = WINDOW_SIZE;
 int     tc_hold_time_coeff   = TC_HOLD_TIME_COEFF;
 int     willingness          = WILL_DEFAULT;
 int     rc_metric            = RC_METRIC_ETX;
-char*   routing_log_file     = NULL;
 
 dessert_periodic_t* periodic_send_hello;
 dessert_periodic_t* periodic_send_tc;
@@ -62,7 +61,6 @@ static void _register_cli_callbacks() {
     cli_register_command(dessert_cli, cli_cfg_set, "window_size", cli_set_window_size, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set window size for calculation of link quality (PDR or ETX)");
     cli_register_command(dessert_cli, cli_cfg_set, "validity_coeff", cli_set_validity_coeff, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set validity time coefficient");
     cli_register_command(dessert_cli, cli_cfg_set, "willingness", cli_set_willingness, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set willingness of host to re-send broadcast messages");
-    cli_register_command(dessert_cli, cli_cfg_set, "routing_log", cli_set_routing_log, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set path to routing logging file");
     cli_register_command(dessert_cli, cli_cfg_set, "metric", cli_set_rc_metric, PRIVILEGE_UNPRIVILEGED, MODE_CONFIG, "set route calculation metric (PLR | HC | ETX | ETX-ADD)");
     
     cli_register_command(dessert_cli, dessert_cli_show, "hello_size", cli_show_hello_size, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show HELLO packet size");

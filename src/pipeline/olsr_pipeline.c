@@ -32,50 +32,7 @@ pthread_rwlock_t pp_rwlock = PTHREAD_RWLOCK_INITIALIZER;
 uint8_t pending_rtc = false;
 uint32_t broadcast_id;
 
-pthread_rwlock_t rlflock = PTHREAD_RWLOCK_INITIALIZER;
 pthread_rwlock_t rlseqlock = PTHREAD_RWLOCK_INITIALIZER;
-
-void _rlfile_log(const uint8_t src_addr[ETH_ALEN], const uint8_t dest_addr[ETH_ALEN],
-        const uint32_t seq_num, const uint8_t hop_count, const uint8_t in_iface[ETH_ALEN],
-        const uint8_t out_iface[ETH_ALEN], const uint8_t next_hop_addr[ETH_ALEN]) {
-    pthread_rwlock_wrlock(&rlflock);
-    FILE* f = fopen(routing_log_file, "a+");
-    if (f == NULL) {
-        dessert_debug("file = 0");
-        return;
-    }
-    if (out_iface == NULL) {
-        fprintf(f, MAC "\t" MAC "\t%u\t%u\t" MAC "\t%s\t%s\n",
-                EXPLODE_ARRAY6(src_addr),
-                EXPLODE_ARRAY6(dest_addr),
-                seq_num,
-                hop_count,
-                EXPLODE_ARRAY6(in_iface),
-                "NULL",
-                "NULL");
-    } else if (in_iface == NULL) {
-        fprintf(f, MAC "\t" MAC "\t%u\t%u\t%s\t" MAC "\t" MAC "\n",
-                EXPLODE_ARRAY6(src_addr),
-                EXPLODE_ARRAY6(dest_addr),
-                seq_num,
-                hop_count,
-                "NULL",
-                EXPLODE_ARRAY6(out_iface),
-                EXPLODE_ARRAY6(next_hop_addr));
-    } else {
-        fprintf(f,
-                MAC "\t" MAC "\t%u\t%u\t" MAC "\t" MAC "\t" MAC "\n",
-                EXPLODE_ARRAY6(src_addr),
-                EXPLODE_ARRAY6(dest_addr),
-                seq_num,
-                hop_count,
-                EXPLODE_ARRAY6(in_iface),
-                EXPLODE_ARRAY6(out_iface),
-                EXPLODE_ARRAY6(next_hop_addr));
-    }
-    fclose(f);
-    pthread_rwlock_unlock(&rlflock);
-}
 
 // ---------------------------- pipeline callbacks ---------------------------------------------
 
@@ -356,10 +313,6 @@ int olsr_fwd2dest(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, cons
         olsr_db_unlock();
         if(result == true) {
             memcpy(msg->l2h.ether_dhost, next_hop_iface, ETH_ALEN);
-            if (routing_log_file != NULL) {
-                _rlfile_log(l25h->ether_shost, l25h->ether_dhost, rl_seq_num, rl_hop_count, iface->hwaddr, output_iface->hwaddr, next_hop_iface);
-            }
-            // forward to the next hop
             dessert_meshsend_fast(msg, output_iface);
         }
         return DESSERT_MSG_DROP;
@@ -404,9 +357,6 @@ int olsr_sys2rp(dessert_msg_t *msg, size_t len, dessert_msg_proc_t *proc, desser
             struct rl_seq* rl_data = (struct rl_seq*) rl_ext->data;
             rl_data->seq_num = seq_num;
             rl_data->hop_count = 0;
-            if (routing_log_file != NULL) {
-                _rlfile_log(dessert_l25_defsrc, l25h->ether_dhost, seq_num, 0, NULL, output_iface->hwaddr, next_hop_iface);
-            }
             memcpy(msg->l2h.ether_dhost, next_hop_iface, ETH_ALEN);
             // forward to the next hop
             dessert_meshsend_fast(msg, output_iface);
@@ -433,12 +383,6 @@ int rp2sys(dessert_msg_t* msg, size_t len, dessert_msg_proc_t *proc, const desse
             rl_seq_num = rl_data->seq_num;
             rl_hop_count = rl_data->hop_count;
             pthread_rwlock_unlock(&rlseqlock);
-        }
-        // log unicast packets
-        if (routing_log_file != NULL
-            && !(proc->lflags & DESSERT_RX_FLAG_L25_BROADCAST)
-            && !(proc->lflags & DESSERT_RX_FLAG_L25_MULTICAST)) {
-            _rlfile_log(l25h->ether_shost, l25h->ether_dhost, rl_seq_num, rl_hop_count, iface->hwaddr, NULL, NULL);
         }
         dessert_syssend_msg(msg);
     }

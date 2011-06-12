@@ -77,21 +77,21 @@ enum olsr_willingness {
 
 #define C_INV_COEFF                 64
 
+#define HELLO_SIZE                  128
+#define TC_SIZE                     128
+
 extern int                          hello_interval;
 extern int                          tc_interval;
 extern uint16_t                     rt_interval_ms;
 extern int                          tc_hold_time_coeff;
 extern int                          willingness;
 extern int                          rc_metric;
-extern char*                        routing_log_file;
 extern int                          hello_size;
 extern int                          tc_size;
 extern dessert_periodic_t*          periodic_send_hello;
 extern dessert_periodic_t*          periodic_send_tc;
 extern dessert_periodic_t*          periodic_rt;
-
-// window size for calculation of PDR or ETX
-extern int                          window_size;
+extern int                          window_size; ///< window size for calculation of PDR or ETX
 
 enum olsr_metric {
     RC_METRIC_PLR = 1,
@@ -100,10 +100,12 @@ enum olsr_metric {
     RC_METRIC_ETX_ADD
 };
 
-#define HELLO_SIZE                  128
-#define TC_SIZE                     128
-
+#ifndef min
 #define min(a, b) (((a) < (b)) ? (a) : (b))
+#endif
+
+#ifndef max
 #define max(a, b) (((a) > (b)) ? (a) : (b))
+#endif
 
 #endif
