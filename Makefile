@@ -51,7 +51,7 @@ build: $(OBJS) $(USER_OBJS)
 
 android: CC=android-gcc
 android: CFLAGS = -I$(DESSERT_LIB)/include
-android: LDFLAGS = -L$(DESSERT_LIB)/lib -Wl,-rpath-link=$(DESSERT_LIB)/lib -ldessert -ldessert-extra
+android: LDFLAGS = -L$(DESSERT_LIB)/lib -Wl,-rpath-link=$(DESSERT_LIB)/lib -ldessert 
 android: LIBS =
 android: build package
 
