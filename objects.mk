@@ -4,4 +4,4 @@
 
 USER_OBJS :=
 
-LIBS := -ldessert -ldessert-extra -lpthread -lcli
+LIBS := -ldessert  -lpthread -lcli
