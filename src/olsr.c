@@ -22,7 +22,6 @@ For further information and questions please use the web site
 *******************************************************************************/
 
 #include <dessert.h>
-#include <dessert-extra.h>
 
 #ifndef ANDROID
 #include <printf.h>
