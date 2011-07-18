@@ -55,11 +55,11 @@ static void _register_cli_callbacks() {
     cli_register_command(dessert_cli, dessert_cli_set, "hello_interval", cli_set_hello_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set HELLO interval");
     cli_register_command(dessert_cli, dessert_cli_set, "tc_size", cli_set_tc_size, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set TC packet size");
     cli_register_command(dessert_cli, dessert_cli_set, "tc_interval", cli_set_tc_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set TC interval");
-    cli_register_command(dessert_cli, dessert_cli_set, "rt_interval", cli_set_rt_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set interval to rebuild routing table");
-    cli_register_command(dessert_cli, dessert_cli_set, "window_size", cli_set_window_size, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set window size for calculation of link quality (PDR or ETX)");
+    cli_register_command(dessert_cli, dessert_cli_set, "rt_interval", cli_set_rt_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set interval to update routing table");
+    cli_register_command(dessert_cli, dessert_cli_set, "window_size", cli_set_window_size, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set window size for the link quality (PDR or ETX)");
     cli_register_command(dessert_cli, dessert_cli_set, "validity_coeff", cli_set_validity_coeff, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set validity time coefficient");
-    cli_register_command(dessert_cli, dessert_cli_set, "willingness", cli_set_willingness, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set willingness of host to re-send broadcast messages");
-    cli_register_command(dessert_cli, dessert_cli_set, "metric", cli_set_rc_metric, PRIVILEGE_UNPRIVILEGED, MODE_CONFIG, "set route calculation metric (PLR | HC | ETX | ETX-ADD)");
+    cli_register_command(dessert_cli, dessert_cli_set, "willingness", cli_set_willingness, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set willingness for MPR selection");
+    cli_register_command(dessert_cli, dessert_cli_set, "metric", cli_set_rc_metric, PRIVILEGE_UNPRIVILEGED, MODE_CONFIG, "set metric (PLR | HC | ETX | ETX-ADD)");
 
     cli_register_command(dessert_cli, dessert_cli_show, "hello_size", cli_show_hello_size, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show HELLO packet size");
     cli_register_command(dessert_cli, dessert_cli_show, "hello_interval", cli_show_hello_interval, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show HELLO interval");

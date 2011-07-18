@@ -182,7 +182,7 @@ dessert_cb_result olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_
 
         olsr_db_unlock();
         pthread_rwlock_wrlock(&pp_rwlock);
-        pending_rtc = true; // schedule re-build of rt everytime a hello is received; rebuilding have a fixed interval to handle other metrics than HC
+        pending_rtc = true; // schedule update of rt everytime a hello is received; update has a fixed interval to handle other metrics than HC
         pthread_rwlock_unlock(&pp_rwlock);
         return DESSERT_MSG_DROP;
     }

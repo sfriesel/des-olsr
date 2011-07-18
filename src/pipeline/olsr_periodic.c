@@ -178,7 +178,7 @@ dessert_per_result_t olsr_periodic_build_routingtable(void* data, struct timeval
     pthread_rwlock_unlock(&pp_rwlock);
 
     if(pending != false) {
-        dessert_debug("re-building routing table");
+        dessert_debug("updating routing table");
         olsr_db_wlock();
         olsr_db_rt_destroy();
         olsr_db_rc_dijkstra();
@@ -188,7 +188,7 @@ dessert_per_result_t olsr_periodic_build_routingtable(void* data, struct timeval
         pthread_rwlock_unlock(&pp_rwlock);
     }
     else {
-        dessert_debug("routing table not updated: pending is false");
+        dessert_debug("routing table not updated: pending_rtc is set to false");
     }
 
     return DESSERT_PER_KEEP;
