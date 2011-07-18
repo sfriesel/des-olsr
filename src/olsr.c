@@ -93,7 +93,6 @@ static void _register_periodics() {
 }
 
 static void _register_pipeline() {
-    dessert_meshrxcb_add(dessert_mesh_filter, 1);
     dessert_meshrxcb_add(dessert_msg_check_cb, 10);
     dessert_meshrxcb_add(dessert_msg_ifaceflags_cb, 20);
     dessert_meshrxcb_add(olsr_drop_errors, 30);
