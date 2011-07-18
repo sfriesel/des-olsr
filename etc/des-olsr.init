@@ -9,27 +9,35 @@
 # Description:       Start des-olsr daemon
 ### END INIT INFO
 
+set -e
+
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
 NAME=des-olsr
-DAEMON=/usr/sbin/$NAME
 DESC="$NAME, a daemon based on libdessert"
 
-test -x $DAEMON || exit 0
-
+# Defaults may be overwritten by /etc/default/$NAME
+DAEMON=/usr/sbin/$NAME
 LOGDIR=/var/log/$NAME
-PIDFILE=/var/run/$NAME.pid # Default may be overwritten by /etc/default/$NAME
-DODTIME=1                  # Time to wait for the server to die, in seconds
-			   # If this value is set too low you might not
-			   # let some servers to die gracefully and
-			   # 'restart' will not work
-HOSTNAME=$(hostname)
+PIDFILE=/var/run/$NAME.pid
+
+if [ ! -x $DAEMON ] ; then
+    echo "daemon not found"
+    exit 0
+fi
+
+DODTIME=1 # Time to wait for the server to die, in seconds
+          # If this value is set too low you might not
+          # let some servers to die gracefully and
+          # 'restart' will not work
+
+# unlimited core dump size
+ulimit -c unlimited
 
 # Include default configuration if available
 if [ -f /etc/default/$NAME ] ; then
     . /etc/default/$NAME
 fi
-
-set -e
 
 build_conf()
 {
@@ -47,7 +55,7 @@ build_conf()
         echo "interface mesh $i" >> /tmp/$NAME.cli
     done
     IFS=$OIFS
-    echo "port $CLI_PORT" >> /tmp/$NAME.cli
+    echo "set port $CLI_PORT" >> /tmp/$NAME.cli
     return 0
 }
 
@@ -146,18 +154,18 @@ case "$1" in
         # check wether $DAEMON is running. If so, restart
         build_conf
         start-stop-daemon --stop --test --quiet --pidfile \
-            /var/run/$NAME.pid --exec $DAEMON \
+            $PIDFILE --exec $DAEMON \
             && $0 restart \
             || exit 0
         ;;
   restart)
         echo -n "Restarting $DESC: "
         start-stop-daemon --stop --quiet --pidfile \
-            /var/run/$NAME.pid --exec $DAEMON
+            $PIDFILE --exec $DAEMON
         [ -n "$DODTIME" ] && sleep $DODTIME
         build_conf
         start-stop-daemon --start --quiet --pidfile \
-            /var/run/$NAME.pid --exec $DAEMON -- /tmp/$NAME.cli
+            $PIDFILE --exec $DAEMON -- /tmp/$NAME.cli
         echo "$NAME."
         ;;
   status)
