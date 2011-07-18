@@ -13,13 +13,6 @@ pthread_rwlock_t tc_seq_lock = PTHREAD_RWLOCK_INITIALIZER;
 const size_t hello_max_links_count = DESSERT_MAXEXTDATALEN / sizeof(struct olsr_msg_hello_niface);
 const size_t hello_max_neigths_count = DESSERT_MAXEXTDATALEN / sizeof(struct olsr_msg_hello_ndescr);
 
-static void _add_dummy_payload(dessert_msg_t* msg, uint8_t min_size) {
-    void* payload;
-    uint16_t size = max(min_size - sizeof(dessert_msg_t) - sizeof(struct ether_header) - 2, 0);
-    dessert_msg_addpayload(msg, &payload, size);
-    memset(payload, 0xA, size);
-}
-
 int olsr_periodic_send_hello(void* data, struct timeval* scheduled, struct timeval* interval) {
     const dessert_meshif_t* iface = dessert_meshiflist_get();
     void* neighs_desc_pointer = NULL;
@@ -115,7 +108,7 @@ int olsr_periodic_send_hello(void* data, struct timeval* scheduled, struct timev
         dessert_msg_addext(msg, &ndesc_ext, HELLO_NEIGH_DESRC_TYPE, neighs_desc_size);
         memcpy(ndesc_ext->data, neighs_desc_pointer, neighs_desc_size);
 
-        _add_dummy_payload(msg, hello_size);
+        dessert_msg_dummy_payload(msg, hello_size);
 
         // HELLO message is ready to send
         dessert_meshsend_fast(msg, iface);
@@ -172,7 +165,7 @@ int olsr_periodic_send_tc(void* data, struct timeval* scheduled, struct timeval*
 
     olsr_db_unlock();
 
-    _add_dummy_payload(msg, tc_size);
+    dessert_msg_dummy_payload(msg, tc_size);
 
     dessert_meshsend_fast(msg, NULL);
     dessert_msg_destroy(msg);
