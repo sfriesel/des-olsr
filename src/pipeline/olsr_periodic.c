@@ -13,7 +13,7 @@ pthread_rwlock_t tc_seq_lock = PTHREAD_RWLOCK_INITIALIZER;
 const size_t hello_max_links_count = DESSERT_MAXEXTDATALEN / sizeof(struct olsr_msg_hello_niface);
 const size_t hello_max_neigths_count = DESSERT_MAXEXTDATALEN / sizeof(struct olsr_msg_hello_ndescr);
 
-int olsr_periodic_send_hello(void* data, struct timeval* scheduled, struct timeval* interval) {
+dessert_per_result_t olsr_periodic_send_hello(void* data, struct timeval* scheduled, struct timeval* interval) {
     const dessert_meshif_t* iface = dessert_meshiflist_get();
     void* neighs_desc_pointer = NULL;
     void* pointer;
@@ -124,12 +124,12 @@ int olsr_periodic_send_hello(void* data, struct timeval* scheduled, struct timev
         free(neighs_desc_pointer);
     }
 
-    return 0;
+    return DESSERT_PER_KEEP;
 }
 
 const uint8_t max_tc_neigh_count = ((DESSERT_MAXEXTDATALEN) - sizeof(struct olsr_msg_tc_hdr)) / sizeof(struct olsr_msg_tc_ndescr);
 
-int olsr_periodic_send_tc(void* data, struct timeval* scheduled, struct timeval* interval) {
+dessert_per_result_t olsr_periodic_send_tc(void* data, struct timeval* scheduled, struct timeval* interval) {
     dessert_msg_t* msg;
     dessert_ext_t* ext;
     dessert_msg_new(&msg);
@@ -169,10 +169,10 @@ int olsr_periodic_send_tc(void* data, struct timeval* scheduled, struct timeval*
 
     dessert_meshsend_fast(msg, NULL);
     dessert_msg_destroy(msg);
-    return 0;
+    return DESSERT_PER_KEEP;
 }
 
-int olsr_periodic_build_routingtable(void* data, struct timeval* scheduled, struct timeval* interval) {
+dessert_per_result_t olsr_periodic_build_routingtable(void* data, struct timeval* scheduled, struct timeval* interval) {
     pthread_rwlock_rdlock(&pp_rwlock);
     uint8_t pending = pending_rtc;
     pthread_rwlock_unlock(&pp_rwlock);
@@ -191,16 +191,16 @@ int olsr_periodic_build_routingtable(void* data, struct timeval* scheduled, stru
         dessert_debug("routing table not updated: pending is false");
     }
 
-    return 0;
+    return DESSERT_PER_KEEP;
 }
 
-int olsr_periodic_cleanup_database(void* data, struct timeval* scheduled, struct timeval* interval) {
+dessert_per_result_t olsr_periodic_cleanup_database(void* data, struct timeval* scheduled, struct timeval* interval) {
     struct timeval timestamp;
     gettimeofday(&timestamp, NULL);
 
     if(olsr_db_cleanup(&timestamp) == true) {
-        return 0;
+        return DESSERT_PER_KEEP;
     }
 
-    return 1;
+    return DESSERT_PER_UNREGISTER;
 }
