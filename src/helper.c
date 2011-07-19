@@ -51,7 +51,7 @@ uint8_t hf_sparce_time(float time) {
     return (a << 4) | b;
 }
 
-float hf_parce_time(uint8_t time) {
+float hf_parse_time(uint8_t time) {
     float a = (time >> 4) & ((1 << 4) - 1);
     uint8_t b = time & ((1 << 4) - 1);
     float x = (1 + a) * (1 << b);

@@ -73,7 +73,7 @@ dessert_per_result_t olsr_periodic_send_hello(void* data, struct timeval* schedu
         // add HELLO header
         struct olsr_msg_hello_hdr* hdr = (struct olsr_msg_hello_hdr*) ext->data;
         hdr->seq_num = hello_seq_num;
-        hdr->hello_interval = hf_sparce_time(hello_interval_ms);
+        hdr->hello_interval = hf_sparce_time(hello_interval_ms/1000.0);
         hdr->willingness = willingness;
         hdr->n_iface_count = link_count;
         pointer = ext->data + sizeof(struct olsr_msg_hello_hdr);
@@ -148,7 +148,7 @@ dessert_per_result_t olsr_periodic_send_tc(void* data, struct timeval* scheduled
     uint8_t tc_neigh_count = (neighbor_count > max_tc_neigh_count) ? max_tc_neigh_count : neighbor_count;
     dessert_msg_addext(msg, &ext, TC_EXT_TYPE, sizeof(struct olsr_msg_tc_hdr) + tc_neigh_count * sizeof(struct olsr_msg_tc_ndescr));
     struct olsr_msg_tc_hdr* hdr = (struct olsr_msg_tc_hdr*)ext->data;
-    hdr->tc_interval = hf_sparce_time(tc_interval_ms);
+    hdr->tc_interval = hf_sparce_time(tc_interval_ms/1000.0);
     pthread_rwlock_wrlock(&tc_seq_lock);
     hdr->seq_num = tc_seq_num++;
     pthread_rwlock_unlock(&tc_seq_lock);

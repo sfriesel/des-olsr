@@ -66,18 +66,18 @@ dessert_cb_result olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_
         expired_time.tv_sec = curr_time.tv_sec - 1;
         expired_time.tv_usec = curr_time.tv_usec;
 
-        float hello_inf_f = hf_parce_time(hdr->hello_interval);
+        float hello_inf_f = hf_parse_time(hdr->hello_interval);
         dessert_debug("got HELLO with hello_inf = %f", hello_inf_f);
 
         float hello_hold_time_f = hello_inf_f * (LINK_HOLD_TIME_COEFF + 1);
         struct timeval hold_time;
         hold_time.tv_sec = hello_hold_time_f;
-        hold_time.tv_usec = (hello_hold_time_f - hold_time.tv_sec) * 1000000;
+        hold_time.tv_usec = (hello_hold_time_f - hold_time.tv_sec) * 1000;
         hf_add_tv(&curr_time, &hold_time, &hold_time);
-        float msg_interval_f = hf_parce_time(hdr->hello_interval);
+        float msg_interval_f = hf_parse_time(hdr->hello_interval);
         struct timeval msg_interval;
         msg_interval.tv_sec = msg_interval_f;
-        msg_interval.tv_usec = (msg_interval_f - msg_interval.tv_sec) * 1000000;
+        msg_interval.tv_usec = (msg_interval_f - msg_interval.tv_sec) * 1000;
 
         olsr_db_wlock();
         // be careful while setting link status to ASYN. It may be SYN before.
@@ -200,12 +200,12 @@ dessert_cb_result olsr_handle_tc(dessert_msg_t* msg, size_t len, dessert_msg_pro
 
         struct timeval curr_time, hold_time, purge_time;
         gettimeofday(&curr_time, NULL);
-        float tc_int_f_s = hf_parce_time(hdr->tc_interval);
-        dessert_debug("tc_int_f_s=%.3f, tc_hold_time_coeff=%.3f", tc_int_f_s, tc_hold_time_coeff);
+        float tc_int_f_s = hf_parse_time(hdr->tc_interval);
+        dessert_debug("tc_int_f_s=%.3f, tc_hold_time_coeff=%d", tc_int_f_s, tc_hold_time_coeff);
         float tc_hold_time_s = tc_int_f_s * tc_hold_time_coeff;
         dessert_debug("tc_hold_time_s=%.3f", tc_hold_time_s);
         hold_time.tv_sec = tc_hold_time_s;
-        hold_time.tv_usec = (tc_hold_time_s - hold_time.tv_sec) * 1000000;
+        hold_time.tv_usec = (tc_hold_time_s - hold_time.tv_sec) * 1000;
         hf_add_tv(&curr_time, &hold_time, &purge_time);
 
         struct ether_header* l25h = dessert_msg_getl25ether(msg);

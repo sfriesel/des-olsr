@@ -39,7 +39,7 @@ int hf_seq_comp_i_j(uint16_t i, uint16_t j);
 
 uint8_t hf_sparce_time(float time);
 
-float hf_parce_time(uint8_t time);
+float hf_parse_time(uint8_t time);
 
 /**
  * Compares two timevals.
