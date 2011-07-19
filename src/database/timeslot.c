@@ -121,6 +121,7 @@ int timeslot_addobject(timeslot_t* ts, struct timeval* purge_time, void* object)
     timeslot_deleteobject(ts, object);
 
     if(create_new_ts_element(&new_el, purge_time, object) == false) {
+        dessert_crit("could not alloc timeslot element");
         return false;
     }
 

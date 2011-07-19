@@ -43,15 +43,18 @@ enum extension_types {
 #define TC_INTERVAL_MS              5000
 
 // holding times
-#define LINK_HOLD_TIME_COEFF        7
-#define TC_HOLD_TIME_COEFF          20
+#define LINK_HOLD_TIME_COEFF        7       ///< determines max. number of missed HELLO packets before neighbor is discarded
+#define TC_HOLD_TIME_COEFF          20      ///< determines max. number of missed TCs packets the corresponding information is discarded
 #define BRCLOG_HOLD_TIME            3
 
 // link types
-#define UNSPEC_LINK                 0
-#define ASYM_LINK                   1
-#define SYM_LINK                    2
-#define LOST_LINK                   3
+enum link_type {
+    UNSPEC_LINK = 0,
+    ASYM_LINK   = 1,
+    SYM_LINK    = 2,
+    LOST_LINK   = 3
+};
+
 #define LINK_MASK                   3
 
 enum neighbor_types {

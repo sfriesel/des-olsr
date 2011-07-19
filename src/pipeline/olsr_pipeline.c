@@ -74,10 +74,12 @@ dessert_cb_result olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_
         hold_time.tv_sec = hello_hold_time_f;
         hold_time.tv_usec = (hello_hold_time_f - hold_time.tv_sec) * 1000;
         hf_add_tv(&curr_time, &hold_time, &hold_time);
-        float msg_interval_f = hf_parse_time(hdr->hello_interval);
-        struct timeval msg_interval;
-        msg_interval.tv_sec = msg_interval_f;
-        msg_interval.tv_usec = (msg_interval_f - msg_interval.tv_sec) * 1000;
+
+// TODO: had this code any function???
+//         float msg_interval_f = hf_parse_time(hdr->hello_interval);
+//         struct timeval msg_interval;
+//         msg_interval.tv_sec = msg_interval_f;
+//         msg_interval.tv_usec = (msg_interval_f - msg_interval.tv_sec) * 1000;
 
         olsr_db_wlock();
         // be careful while setting link status to ASYN. It may be SYN before.
