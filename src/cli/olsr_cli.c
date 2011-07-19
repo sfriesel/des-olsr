@@ -132,7 +132,7 @@ int cli_set_validity_coeff(struct cli_def* cli, char* command, char* argv[], int
         dessert_debug("set TC_HOLD_TIME_COEFF to %i", tc_hold_time_coeff);
     }
 
-    dessert_debug("TC_HOLD_TIME_COEFF must be greater than LINK_HOLD_TIME_KOEFF");
+    dessert_debug("TC_HOLD_TIME_COEFF must be larger than LINK_HOLD_TIME_KOEFF");
     return CLI_OK;
 }
 

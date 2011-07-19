@@ -91,7 +91,7 @@ dessert_cb_result olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_
         link_neigh->ASYM_time.tv_usec = hold_time.tv_usec;
         link_neigh->quality_to_neighbor = 0;
 
-        int recalculate_mpr_set = false;
+        bool recalculate_mpr_set = false;
 
         // parse neighbor_interface section
         while(hdr->n_iface_count-- > 0) {
@@ -202,6 +202,7 @@ dessert_cb_result olsr_handle_tc(dessert_msg_t* msg, size_t len, dessert_msg_pro
         gettimeofday(&curr_time, NULL);
         float tc_int_f = hf_parce_time(hdr->tc_interval);
         float tc_hold_time_f = tc_int_f * tc_hold_time_coeff;
+        dessert_debug("tc_hold_time_f=%.3f", tc_hold_time_f);
         hold_time.tv_sec = tc_hold_time_f;
         hold_time.tv_usec = (tc_hold_time_f - hold_time.tv_sec) * 1000000;
         hf_add_tv(&curr_time, &hold_time, &purge_time);
