@@ -34,13 +34,14 @@ olsr_db_ns_tuple_t* neighbor_set = NULL;
 timeslot_t*         ns_ts;
 
 void purge_nstuple(struct timeval* timestamp, void* src_object, void* object) {
+    dessert_debug("purging");
     olsr_db_ns_tuple_t* tuple = object;
     olsr_db_2hns_del1hneighbor(tuple->neighbor_main_addr);
     HASH_DEL(neighbor_set, tuple);
     free(tuple);
 }
 
-int	olsr_db_ns_init() {
+int olsr_db_ns_init() {
     return timeslot_create(&ns_ts, NULL, purge_nstuple);
 }
 

@@ -39,8 +39,8 @@ enum extension_types {
 #define SEQNO_MAX                   (1 << 16) - 1
 
 // emission intervals
-#define HELLO_INTERVAL              2000
-#define TC_INTERVAL                 5000
+#define HELLO_INTERVAL_MS           2000
+#define TC_INTERVAL_MS              5000
 
 // holding times
 #define LINK_HOLD_TIME_COEFF        7
@@ -69,7 +69,7 @@ enum olsr_willingness {
 };
 
 // build intervals
-#define BUILD_RT_INTERVAL_MS        1000
+#define RT_INTERVAL_MS              1000
 
 // link quality
 #define WINDOW_SIZE                 50
@@ -80,10 +80,10 @@ enum olsr_willingness {
 #define HELLO_SIZE                  128
 #define TC_SIZE                     128
 
-extern int                          hello_interval;
-extern int                          tc_interval;
+extern uint16_t                     hello_interval_ms;
+extern uint16_t                     tc_interval_ms;
 extern uint16_t                     rt_interval_ms;
-extern int                          tc_hold_time_coeff;
+extern uint16_t                     tc_hold_time_coeff;
 extern int                          willingness;
 extern int                          rc_metric;
 extern int                          hello_size;

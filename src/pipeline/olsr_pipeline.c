@@ -142,7 +142,7 @@ dessert_cb_result olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_
                 olsr_db_ns_updatetimeslot(neighbor, &hold_time);
                 // host in 1hop neighborhood can not be 2hop neighbor
                 olsr_db_2hns_del2hneighbor(l25h->ether_shost);
-                // remove old 2hop neighbors from 1hop host
+                // remove old 2hop neighbors from 1hop neighbors
                 olsr_db_2hns_clear1hn(l25h->ether_shost);
                 recalculate_mpr_set = true;
             }
@@ -200,11 +200,12 @@ dessert_cb_result olsr_handle_tc(dessert_msg_t* msg, size_t len, dessert_msg_pro
 
         struct timeval curr_time, hold_time, purge_time;
         gettimeofday(&curr_time, NULL);
-        float tc_int_f = hf_parce_time(hdr->tc_interval);
-        float tc_hold_time_f = tc_int_f * tc_hold_time_coeff;
-        dessert_debug("tc_hold_time_f=%.3f", tc_hold_time_f);
-        hold_time.tv_sec = tc_hold_time_f;
-        hold_time.tv_usec = (tc_hold_time_f - hold_time.tv_sec) * 1000000;
+        float tc_int_f_s = hf_parce_time(hdr->tc_interval);
+        dessert_debug("tc_int_f_s=%.3f, tc_hold_time_coeff=%.3f", tc_int_f_s, tc_hold_time_coeff);
+        float tc_hold_time_s = tc_int_f_s * tc_hold_time_coeff;
+        dessert_debug("tc_hold_time_s=%.3f", tc_hold_time_s);
+        hold_time.tv_sec = tc_hold_time_s;
+        hold_time.tv_usec = (tc_hold_time_s - hold_time.tv_sec) * 1000000;
         hf_add_tv(&curr_time, &hold_time, &purge_time);
 
         struct ether_header* l25h = dessert_msg_getl25ether(msg);
