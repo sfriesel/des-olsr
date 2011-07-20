@@ -36,7 +36,7 @@ pthread_rwlock_t rlseqlock = PTHREAD_RWLOCK_INITIALIZER;
 
 // ---------------------------- pipeline callbacks ---------------------------------------------
 
-dessert_cb_result olsr_drop_errors(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, const dessert_meshif_t* iface, dessert_frameid_t id) {
+dessert_cb_result olsr_drop_errors(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id) {
     if(proc->lflags & DESSERT_RX_FLAG_L2_SRC
        || proc->lflags & DESSERT_RX_FLAG_L25_SRC) {
         struct ether_header* l25h = dessert_msg_getl25ether(msg);
@@ -51,7 +51,7 @@ dessert_cb_result olsr_drop_errors(dessert_msg_t* msg, size_t len, dessert_msg_p
     return DESSERT_MSG_KEEP;
 }
 
-dessert_cb_result olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, const dessert_meshif_t* iface, dessert_frameid_t id) {
+dessert_cb_result olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id) {
     dessert_ext_t* ext;
 
     if(dessert_msg_getext(msg, &ext, HELLO_EXT_TYPE, 0) != 0) {
@@ -192,7 +192,7 @@ dessert_cb_result olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_
     return DESSERT_MSG_KEEP;
 }
 
-dessert_cb_result olsr_handle_tc(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, const dessert_meshif_t* iface, dessert_frameid_t id) {
+dessert_cb_result olsr_handle_tc(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id) {
     dessert_ext_t* ext;
 
     if(dessert_msg_getext(msg, &ext, TC_EXT_TYPE, 0) != 0) {
@@ -261,7 +261,7 @@ dessert_cb_result olsr_handle_tc(dessert_msg_t* msg, size_t len, dessert_msg_pro
     return DESSERT_MSG_KEEP;
 }
 
-dessert_cb_result olsr_fwd2dest(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, const dessert_meshif_t* iface, dessert_frameid_t id) {
+dessert_cb_result olsr_fwd2dest(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id) {
     struct ether_header* l25h = dessert_msg_getl25ether(msg);
     dessert_ext_t* rl_ext;
     uint32_t rl_seq_num = 0;
@@ -334,7 +334,7 @@ dessert_cb_result olsr_fwd2dest(dessert_msg_t* msg, size_t len, dessert_msg_proc
             && !(proc->lflags & DESSERT_RX_FLAG_L25_DST)) { // Directed message
         uint8_t next_hop[ETH_ALEN];
         uint8_t next_hop_iface[ETH_ALEN];
-        const dessert_meshif_t* output_iface;
+        dessert_meshif_t* output_iface;
         // find and set (if found) NEXT HOP towards destination
         olsr_db_rlock();
         uint8_t result = olsr_db_rt_getnexthop(l25h->ether_dhost, next_hop);
@@ -376,7 +376,7 @@ dessert_cb_result olsr_sys2rp(dessert_msg_t* msg, size_t len, dessert_msg_proc_t
     else {
         uint8_t next_hop[ETH_ALEN];
         uint8_t next_hop_iface[ETH_ALEN];
-        const dessert_meshif_t* output_iface;
+        dessert_meshif_t* output_iface;
         // find and set (if found) NEXT HOP towards destination
         olsr_db_rlock();
         uint8_t result = olsr_db_rt_getnexthop(l25h->ether_dhost, next_hop);
@@ -409,7 +409,7 @@ dessert_cb_result olsr_sys2rp(dessert_msg_t* msg, size_t len, dessert_msg_proc_t
 /**
 * Forward packets addressed to me via sysif. The packet is always dropped after handling.
 */
-dessert_cb_result rp2sys(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, const dessert_meshif_t* iface, dessert_frameid_t id) {
+dessert_cb_result rp2sys(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id) {
     if((proc->lflags & DESSERT_RX_FLAG_L25_DST && !(proc->lflags & DESSERT_RX_FLAG_L25_OVERHEARD))
        || proc->lflags & DESSERT_RX_FLAG_L25_BROADCAST
        || proc->lflags & DESSERT_RX_FLAG_L25_MULTICAST) {

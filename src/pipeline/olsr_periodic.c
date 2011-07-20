@@ -14,7 +14,7 @@ const size_t hello_max_links_count = DESSERT_MAXEXTDATALEN / sizeof(struct olsr_
 const size_t hello_max_neigths_count = DESSERT_MAXEXTDATALEN / sizeof(struct olsr_msg_hello_ndescr);
 
 dessert_per_result_t olsr_periodic_send_hello(void* data, struct timeval* scheduled, struct timeval* interval) {
-    const dessert_meshif_t* iface = dessert_meshiflist_get();
+    dessert_meshif_t* iface = dessert_meshiflist_get();
     void* neighs_desc_pointer = NULL;
     void* pointer;
 

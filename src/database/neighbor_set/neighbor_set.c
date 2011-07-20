@@ -167,7 +167,7 @@ uint8_t olsr_db_ns_getlinkquality(uint8_t neighbor_main_addr[ETH_ALEN]) {
 /**
 * @hint: read lock
 */
-int olsr_db_ns_getbestlink(uint8_t neighbor_main_addr[ETH_ALEN], const dessert_meshif_t** output_iface_out, uint8_t neighbor_iface[ETH_ALEN]) {
+int olsr_db_ns_getbestlink(uint8_t neighbor_main_addr[ETH_ALEN], dessert_meshif_t** output_iface_out, uint8_t neighbor_iface[ETH_ALEN]) {
     olsr_db_ns_tuple_t* tuple;
     HASH_FIND(hh, neighbor_set, neighbor_main_addr, ETH_ALEN, tuple);
 
