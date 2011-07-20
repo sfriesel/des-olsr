@@ -86,7 +86,8 @@ enum olsr_willingness {
 extern uint16_t                     hello_interval_ms;
 extern uint16_t                     tc_interval_ms;
 extern uint16_t                     rt_interval_ms;
-extern uint16_t                     tc_hold_time_coeff;
+extern uint16_t                     max_missed_tc;
+extern uint16_t                     max_missed_hello;
 extern int                          willingness;
 extern int                          rc_metric;
 extern int                          hello_size;

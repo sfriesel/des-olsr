@@ -33,6 +33,7 @@ int create_new_ts_element(timeslot_element_t** ts_el_out, struct timeval* timest
     new_el = malloc(sizeof(timeslot_element_t));
 
     if(new_el == NULL) {
+        dessert_crit("could not alloc timeslot element");
         return false;
     }
 
@@ -50,6 +51,7 @@ int timeslot_create(timeslot_t** ts_out, void* src_object, object_purger_t* obje
     ts = malloc(sizeof(timeslot_t));
 
     if(ts == NULL) {
+        dessert_crit("could not alloc timeslot element");
         return false;
     }
 

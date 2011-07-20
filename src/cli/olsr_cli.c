@@ -119,7 +119,12 @@ int cli_set_rt_interval(struct cli_def* cli, char* command, char* argv[], int ar
     return CLI_OK;
 }
 
-int cli_set_validity_coeff(struct cli_def* cli, char* command, char* argv[], int argc) {
+int cli_show_rt_interval(struct cli_def* cli, char* command, char* argv[], int argc) {
+    cli_print(cli, "setting RT interval set to %d [ms]", rt_interval_ms);
+    return CLI_OK;
+}
+
+int cli_set_max_missed_tc(struct cli_def* cli, char* command, char* argv[], int argc) {
     unsigned int tcoeff;
 
     if(argc != 1 || sscanf(argv[0], "%u", &tcoeff) != 1) {
@@ -127,17 +132,46 @@ int cli_set_validity_coeff(struct cli_def* cli, char* command, char* argv[], int
         return CLI_ERROR_ARG;
     }
 
-    if(tcoeff >= LINK_HOLD_TIME_COEFF) {
-        tc_hold_time_coeff = (uint16_t) tcoeff;
-        dessert_debug("set TC_HOLD_TIME_COEFF to %d", tc_hold_time_coeff);
+    if(tcoeff >= max_missed_hello) {
+        max_missed_tc = (uint16_t) tcoeff;
+        cli_print(cli, "set maximum number of tolerated missed TCs to %d", max_missed_tc);
+        dessert_notice("set maximum number of tolerated missed TCs to %d", max_missed_tc);
+        return CLI_OK;
     }
 
-    dessert_debug("TC_HOLD_TIME_COEFF must be larger than LINK_HOLD_TIME_KOEFF");
+    cli_print(cli, "ERROR: max_missed_tc < max_missed_hello");
+    dessert_err("max_missed_tc < max_missed_hello");
+    return CLI_ERROR_ARG;
+}
+
+int cli_show_max_missed_tc(struct cli_def* cli, char* command, char* argv[], int argc) {
+    cli_print(cli, "maximum number of tolerated missed TCs = %d", max_missed_tc);
     return CLI_OK;
 }
 
-int cli_show_validity_coeff(struct cli_def* cli, char* command, char* argv[], int argc) {
-    cli_print(cli, "TC_HOLD_TIME_COEFF = %d", tc_hold_time_coeff);
+int cli_set_max_missed_hello(struct cli_def* cli, char* command, char* argv[], int argc) {
+    unsigned int tcoeff;
+
+    if(argc != 1 || sscanf(argv[0], "%u", &tcoeff) != 1) {
+        cli_print(cli, "usage of %s command [0, 1]\n", command);
+        return CLI_ERROR_ARG;
+    }
+
+    if(max_missed_tc >= tcoeff) {
+        max_missed_hello = (uint16_t) tcoeff;
+        cli_print(cli, "set maximum number of tolerated missed HELLOs to %d", max_missed_hello);
+        dessert_notice("set maximum number of tolerated missed HELLOs to %d", max_missed_hello);
+        return CLI_OK;
+    }
+
+    cli_print(cli, "ERROR: max_missed_tc < max_missed_hello");
+    dessert_err("max_missed_tc < max_missed_hello");
+    return CLI_ERROR_ARG;
+}
+
+
+int cli_show_max_missed_hello(struct cli_def* cli, char* command, char* argv[], int argc) {
+    cli_print(cli, "maximum number of tolerated missed HELLOs = %d", max_missed_hello);
     return CLI_OK;
 }
 

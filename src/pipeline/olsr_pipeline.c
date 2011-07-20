@@ -69,7 +69,7 @@ dessert_cb_result olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_
         float hello_inf_f = hf_parse_time(hdr->hello_interval);
         dessert_debug("got HELLO with hello_inf = %f", hello_inf_f);
 
-        float hello_hold_time_f = hello_inf_f * (LINK_HOLD_TIME_COEFF + 1);
+        float hello_hold_time_f = hello_inf_f * (max_missed_hello + 1);
         struct timeval hold_time;
         hold_time.tv_sec = hello_hold_time_f;
         hold_time.tv_usec = (hello_hold_time_f - hold_time.tv_sec) * 1000;
@@ -203,8 +203,8 @@ dessert_cb_result olsr_handle_tc(dessert_msg_t* msg, size_t len, dessert_msg_pro
         struct timeval curr_time, hold_time, purge_time;
         gettimeofday(&curr_time, NULL);
         float tc_int_f_s = hf_parse_time(hdr->tc_interval);
-        dessert_debug("tc_int_f_s=%.3f, tc_hold_time_coeff=%d", tc_int_f_s, tc_hold_time_coeff);
-        float tc_hold_time_s = tc_int_f_s * tc_hold_time_coeff;
+        dessert_debug("tc_int_f_s=%.3f, max_missed_tc=%d", tc_int_f_s, max_missed_tc);
+        float tc_hold_time_s = tc_int_f_s * max_missed_tc;
         dessert_debug("tc_hold_time_s=%.3f", tc_hold_time_s);
         hold_time.tv_sec = tc_hold_time_s;
         hold_time.tv_usec = (tc_hold_time_s - hold_time.tv_sec) * 1000;
