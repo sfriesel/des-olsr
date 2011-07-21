@@ -130,7 +130,7 @@ int olsr_db_rt_report(char** str_out) {
     strcat(output, "+-------------------+-------------------+-------------------+-----------+--------------+\n");
 
     while(current_entry != NULL) {
-        snprintf(entry_str, report_str_len + 1, "| " MAC " | " MAC " | "MAC"  | %9i | %12.2f |\n",
+        snprintf(entry_str, report_str_len + 1, "| " MAC " | " MAC " | "MAC" | %9i | %12.2f |\n",
                  EXPLODE_ARRAY6(current_entry->dest_addr), EXPLODE_ARRAY6(current_entry->next_hop), EXPLODE_ARRAY6(current_entry->precursor_addr), current_entry->hop_count, current_entry->link_quality);
         strcat(output, entry_str);
         current_entry = current_entry->hh.next;
