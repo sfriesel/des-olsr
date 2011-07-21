@@ -32,16 +32,16 @@ For further information and questions please use the web site
 #include "pipeline/olsr_pipeline.h"
 #include "database/olsr_database.h"
 
-int         hello_size              = HELLO_SIZE;
-uint16_t    hello_interval_ms       = HELLO_INTERVAL_MS;
-int         tc_size                 = TC_SIZE;
-uint16_t    tc_interval_ms          = TC_INTERVAL_MS;
-uint16_t    rt_interval_ms          = RT_INTERVAL_MS;
-int         window_size             = WINDOW_SIZE;
-uint16_t    max_missed_tc           = TC_HOLD_TIME_COEFF;
-uint16_t    max_missed_hello        = LINK_HOLD_TIME_COEFF;
-int         willingness             = WILL_DEFAULT;
-int         rc_metric               = RC_METRIC_ETX;
+uint16_t        hello_size              = HELLO_SIZE;
+uint16_t        hello_interval_ms       = HELLO_INTERVAL_MS;
+uint16_t        tc_size                 = TC_SIZE;
+uint16_t        tc_interval_ms          = TC_INTERVAL_MS;
+uint16_t        rt_interval_ms          = RT_INTERVAL_MS;
+uint16_t        window_size             = WINDOW_SIZE;
+uint16_t        max_missed_tc           = TC_HOLD_TIME_COEFF;
+uint16_t        max_missed_hello        = LINK_HOLD_TIME_COEFF;
+uint8_t         willingness             = WILL_DEFAULT;
+olsr_metric_t   rc_metric               = RC_METRIC_ETX;
 
 dessert_periodic_t* periodic_send_hello;
 dessert_periodic_t* periodic_send_tc;
@@ -56,14 +56,14 @@ static void _register_cli_callbacks() {
     cli_register_command(dessert_cli, dessert_cli_set, "hello_interval_ms", cli_set_hello_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set HELLO interval");
     cli_register_command(dessert_cli, dessert_cli_set, "tc_size", cli_set_tc_size, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set TC packet size");
     cli_register_command(dessert_cli, dessert_cli_set, "tc_interval_ms", cli_set_tc_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set TC interval");
-    cli_register_command(dessert_cli, dessert_cli_set, "rt_interval_ms", cli_set_rt_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set interval to update routing table");
-    cli_register_command(dessert_cli, dessert_cli_set, "window_size", cli_set_window_size, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set window size for the link quality (PDR or ETX)");
+    cli_register_command(dessert_cli, dessert_cli_set, "rt_interval_ms", cli_set_rt_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set routing table update interval");
+    cli_register_command(dessert_cli, dessert_cli_set, "window_size", cli_set_window_size, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set link quality window size (PDR or ETX)");
     cli_register_command(dessert_cli, dessert_cli_set, "max_miss_tc", cli_set_max_missed_tc, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set limit for missed TCs");
     cli_register_command(dessert_cli, dessert_cli_set, "max_miss_hello", cli_set_max_missed_hello, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set limit for missed HELLOs");
     cli_register_command(dessert_cli, dessert_cli_set, "willingness", cli_set_willingness, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set willingness for MPR selection");
-    cli_register_command(dessert_cli, dessert_cli_set, "metric", cli_set_rc_metric, PRIVILEGE_UNPRIVILEGED, MODE_CONFIG, "set metric (PLR | HC | ETX | ETX-ADD)");
+    cli_register_command(dessert_cli, dessert_cli_set, "metric", cli_set_rc_metric, PRIVILEGE_UNPRIVILEGED, MODE_CONFIG, "set metric (PLR | PDR | HC | ETX | ETX-ADD)");
 
-    cli_register_command(dessert_cli, dessert_cli_show, "rt_interval_ms", cli_show_rt_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "show interval to update routing table");
+    cli_register_command(dessert_cli, dessert_cli_show, "rt_interval_ms", cli_show_rt_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "show routing table update interval");
     cli_register_command(dessert_cli, dessert_cli_show, "max_miss_tc", cli_show_max_missed_tc, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show limit for the max. number of missed TCs");
     cli_register_command(dessert_cli, dessert_cli_show, "max_miss_hello", cli_show_max_missed_hello, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show limit for the max. number of missed HELLOs");
     cli_register_command(dessert_cli, dessert_cli_show, "hello_size", cli_show_hello_size, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show HELLO packet size");
@@ -77,6 +77,7 @@ static void _register_cli_callbacks() {
     cli_register_command(dessert_cli, dessert_cli_show, "tc", cli_show_tc, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show TC set table");
     cli_register_command(dessert_cli, dessert_cli_show, "rt", cli_show_rt, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show routing table");
     cli_register_command(dessert_cli, dessert_cli_show, "rt_so", cli_show_rt_so, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show routing table (simple output)");
+    cli_register_command(dessert_cli, dessert_cli_show, "metric", cli_show_rc_metric, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show routing metric");
 }
 
 static void _register_periodics() {

@@ -201,30 +201,45 @@ int cli_set_window_size(struct cli_def* cli, char* command, char* argv[], int ar
     return CLI_OK;
 }
 
-int cli_set_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc) {
-    if(argc != 1 || (strcmp(argv[0], "PLR") != 0 && strcmp(argv[0], "HC") != 0 && strcmp(argv[0], "ETX") != 0 && strcmp(argv[0], "ETX-ADD") != 0)) {
-        cli_print(cli, "usage of %s command [PLR, HC, ETX, ETX-ADD]\n", command);
-        return CLI_ERROR_ARG;
-    }
+const char* metric2str[] = {
+    "unknown",
+    "PLR/PDR",
+    "HC",
+    "ETX",
+    "ETX_ADD"
+};
 
+int cli_show_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc) {
+    cli_print(cli, "metric = %s", metric2str[rc_metric]);
+}
+
+int cli_set_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc) {
     if(strcmp(argv[0], "PLR") == 0
        || strcmp(argv[0], "PDR") == 0) {
         rc_metric = RC_METRIC_PLR;
-        dessert_debug("set metric to PLR (packet lost rate) where PLR = 1-PDR");
+        dessert_notice("set metric to PLR (packet lost rate) where PLR = 1-PDR");
+        goto ok;
     }
     else if(strcmp(argv[0], "HC") == 0) {
         rc_metric = RC_METRIC_HC;
-        dessert_debug("set metric to HC (hop count)");
+        dessert_notice("set metric to HC (hop count)");
+        goto ok;
     }
     else if(strcmp(argv[0], "ETX") == 0) {
         rc_metric = RC_METRIC_ETX;
-        dessert_debug("set metric to ETX (probabilistic path ETX)");
+        dessert_notice("set metric to ETX (probabilistic path ETX)");
+        goto ok;
     }
     else if(strcmp(argv[0], "ETX-ADD") == 0) {
         rc_metric = RC_METRIC_ETX_ADD;
-        dessert_debug("set metric to ETX-ADD (additive path ETX)");
+        dessert_notice("set metric to ETX-ADD (additive path ETX)");
+        goto ok;
     }
 
+    cli_print(cli, "usage of %s command [PLR, HC, ETX, ETX-ADD]\n", command);
+    return CLI_ERROR_ARG;
+
+ok:
     return CLI_OK;
 }
 

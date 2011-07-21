@@ -67,3 +67,7 @@
     - Fixed bug in TC and HELLO handling
     - Usage of new libdessert features
     - Released as 1.6
+
+201107??
+    - "show metric" command
+    -
