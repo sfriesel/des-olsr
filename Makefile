@@ -1,6 +1,6 @@
 DAEMON_NAME = des-olsr
 VERSION_MAJOR = 1
-VERSION_MINOR = 6
+VERSION_MINOR = 7
 VERSION = $(VERSION_MAJOR).$(VERSION_MINOR)
 DESTDIR ?=
 
@@ -52,7 +52,7 @@ build: $(OBJS) $(USER_OBJS)
 
 android: CC=android-gcc
 android: CFLAGS = -I$(DESSERT_LIB)/include
-android: LDFLAGS = -L$(DESSERT_LIB)/lib -Wl,-rpath-link=$(DESSERT_LIB)/lib -ldessert 
+android: LDFLAGS = -L$(DESSERT_LIB)/lib -Wl,-rpath-link=$(DESSERT_LIB)/lib -ldessert
 android: LIBS =
 android: build package
 

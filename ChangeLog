@@ -49,13 +49,13 @@
 20110306
     - changing CLI "print" parameters to "show"
     - adding CLI parameter to config file with comments
-    - unifying routing tables to the streucture: destination | next hop | out iface addr | daemon specifc
+    - unifying routing tables to the structure: destination | next hop | out iface addr | daemon specifc
     - changing "metric x" CLI parameter to "set metric x" and fixing crash bug
 
 20110323
     - added android compatibility
     - added android make target
-    - added "android.files" diretory
+    - added "android.files" directory
 
 20110610
     - Code cleanup
@@ -72,3 +72,4 @@
     - "show metric" command
     - Merged ETT branch
     - Code cleanup
+    - Released as 1.7
