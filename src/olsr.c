@@ -66,7 +66,7 @@ static void _register_cli_callbacks() {
     cli_register_command(dessert_cli, dessert_cli_set, "willingness", cli_set_willingness, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set willingness for MPR selection");
     cli_register_command(dessert_cli, dessert_cli_set, "metric", cli_set_rc_metric, PRIVILEGE_UNPRIVILEGED, MODE_CONFIG, "set metric (PLR | PDR | HC | ETX | ETX-ADD)");
 
-    cli_register_command(dessert_cli, dessert_cli_show, "rt_interval_ms", cli_show_rt_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "show routing table update interval");
+    cli_register_command(dessert_cli, dessert_cli_show, "rt_interval_ms", cli_show_rt_interval, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show routing table update interval");
     cli_register_command(dessert_cli, dessert_cli_show, "max_miss_tc", cli_show_max_missed_tc, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show limit for the max. number of missed TCs");
     cli_register_command(dessert_cli, dessert_cli_show, "max_miss_hello", cli_show_max_missed_hello, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show limit for the max. number of missed HELLOs");
     cli_register_command(dessert_cli, dessert_cli_show, "hello_size", cli_show_hello_size, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show HELLO packet size");

@@ -136,7 +136,7 @@ int cli_set_rt_interval(struct cli_def* cli, char* command, char* argv[], int ar
 }
 
 int cli_show_rt_interval(struct cli_def* cli, char* command, char* argv[], int argc) {
-    cli_print(cli, "setting RT interval set to %d [ms]", rt_interval_ms);
+    cli_print(cli, "RT interval is set to %d [ms]", rt_interval_ms);
     return CLI_OK;
 }
 
