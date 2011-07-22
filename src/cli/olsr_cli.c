@@ -103,6 +103,22 @@ int cli_set_tc_interval(struct cli_def* cli, char* command, char* argv[], int ar
     return CLI_OK;
 }
 
+int cli_set_ett_interval(struct cli_def* cli, char* command, char* argv[], int argc) {
+    if(argc != 1) {
+        cli_print(cli, "usage %s  [interval]\n", command);
+        return CLI_ERROR;
+    }
+
+    ett_interval = strtoul(argv[0], NULL, 10);
+    dessert_periodic_del(periodic_send_ett);
+    struct timeval ett_interval_tv;
+    ett_interval_tv.tv_sec = ett_interval / 1000;
+    ett_interval_tv.tv_usec = (ett_interval % 1000) * 1000;
+    periodic_send_ett = dessert_periodic_add(olsr_periodic_send_ett, NULL, NULL, &ett_interval_tv);
+    dessert_notice("setting ETT interval to %d", ett_interval);
+    return CLI_OK;
+}
+
 int cli_set_rt_interval(struct cli_def* cli, char* command, char* argv[], int argc) {
     if(argc != 1) {
         cli_print(cli, "usage %s  [ms]\n", command);
@@ -206,7 +222,8 @@ const char* metric2str[] = {
     "PLR/PDR",
     "HC",
     "ETX",
-    "ETX_ADD"
+    "ETX-ADD",
+    "ETT"
 };
 
 int cli_show_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc) {
@@ -214,30 +231,44 @@ int cli_show_rc_metric(struct cli_def* cli, char* command, char* argv[], int arg
 }
 
 int cli_set_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc) {
-    if(strcmp(argv[0], "PLR") == 0
-       || strcmp(argv[0], "PDR") == 0) {
+    if(argc != 1) {
+        goto error;
+    }
+
+    if(strcmp(argv[0], "PLR") == 0 || strcmp(argv[0], "PDR") == 0) {
         rc_metric = RC_METRIC_PLR;
         dessert_notice("set metric to PLR (packet lost rate) where PLR = 1-PDR");
+        cli_print(cli, "set metric to PLR (packet lost rate) where PLR = 1-PDR");
         goto ok;
     }
-    else if(strcmp(argv[0], "HC") == 0) {
+    else if(strcmp(argv[0], metric2str[RC_METRIC_HC]) == 0) {
         rc_metric = RC_METRIC_HC;
         dessert_notice("set metric to HC (hop count)");
+        cli_print(cli, "set metric to HC (hop count)");
         goto ok;
     }
-    else if(strcmp(argv[0], "ETX") == 0) {
+    else if(strcmp(argv[0], metric2str[RC_METRIC_ETX]) == 0) {
         rc_metric = RC_METRIC_ETX;
-        dessert_notice("set metric to ETX (probabilistic path ETX)");
+        dessert_notice("set metric to ETX (multiplicative ETX)");
+        cli_print(cli, "set metric to ETX (multiplicative ETX)");
         goto ok;
     }
-    else if(strcmp(argv[0], "ETX-ADD") == 0) {
+    else if(strcmp(argv[0], metric2str[RC_METRIC_ETX_ADD]) == 0) {
         rc_metric = RC_METRIC_ETX_ADD;
-        dessert_notice("set metric to ETX-ADD (additive path ETX)");
+        dessert_notice("set metric to ETX-ADD (additive ETX)");
+        cli_print(cli, "set metric to ETX-ADD (additive ETX)");
+        goto ok;
+    }
+    else if(strcmp(argv[0], metric2str[RC_METRIC_ETT]) == 0) {
+        rc_metric = RC_METRIC_ETT;
+        dessert_debug("set metric to ETT (expected transmission time)");
+        cli_print(cli, "set metric to ETT (expected transmission time)");
         goto ok;
     }
 
-    cli_print(cli, "usage of %s command [PLR, HC, ETX, ETX-ADD]\n", command);
-    return CLI_ERROR_ARG;
+error:
+    cli_print(cli, "usage: set %s [PLR, PDR,, HC, ETX, ETX-ADD, ETT]\n", command);
+    return CLI_ERROR;
 
 ok:
     return CLI_OK;
@@ -265,6 +296,11 @@ int cli_show_tc_size(struct cli_def* cli, char* command, char* argv[], int argc)
 
 int cli_show_tc_interval(struct cli_def* cli, char* command, char* argv[], int argc) {
     cli_print(cli, "TC interval = %d [ms]\n", tc_interval_ms);
+    return CLI_OK;
+}
+
+int cli_show_ett_interval(struct cli_def *cli, char *command, char *argv[], int argc) {
+    cli_print(cli, "ETT interval = %d [ms]\n", ett_interval);
     return CLI_OK;
 }
 
@@ -350,6 +386,21 @@ int cli_show_tc(struct cli_def* cli, char* command, char* argv[], int argc) {
         free(report);
     }
 
+    return CLI_OK;
+}
+
+/**
+ * Print ETT table
+ */
+int cli_show_ett(struct cli_def* cli, char* command, char* argv[], int argc){
+    char* report;
+    olsr_db_wlock();
+    int result = olsr_db_ett_report(&report);
+    olsr_db_unlock();
+    if (result == true) {
+        cli_print(cli, "\n%s\n", report);
+        free(report);
+    }
     return CLI_OK;
 }
 

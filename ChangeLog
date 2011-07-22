@@ -68,6 +68,7 @@
     - Usage of new libdessert features
     - Released as 1.6
 
-201107??
+20110722
     - "show metric" command
-    -
+    - Merged ETT branch
+    - Code cleanup

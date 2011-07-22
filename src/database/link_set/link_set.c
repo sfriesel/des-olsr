@@ -144,6 +144,22 @@ uint8_t olsr_db_ls_get_linkmetrik_quality(const dessert_meshif_t* local_iface, u
         // (1 / ETX) * 100 %
         quality = (quality_from_neighbor * quality_to_neighbor) / 100;
     }
+    else if(rc_metric == RC_METRIC_ETT) {
+        uint8_t quality_from_neighbor = olsr_sw_getquality(nl_tuple->sw);
+        uint8_t quality_to_neighbor = nl_tuple->quality_to_neighbor;
+        uint32_t min_ett_time_to_neighbor = get_min_time_from_neighbor(nl_tuple->neighbor_iface_addr);
+        uint8_t ett_time_weight = min_ett_time_to_neighbor < 9000 ? 1 : (min_ett_time_to_neighbor < 10000 ? 2 : 3);
+
+        if(quality_from_neighbor != 0 && quality_to_neighbor != 0) {
+            // ETT = ETX * t/S = (10000 / (qfN * qtN)) * t * S/S_ett
+            // S/S_ett left away:
+            // ETT = (10000 * t) / (qfN * qtN)
+            quality = (10000 * ett_time_weight) / (quality_from_neighbor * quality_to_neighbor);
+        }
+        else {
+            quality = 0;
+        }
+    }
     else {
         quality = nl_tuple->quality_to_neighbor;
     }

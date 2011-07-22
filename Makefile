@@ -26,6 +26,7 @@ RM := rm -rf
 -include src/database/routing_calculation/subdir.mk
 -include src/database/rl_seq_t/subdir.mk
 -include src/database/neighbor_set/subdir.mk
+-include src/database/neighbor_set_ett/subdir.mk
 -include src/database/local_iface_set/subdir.mk
 -include src/database/link_set/subdir.mk
 -include src/database/duplicate_table/subdir.mk

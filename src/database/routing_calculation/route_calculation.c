@@ -176,6 +176,7 @@ typedef struct rt_el {
     uint8_t		precursor_addr[ETH_ALEN];
     float			quality; // if PDR or probabilistic ETX :0 - no link, 100 - full link
     // if additive ETX : 1 - full link, 65k - no link
+    // if ETT : 1 - full link, inf - no link
     struct rt_el*	prev, *next;
 } rt_el_t;
 
@@ -258,7 +259,7 @@ void olsr_db_rc_dijkstra() {
     while(source_neighbors != NULL) {
         float link_quality = source_neighbors->best_link.quality;
 
-        if(rc_metric == RC_METRIC_ETX_ADD) {
+        if(rc_metric == RC_METRIC_ETX_ADD || rc_metric == RC_METRIC_ETT) {
             link_quality = calculate_etx(link_quality);
         }
 
@@ -280,7 +281,7 @@ void olsr_db_rc_dijkstra() {
         else if(rc_metric == RC_METRIC_HC) {
             DL_SORT(candidate_hosts, compare_candidates_hc);
         }
-        else {
+        else {   //ETX-ADD or ETT
             DL_SORT(candidate_hosts, compare_candidates_etx_additive);
         }
 
@@ -310,7 +311,7 @@ void olsr_db_rc_dijkstra() {
                 float total_link_quality = (best_candidate->quality * bc_neighbors->link_quality) / 100;
 
                 // if additive ETX metric
-                if(rc_metric == RC_METRIC_ETX_ADD) {
+                if(rc_metric == RC_METRIC_ETX_ADD || rc_metric == RC_METRIC_ETT) {
                     total_link_quality = best_candidate->quality + calculate_etx(bc_neighbors->link_quality);
                 }
 

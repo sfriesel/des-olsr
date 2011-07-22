@@ -33,7 +33,8 @@ enum extension_types {
     HELLO_NEIGH_DESRC_TYPE,
     TC_EXT_TYPE,
     BROADCAST_ID_EXT_TYPE,
-    RL_EXT_TYPE
+    RL_EXT_TYPE,
+    ETT_EXT_TYPE
 };
 
 #define SEQNO_MAX                   (1 << 16) - 1
@@ -41,6 +42,7 @@ enum extension_types {
 // emission intervals
 #define HELLO_INTERVAL_MS           2000
 #define TC_INTERVAL_MS              5000
+#define ETT_INTERVAL_MS             60000
 
 // holding times
 #define LINK_HOLD_TIME_COEFF        7       ///< determines max. number of missed HELLO packets before neighbor is discarded
@@ -78,6 +80,16 @@ enum olsr_willingness {
 #define WINDOW_SIZE                 50
 #define MPR_QUALITY_THRESHOLD       75
 
+//ETT
+#define ETT_START                   0
+#define ETT_STOP                    1
+#define ETT_MSG                     2
+#define ETT_START_SIZE              128
+#define ETT_STOP_SIZE               1024
+
+// Size of the sliding window for the ett calculation
+#define ETT_SW_SIZE 10
+
 #define C_INV_COEFF                 64
 
 #define HELLO_SIZE                  128
@@ -87,11 +99,13 @@ typedef enum olsr_metric {
     RC_METRIC_PLR = 1,
     RC_METRIC_HC,
     RC_METRIC_ETX,
-    RC_METRIC_ETX_ADD
+    RC_METRIC_ETX_ADD,
+    RC_METRIC_ETT
 } olsr_metric_t;
 
 extern uint16_t                     hello_interval_ms;
 extern uint16_t                     tc_interval_ms;
+extern uint16_t                     ett_interval;
 extern uint16_t                     rt_interval_ms;
 extern uint16_t                     max_missed_tc;
 extern uint16_t                     max_missed_hello;
@@ -101,6 +115,7 @@ extern uint16_t                     hello_size;
 extern uint16_t                     tc_size;
 extern dessert_periodic_t*          periodic_send_hello;
 extern dessert_periodic_t*          periodic_send_tc;
+extern dessert_periodic_t*          periodic_send_ett;
 extern dessert_periodic_t*          periodic_rt;
 extern uint16_t                     window_size; ///< window size for calculation of PDR or ETX
 

@@ -36,6 +36,7 @@ uint16_t        hello_size              = HELLO_SIZE;
 uint16_t        hello_interval_ms       = HELLO_INTERVAL_MS;
 uint16_t        tc_size                 = TC_SIZE;
 uint16_t        tc_interval_ms          = TC_INTERVAL_MS;
+uint16_t        ett_interval            = ETT_INTERVAL_MS;
 uint16_t        rt_interval_ms          = RT_INTERVAL_MS;
 uint16_t        window_size             = WINDOW_SIZE;
 uint16_t        max_missed_tc           = TC_HOLD_TIME_COEFF;
@@ -46,6 +47,7 @@ olsr_metric_t   rc_metric               = RC_METRIC_ETX;
 dessert_periodic_t* periodic_send_hello;
 dessert_periodic_t* periodic_send_tc;
 dessert_periodic_t* periodic_rt;
+dessert_periodic_t* periodic_send_ett;
 
 static void _register_cli_callbacks() {
     /* cli initialization */
@@ -56,6 +58,7 @@ static void _register_cli_callbacks() {
     cli_register_command(dessert_cli, dessert_cli_set, "hello_interval_ms", cli_set_hello_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set HELLO interval");
     cli_register_command(dessert_cli, dessert_cli_set, "tc_size", cli_set_tc_size, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set TC packet size");
     cli_register_command(dessert_cli, dessert_cli_set, "tc_interval_ms", cli_set_tc_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set TC interval");
+    cli_register_command(dessert_cli, dessert_cli_set, "ett_interval", cli_set_ett_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set ETT interval");
     cli_register_command(dessert_cli, dessert_cli_set, "rt_interval_ms", cli_set_rt_interval, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set routing table update interval");
     cli_register_command(dessert_cli, dessert_cli_set, "window_size", cli_set_window_size, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set link quality window size (PDR or ETX)");
     cli_register_command(dessert_cli, dessert_cli_set, "max_miss_tc", cli_set_max_missed_tc, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set limit for missed TCs");
@@ -70,6 +73,8 @@ static void _register_cli_callbacks() {
     cli_register_command(dessert_cli, dessert_cli_show, "hello_interval_ms", cli_show_hello_interval, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show HELLO interval");
     cli_register_command(dessert_cli, dessert_cli_show, "tc_size", cli_show_tc_size, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show TC packet size");
     cli_register_command(dessert_cli, dessert_cli_show, "tc_interval_ms", cli_show_tc_interval, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show TC interval");
+    cli_register_command(dessert_cli, dessert_cli_show, "ett", cli_show_ett, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show ETT table");
+    cli_register_command(dessert_cli, dessert_cli_show, "ett_interval", cli_show_ett_interval, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show ETT interval");
     cli_register_command(dessert_cli, dessert_cli_show, "ns", cli_show_ns, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show neighbor set table");
     cli_register_command(dessert_cli, dessert_cli_show, "ns_so", cli_show_ns_so, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show neighbor set table (simple output)");
     cli_register_command(dessert_cli, dessert_cli_show, "ls", cli_show_ls, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show link set table");
@@ -99,6 +104,11 @@ static void _register_periodics() {
     build_rt_interval.tv_usec = (rt_interval_ms % 1000) * 1000;
     periodic_rt = dessert_periodic_add(olsr_periodic_build_routingtable, NULL, NULL, &build_rt_interval);
     dessert_register_ptr_name(olsr_periodic_build_routingtable, "olsr_periodic_build_routingtable");
+
+    struct timeval ett_interval_tv;
+    ett_interval_tv.tv_sec = ett_interval / 1000;
+    ett_interval_tv.tv_usec = (ett_interval % 1000) * 1000;
+    periodic_send_ett = dessert_periodic_add(olsr_periodic_send_ett, NULL, NULL, &ett_interval_tv);
 }
 
 static void _register_pipeline() {
@@ -107,6 +117,7 @@ static void _register_pipeline() {
     dessert_meshrxcb_add(olsr_drop_errors, 30);
     dessert_meshrxcb_add(olsr_handle_hello, 40);
     dessert_meshrxcb_add(olsr_handle_tc, 45);
+    dessert_meshrxcb_add(olsr_handle_ett, 60);
     dessert_meshrxcb_add(dessert_mesh_ipttl, 75);
     dessert_meshrxcb_add(olsr_fwd2dest, 80);
     dessert_meshrxcb_add(rp2sys, 100);

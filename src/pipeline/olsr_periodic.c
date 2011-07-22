@@ -174,6 +174,75 @@ dessert_per_result_t olsr_periodic_send_tc(void* data, struct timeval* scheduled
     return DESSERT_PER_KEEP;
 }
 
+/*
+ * This Method sends two unicast messages to every known 1-hop neighbor.
+ * The small first message (ETT_START) signals the receiver to start the ETT measurement
+ * The large second message (ETT_STOP) signals the receiver to stop the ETT measurement
+ * This is the Packetpair procedure
+ */
+dessert_per_result_t olsr_periodic_send_ett(void* data, struct timeval* scheduled, struct timeval* interval) {
+
+    if(rc_metric == RC_METRIC_ETT) {
+
+        dessert_msg_t* msg_ett_start;
+        dessert_ext_t* ext_ett_start;
+        dessert_msg_new(&msg_ett_start);
+
+        dessert_msg_t* msg_ett_stop;
+        dessert_ext_t* ext_ett_stop;
+        dessert_msg_new(&msg_ett_stop);
+
+        // add l2.5 headers
+        dessert_msg_addext(msg_ett_start, &ext_ett_start, DESSERT_EXT_ETH, ETHER_HDR_LEN);
+        struct ether_header* l25h_ett_start = (struct ether_header*) ext_ett_start->data;
+        memcpy(l25h_ett_start->ether_shost, dessert_l25_defsrc, ETH_ALEN);
+        //memcpy(l25h->ether_dhost, ether_broadcast, ETH_ALEN);
+
+        dessert_msg_addext(msg_ett_stop, &ext_ett_stop, DESSERT_EXT_ETH, ETHER_HDR_LEN);
+        struct ether_header* l25h_ett_stop = (struct ether_header*) ext_ett_stop->data;
+        memcpy(l25h_ett_stop->ether_shost, dessert_l25_defsrc, ETH_ALEN);
+
+        // add ett headers
+        dessert_msg_addext(msg_ett_start, &ext_ett_start, ETT_EXT_TYPE, sizeof(struct olsr_msg_ett_hdr));
+        struct olsr_msg_ett_hdr* hdr_ett_start = (struct olsr_msg_ett_hdr*)ext_ett_start->data;
+        hdr_ett_start->type = ETT_START;
+
+        dessert_msg_addext(msg_ett_stop, &ext_ett_stop, ETT_EXT_TYPE, sizeof(struct olsr_msg_ett_hdr));
+        struct olsr_msg_ett_hdr* hdr_ett_stop = (struct olsr_msg_ett_hdr*)ext_ett_stop->data;
+        hdr_ett_stop->type = ETT_STOP;
+
+        //send msg to all known 1-hop neighbors
+        olsr_db_wlock();
+        olsr_db_ns_tuple_t* neighbors = olsr_db_ns_getneighset();
+        size_t neighs_count = HASH_COUNT(neighbors);
+
+        while(neighbors != NULL && neighs_count-- > 0) {
+            memcpy(l25h_ett_start->ether_dhost, neighbors->neighbor_main_addr, ETH_ALEN);
+            memcpy(l25h_ett_stop->ether_dhost, neighbors->neighbor_main_addr, ETH_ALEN);
+
+            void* payload_ett_start;
+            dessert_msg_addpayload(msg_ett_start, &payload_ett_start, ETT_START_SIZE);
+            memset(payload_ett_start, 0xA, ETT_START_SIZE);
+
+            void* payload_ett_stop;
+            dessert_msg_addpayload(msg_ett_stop, &payload_ett_stop, ETT_STOP_SIZE);
+            memset(payload_ett_stop, 0xA, ETT_STOP_SIZE);
+
+            dessert_meshsend_fast(msg_ett_start, NULL);
+            dessert_meshsend_fast(msg_ett_stop, NULL);
+
+            neighbors = neighbors->hh.next;
+        }
+
+        olsr_db_unlock();
+
+        dessert_msg_destroy(msg_ett_start);
+        dessert_msg_destroy(msg_ett_stop);
+    }
+
+    return DESSERT_PER_KEEP;
+}
+
 dessert_per_result_t olsr_periodic_build_routingtable(void* data, struct timeval* scheduled, struct timeval* interval) {
     pthread_rwlock_rdlock(&pp_rwlock);
     uint8_t pending = pending_rtc;

@@ -118,6 +118,23 @@ dessert_cb_result olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_
                     // (1 / ETX) * 100 %
                     quality = (quality_from_neighbor * quality_to_neighbor) / 100;
                 }
+                else if(rc_metric == RC_METRIC_ETT) {
+                    uint8_t quality_from_neighbor =
+                        olsr_sw_getquality(link_neigh->sw);
+                    uint8_t quality_to_neighbor = neighbor_iface->quality_from_neighbor;
+                    uint32_t min_ett_time_to_neighbor = get_min_time_from_neighbor(link_neigh->neighbor_main_addr);
+                    uint8_t ett_time_weight = min_ett_time_to_neighbor < 9000 ? 1 : (min_ett_time_to_neighbor < 9400 ? 2 : 3);
+
+                    if(quality_from_neighbor != 0 && quality_to_neighbor != 0) {
+                        // ETT = ETX * t/S = (10000 / (qfN * qtN)) * t * S/S_ett
+                        // S/S_ett left away:
+                        // ETT = (10000 * t) / (qfN * qtN)
+                        quality = (10000 * ett_time_weight) / (quality_from_neighbor * quality_to_neighbor);
+                    }
+                    else {
+                        quality = 0;
+                    }
+                }
                 else {
                     quality = neighbor_iface->quality_from_neighbor;
                 }
@@ -255,6 +272,61 @@ dessert_cb_result olsr_handle_tc(dessert_msg_t* msg, size_t len, dessert_msg_pro
         pthread_rwlock_wrlock(&pp_rwlock);
         pending_rtc = true;
         pthread_rwlock_unlock(&pp_rwlock);
+        return DESSERT_MSG_DROP;
+    }
+
+    return DESSERT_MSG_KEEP;
+}
+
+dessert_cb_result olsr_handle_ett(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id) {
+    dessert_ext_t* ext;
+
+    if(dessert_msg_getext(msg, &ext, ETT_EXT_TYPE, 0) != 0) {
+        struct ether_header* l25h = dessert_msg_getl25ether(msg);
+        struct olsr_msg_ett_hdr* hdr = (struct olsr_msg_ett_hdr*) ext->data;
+
+        if(hdr->type == ETT_START) {
+
+            struct timeval ett_start_time;
+            gettimeofday(&ett_start_time, NULL);
+            insert_ett_start_time(l25h->ether_shost, &ett_start_time);
+
+        }
+        else if(hdr->type == ETT_STOP) {
+
+            struct timeval ett_stop_time;
+            uint32_t diff_time;
+
+            gettimeofday(&ett_stop_time, NULL);
+
+            if((diff_time = process_ett_stop_time(l25h->ether_shost, &ett_stop_time)) != false) {
+
+                dessert_msg_t* msg_ett_msg;
+                dessert_ext_t* ext_ett_msg;
+                dessert_msg_new(&msg_ett_msg);
+
+                //add l2.5 header
+                dessert_msg_addext(msg_ett_msg, &ext_ett_msg, DESSERT_EXT_ETH, ETHER_HDR_LEN);
+                struct ether_header* l25h_ett_msg = (struct ether_header*) ext_ett_msg->data;
+                memcpy(l25h_ett_msg->ether_shost, dessert_l25_defsrc, ETH_ALEN);
+                memcpy(l25h_ett_msg->ether_dhost, l25h->ether_shost, ETH_ALEN);
+
+                //add ett header
+                dessert_msg_addext(msg_ett_msg, &ext_ett_msg, ETT_EXT_TYPE, sizeof(struct olsr_msg_ett_hdr));
+                struct olsr_msg_ett_hdr* hdr_ett_msg = (struct olsr_msg_ett_hdr*)ext_ett_msg->data;
+                hdr_ett_msg->type = ETT_MSG;
+                hdr_ett_msg->measured_time = diff_time;
+
+                dessert_meshsend_fast(msg_ett_msg, NULL);
+                dessert_msg_destroy(msg_ett_msg);
+            }
+
+        }
+        else { //hdr->type == ETT_MSG
+
+            process_ett_msg(l25h->ether_shost, hdr->measured_time);
+        }
+
         return DESSERT_MSG_DROP;
     }
 

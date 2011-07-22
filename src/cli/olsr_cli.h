@@ -28,6 +28,7 @@ int cli_set_hello_interval(struct cli_def* cli, char* command, char* argv[], int
 int cli_set_tc_size(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_set_tc_interval(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_set_rt_interval(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_set_ett_interval(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_set_max_missed_tc(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_set_max_missed_hello(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_set_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc);
@@ -43,10 +44,12 @@ int cli_show_hello_size(struct cli_def* cli, char* command, char* argv[], int ar
 int cli_show_hello_interval(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_show_tc_size(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_show_tc_interval(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_show_ett_interval(struct cli_def *cli, char *command, char *argv[], int argc);
 int cli_show_ns(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_show_ns_so(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_show_ls(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_show_2hns(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_show_tc(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_show_ett(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_show_rt_so(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_show_rt(struct cli_def* cli, char* command, char* argv[], int argc);

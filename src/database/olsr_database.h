@@ -27,6 +27,7 @@ For further information and questions please use the web site
 #include <stdlib.h>
 #include "link_set/link_set.h"
 #include "neighbor_set/neighbor_set.h"
+#include "neighbor_set_ett/neighbor_set_ett.h"
 #include "2hop_neighbor_set/2hop_neighbor_set.h"
 #include "duplicate_table/duplicate_table.h"
 #include "local_iface_set/liface_set.h"

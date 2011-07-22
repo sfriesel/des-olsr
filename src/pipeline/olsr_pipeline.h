@@ -96,6 +96,21 @@ struct olsr_msg_tc_ndescr {
 } __attribute__((__packed__));
 
 /**
+ * Header of the ETT-Messages
+ */
+struct olsr_msg_ett_hdr {
+    /**
+     * Type of the ETT-Message:
+     * ETT_START - Message to start the bandwidth measurement
+     * ETT_STOP  - Message to stop the bandwidth measurement
+     * ETT_MSG   - Message to propagate the measured time
+     */
+    uint8_t     type;
+    uint32_t    measured_time;
+
+} __attribute((__packed__));
+
+/**
 * Struct for routing log sequence number
 */
 struct rl_seq {
@@ -118,6 +133,7 @@ struct olsr_msg_brc {
 
 dessert_cb_result olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id);
 dessert_cb_result olsr_handle_tc(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id);
+dessert_cb_result olsr_handle_ett(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id);
 dessert_cb_result olsr_fwd2dest(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id);
 
 /**
@@ -139,6 +155,7 @@ dessert_cb_result olsr_drop_errors(dessert_msg_t* msg, size_t len, dessert_msg_p
 
 dessert_per_result_t olsr_periodic_send_hello(void* data, struct timeval* scheduled, struct timeval* interval);
 dessert_per_result_t olsr_periodic_send_tc(void* data, struct timeval* scheduled, struct timeval* interval);
+dessert_per_result_t olsr_periodic_send_ett(void* data, struct timeval* scheduled, struct timeval* interval);
 dessert_per_result_t olsr_periodic_build_routingtable(void* data, struct timeval* scheduled, struct timeval* interval);
 
 /** clean up database from old entrys */
