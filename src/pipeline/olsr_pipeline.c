@@ -289,7 +289,7 @@ dessert_cb_result olsr_handle_ett(dessert_msg_t* msg, size_t len, dessert_msg_pr
 
             struct timeval ett_start_time;
             gettimeofday(&ett_start_time, NULL);
-            insert_ett_start_time(l25h->ether_shost, &ett_start_time);
+            process_ett_start_time(l25h->ether_shost, &ett_start_time);
 
         }
         else if(hdr->type == ETT_STOP) {

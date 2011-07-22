@@ -21,6 +21,7 @@ src/database/routing_table \
 src/database/routing_calculation \
 src/database/rl_seq_t \
 src/database/neighbor_set \
+src/database/neighbor_set_ett \
 src/database/local_iface_set \
 src/database/link_set \
 src/database/duplicate_table \

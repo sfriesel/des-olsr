@@ -220,13 +220,9 @@ dessert_per_result_t olsr_periodic_send_ett(void* data, struct timeval* schedule
             memcpy(l25h_ett_start->ether_dhost, neighbors->neighbor_main_addr, ETH_ALEN);
             memcpy(l25h_ett_stop->ether_dhost, neighbors->neighbor_main_addr, ETH_ALEN);
 
-            void* payload_ett_start;
-            dessert_msg_addpayload(msg_ett_start, &payload_ett_start, ETT_START_SIZE);
-            memset(payload_ett_start, 0xA, ETT_START_SIZE);
+            dessert_msg_dummy_payload(msg_ett_start, ETT_START_SIZE);
 
-            void* payload_ett_stop;
-            dessert_msg_addpayload(msg_ett_stop, &payload_ett_stop, ETT_STOP_SIZE);
-            memset(payload_ett_stop, 0xA, ETT_STOP_SIZE);
+            dessert_msg_dummy_payload(msg_ett_stop, ETT_STOP_SIZE);
 
             dessert_meshsend_fast(msg_ett_start, NULL);
             dessert_meshsend_fast(msg_ett_stop, NULL);

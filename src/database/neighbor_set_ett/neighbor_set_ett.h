@@ -48,10 +48,10 @@ uint32_t get_min_time_from_neighbor(uint8_t neighbor_main_addr[ETH_ALEN]);
 /*
  * Inserts a timeval into timeval_recv when the ETT_START packet is received.
  */
-int insert_ett_start_time(uint8_t neighbor_main_addr[ETH_ALEN], struct timeval* ett_start_time);
+int process_ett_start_time(uint8_t neighbor_main_addr[ETH_ALEN], struct timeval* ett_start_time);
 
 /*
- * Wenn the ETT_STOP packet is received this method calculates the difference to the
+ * When the ETT_STOP packet is received this method calculates the difference to the
  * timeval when the ETT_START packet was received and returns it.
  */
 uint32_t process_ett_stop_time(uint8_t neighbor_main_addr[ETH_ALEN], struct timeval* ett_stop_time);

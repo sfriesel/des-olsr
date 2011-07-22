@@ -90,7 +90,7 @@ uint32_t get_min_time_from_neighbor(uint8_t neighbor_main_addr[ETH_ALEN]) {
     return min;
 }
 
-int insert_ett_start_time(uint8_t neighbor_main_addr[ETH_ALEN], struct timeval* ett_start_time) {
+int process_ett_start_time(uint8_t neighbor_main_addr[ETH_ALEN], struct timeval* ett_start_time) {
     olsr_db_neighbors_ett_entry_t* entry;
 
     //if the set is empty a new entry is created
@@ -231,16 +231,12 @@ int olsr_db_ett_report(char** str_out) {
     while(current_entry != NULL) {
         if((min_time = get_min_time_from_neighbor(current_entry->neighbor_main_addr)) != false) {
             snprintf(entry_str, report_ett_str_len + 1, "|" MAC "| %20i |\n",
-                     current_entry->neighbor_main_addr[0], current_entry->neighbor_main_addr[1],
-                     current_entry->neighbor_main_addr[2], current_entry->neighbor_main_addr[3],
-                     current_entry->neighbor_main_addr[4], current_entry->neighbor_main_addr[5],
+                     EXPLODE_ARRAY6(current_entry->neighbor_main_addr),
                      min_time);
         }
         else {
             snprintf(entry_str, report_ett_str_len + 1, "|" MAC "| %20s |\n",
-                     current_entry->neighbor_main_addr[0], current_entry->neighbor_main_addr[1],
-                     current_entry->neighbor_main_addr[2], current_entry->neighbor_main_addr[3],
-                     current_entry->neighbor_main_addr[4], current_entry->neighbor_main_addr[5],
+                     EXPLODE_ARRAY6(current_entry->neighbor_main_addr),
                      "none");
         }
 
