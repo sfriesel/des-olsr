@@ -24,7 +24,6 @@ For further information and questions please use the web site
 #ifndef HELPER
 #define HELPER
 
-#include <linux/if_ether.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include "android.h"
