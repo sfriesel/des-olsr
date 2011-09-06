@@ -54,7 +54,7 @@ android: CC=android-gcc
 android: CFLAGS = -I$(DESSERT_LIB)/include
 android: LDFLAGS = -L$(DESSERT_LIB)/lib -Wl,-rpath-link=$(DESSERT_LIB)/lib -ldessert
 android: LIBS =
-android: build package
+android: clean build package
 
 package:
 	mv $(DAEMON_NAME) android.files/daemon
