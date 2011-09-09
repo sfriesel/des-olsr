@@ -224,7 +224,7 @@ dessert_cb_result olsr_handle_tc(dessert_msg_t* msg, uint32_t len, dessert_msg_p
         float tc_hold_time_s = tc_int_f_s * max_missed_tc;
         dessert_debug("tc_hold_time_s=%.3f", tc_hold_time_s);
         hold_time.tv_sec = tc_hold_time_s;
-        hold_time.tv_usec = (tc_hold_time_s - hold_time.tv_sec) * 1000;
+        hold_time.tv_usec = (tc_hold_time_s - hold_time.tv_sec) * 1000000;
         hf_add_tv(&curr_time, &hold_time, &purge_time);
 
         struct ether_header* l25h = dessert_msg_getl25ether(msg);
