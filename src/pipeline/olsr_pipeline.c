@@ -72,7 +72,7 @@ dessert_cb_result olsr_handle_hello(dessert_msg_t* msg, uint32_t len, dessert_ms
         float hello_hold_time_f = hello_inf_f * (max_missed_hello + 1);
         struct timeval hold_time;
         hold_time.tv_sec = hello_hold_time_f;
-        hold_time.tv_usec = (hello_hold_time_f - hold_time.tv_sec) * 1000;
+        hold_time.tv_usec = (hello_hold_time_f - hold_time.tv_sec) * 1000000;
         hf_add_tv(&curr_time, &hold_time, &hold_time);
 
 // TODO: had this code any function???
