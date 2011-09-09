@@ -131,22 +131,22 @@ struct olsr_msg_brc {
 
 // ------------- pipeline -----------------------------------------------------
 
-dessert_cb_result olsr_handle_hello(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id);
-dessert_cb_result olsr_handle_tc(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id);
-dessert_cb_result olsr_handle_ett(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id);
-dessert_cb_result olsr_fwd2dest(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id);
+dessert_cb_result olsr_handle_hello(dessert_msg_t* msg, uint32_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id);
+dessert_cb_result olsr_handle_tc(dessert_msg_t* msg, uint32_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id);
+dessert_cb_result olsr_handle_ett(dessert_msg_t* msg, uint32_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id);
+dessert_cb_result olsr_fwd2dest(dessert_msg_t* msg, uint32_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id);
 
 /**
 * Encapsulate packets as dessert_msg,
 * sets NEXT HOP if known and send via OLSR routing protocol
 */
-dessert_cb_result olsr_sys2rp(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, dessert_sysif_t* tunif, dessert_frameid_t id);
+dessert_cb_result olsr_sys2rp(dessert_msg_t* msg, uint32_t len, dessert_msg_proc_t* proc, dessert_sysif_t* tunif, dessert_frameid_t id);
 
 /** forward packets received via OLSR to tun interface */
-dessert_cb_result rp2sys(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc,  dessert_meshif_t* iface, dessert_frameid_t id);
+dessert_cb_result rp2sys(dessert_msg_t* msg, uint32_t len, dessert_msg_proc_t* proc,  dessert_meshif_t* iface, dessert_frameid_t id);
 
 /** drop errors (drop corrupt packets, packets from myself and etc.)*/
-dessert_cb_result olsr_drop_errors(dessert_msg_t* msg, size_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id);
+dessert_cb_result olsr_drop_errors(dessert_msg_t* msg, uint32_t len, dessert_msg_proc_t* proc, dessert_meshif_t* iface, dessert_frameid_t id);
 
 // ----- Pipeline callbacks ---------- //
 

@@ -28,6 +28,7 @@ For further information and questions please use the web site
 #include "../../android.h"
 #include "sliding_window.h"
 #include "../timeslot.h"
+#include "../neighbor_set_ett/neighbor_set_ett.h"
 
 
 typedef struct olsr_db_linkset_nl_entry {

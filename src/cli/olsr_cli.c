@@ -228,6 +228,7 @@ const char* metric2str[] = {
 
 int cli_show_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc) {
     cli_print(cli, "metric = %s", metric2str[rc_metric]);
+    return CLI_OK;
 }
 
 int cli_set_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc) {
