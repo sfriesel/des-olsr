@@ -190,18 +190,15 @@ olsr_db_tc_tcsentry_t* olsr_db_tc_getneighbors(uint8_t tc_orig_addr[ETH_ALEN]) {
 int olsr_db_tc_report(char** str_out) {
     timeslot_purgeobjects(tc_ts);
     int report_str_len = 57;
-    olsr_db_tc_tcs_t* current_entry = tc_set;
+    olsr_db_tc_tcs_t* current;
     char* output;
     char entry_str[report_str_len  + 1];
 
     size_t str_count = 0;
 
-    while(current_entry != NULL) {
-        str_count += HASH_COUNT(current_entry->orig_neighbors) + 1 ;
-        current_entry = current_entry->hh.next;
+    for(current = tc_set; current != NULL; current = current->hh.next) {
+        str_count += HASH_COUNT(current->orig_neighbors) + 1 ;
     }
-
-    current_entry = tc_set;
 
     output = malloc(sizeof(char) * report_str_len * (3 + str_count) + 1);
 
@@ -215,14 +212,14 @@ int olsr_db_tc_report(char** str_out) {
     strcat(output, "|   TC orig. addr   | neigh. main addr  | link quality |\n");
     strcat(output, "+-------------------+-------------------+--------------+\n");
 
-    while(current_entry != NULL) {
+    for(current = tc_set; current != NULL; current = current->hh.next) {
         int flag = false;
-        olsr_db_tc_tcsentry_t* neigbors = current_entry->orig_neighbors;
+        olsr_db_tc_tcsentry_t* neigbors = current->orig_neighbors;
 
         while(neigbors != NULL) {
             if(flag == false) {
                 snprintf(entry_str, report_str_len + 1, "| " MAC " | " MAC " | %12i |\n",
-                         EXPLODE_ARRAY6(current_entry->tc_orig_addr), EXPLODE_ARRAY6(neigbors->neighbor_main_addr), neigbors->link_quality);
+                         EXPLODE_ARRAY6(current->tc_orig_addr), EXPLODE_ARRAY6(neigbors->neighbor_main_addr), neigbors->link_quality);
                 flag = true;
             }
             else {
@@ -234,7 +231,6 @@ int olsr_db_tc_report(char** str_out) {
             neigbors = neigbors->hh.next;
         }
 
-        current_entry = current_entry->hh.next;
         strcat(output, "+-------------------+-------------------+--------------+\n");
     }
 
