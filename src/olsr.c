@@ -43,6 +43,7 @@ uint16_t        max_missed_tc           = TC_HOLD_TIME_COEFF;
 uint16_t        max_missed_hello        = LINK_HOLD_TIME_COEFF;
 uint8_t         willingness             = WILL_DEFAULT;
 olsr_metric_t   rc_metric               = RC_METRIC_ETX;
+bool            fisheye                 = FISHEYE;
 
 dessert_periodic_t* periodic_send_hello;
 dessert_periodic_t* periodic_send_tc;
@@ -65,6 +66,7 @@ static void _register_cli_callbacks() {
     cli_register_command(dessert_cli, dessert_cli_set, "max_miss_hello", cli_set_max_missed_hello, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set limit for missed HELLOs");
     cli_register_command(dessert_cli, dessert_cli_set, "willingness", cli_set_willingness, PRIVILEGE_PRIVILEGED, MODE_CONFIG, "set willingness for MPR selection");
     cli_register_command(dessert_cli, dessert_cli_set, "metric", cli_set_rc_metric, PRIVILEGE_UNPRIVILEGED, MODE_CONFIG, "set metric (PLR | PDR | HC | ETX | ETX-ADD)");
+    cli_register_command(dessert_cli, dessert_cli_set, "fisheye", cli_set_fisheye, PRIVILEGE_UNPRIVILEGED, MODE_CONFIG, "set fisheye (on | off)");
 
     cli_register_command(dessert_cli, dessert_cli_show, "rt_interval_ms", cli_show_rt_interval, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show routing table update interval");
     cli_register_command(dessert_cli, dessert_cli_show, "max_miss_tc", cli_show_max_missed_tc, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show limit for the max. number of missed TCs");
@@ -83,6 +85,7 @@ static void _register_cli_callbacks() {
     cli_register_command(dessert_cli, dessert_cli_show, "rt", cli_show_rt, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show routing table");
     cli_register_command(dessert_cli, dessert_cli_show, "rt_so", cli_show_rt_so, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show routing table (simple output)");
     cli_register_command(dessert_cli, dessert_cli_show, "metric", cli_show_rc_metric, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show routing metric");
+    cli_register_command(dessert_cli, dessert_cli_show, "fisheye", cli_show_fisheye, PRIVILEGE_UNPRIVILEGED, MODE_EXEC, "show fisheye");
 }
 
 static void _register_periodics() {

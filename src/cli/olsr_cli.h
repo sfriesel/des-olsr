@@ -35,6 +35,7 @@ int cli_set_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc
 int cli_set_willingness(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_set_window_size(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_set_port(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_set_fisheye(struct cli_def* cli, char* command, char* argv[], int argc);
 
 int cli_show_rc_metric(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_show_rt_interval(struct cli_def* cli, char* command, char* argv[], int argc);
@@ -53,3 +54,4 @@ int cli_show_tc(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_show_ett(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_show_rt_so(struct cli_def* cli, char* command, char* argv[], int argc);
 int cli_show_rt(struct cli_def* cli, char* command, char* argv[], int argc);
+int cli_show_fisheye(struct cli_def* cli, char* command, char* argv[], int argc);

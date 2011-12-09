@@ -152,6 +152,19 @@ dessert_per_result_t olsr_periodic_send_tc(void* data, struct timeval* scheduled
     hdr->tc_interval = hf_sparce_time(tc_interval_ms/1000.0);
     dessert_debug("hdr->tc_interval=%d, tc_interval_ms=%d", hdr->tc_interval, tc_interval_ms);
     pthread_rwlock_wrlock(&tc_seq_lock);
+    if(fisheye) {
+        /* Limit the ttl in most TCs to reduce overhead drastically. The numbers
+         * are currently chosen to approximately achieve the 80% overhead
+         * reduction cited in Fisheye State Routing (Pei, Gerla, Chen; 2000)
+         */
+        msg->ttl = 1;
+        if(tc_seq_num % 3) {
+            msg->ttl = 2;
+        }
+        if(tc_seq_num % 8) {
+            msg->ttl = 255;
+        }
+    }
     hdr->seq_num = tc_seq_num++;
     pthread_rwlock_unlock(&tc_seq_lock);
     hdr->neighbor_count = tc_neigh_count;

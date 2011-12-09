@@ -275,6 +275,37 @@ ok:
     return CLI_OK;
 }
 
+int cli_show_fisheye(struct cli_def* cli, char* command, char* argv[], int argc) {
+    cli_print(cli, "fisheye = %s", fisheye ? "on" : "off");
+    return CLI_OK;
+}
+
+int cli_set_fisheye(struct cli_def* cli, char* command, char* argv[], int argc) {
+    if(argc != 1) {
+        goto error;
+    }
+
+    if(strcmp(argv[0], "on") == 0 || strcmp(argv[0], "1") == 0 || strcmp(argv[0], "true") == 0) {
+        fisheye = true;
+        dessert_notice("enabling fisheye routing");
+        cli_print(cli, "enabling fisheye routing");
+        goto ok;
+    }
+    if(strcmp(argv[0], "off") == 0 || strcmp(argv[0], "0") == 0 || strcmp(argv[0], "false") == 0) {
+        fisheye = false;
+        dessert_notice("disabling fisheye routing");
+        cli_print(cli, "disabling fisheye routing");
+        goto ok;
+    }
+
+error:
+    cli_print(cli, "usage: set %s [on,off]\n", command);
+    return CLI_ERROR;
+
+ok:
+    return CLI_OK;
+}
+
 // -------------------- Testing ------------------------------------------------------------
 
 /**
