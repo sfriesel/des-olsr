@@ -50,11 +50,7 @@ enum extension_types {
 // determines max. number of missed HELLO packets before neighbor is discarded
 #define LINK_HOLD_TIME_COEFF        7
 // determines max. number of missed TCs packets the corresponding information is discarded
-#if FISHEYE == false
-#  define TC_HOLD_TIME_COEFF          20
-#else
-#  define TC_HOLD_TIME_COEFF          (20*8) ///< distant nodes receive 8x fewer TCs
-#endif
+#define TC_HOLD_TIME_COEFF          (fisheye ? 8 * 20 : 20) ///< distant nodes receive 8x fewer TCs when using fisheye
 #define BRCLOG_HOLD_TIME            3
 
 // link types
