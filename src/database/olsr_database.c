@@ -28,15 +28,15 @@ For further information and questions please use the web site
 
 pthread_rwlock_t db_rwlock = PTHREAD_RWLOCK_INITIALIZER;
 
-inline void olsr_db_rlock() {
+void olsr_db_rlock() {
     pthread_rwlock_rdlock(&db_rwlock);
 }
 
-inline void olsr_db_wlock() {
+void olsr_db_wlock() {
     pthread_rwlock_wrlock(&db_rwlock);
 }
 
-inline void olsr_db_unlock() {
+void olsr_db_unlock() {
     pthread_rwlock_unlock(&db_rwlock);
 }
 

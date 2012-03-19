@@ -37,13 +37,13 @@ For further information and questions please use the web site
 #include "broadcast_log/broadcast_log.h"
 
 /** Make read lock over database to avoid corrupt read/write */
-inline void olsr_db_rlock();
+void olsr_db_rlock();
 
 /** Make write lock over database to avoid currupt read/write */
-inline void olsr_db_wlock();
+void olsr_db_wlock();
 
 /** Unlock previos locks for this thread */
-inline void olsr_db_unlock();
+void olsr_db_unlock();
 
 /** initialize all tables of routing database */
 int olsr_db_init();
