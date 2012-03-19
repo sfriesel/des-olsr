@@ -22,6 +22,8 @@ For further information and questions please use the web site
 *******************************************************************************/
 
 #include <dessert.h>
+#include <unistd.h>
+#include <libgen.h>
 
 #ifndef ANDROID
 #include <printf.h>
@@ -128,25 +130,65 @@ static void _register_pipeline() {
 }
 
 int main(int argc, char** argv) {
-    /* initialize daemon with correct parameters */
-    FILE* cfg = NULL;
+    uint16_t init_flags = DESSERT_OPT_DAEMONIZE;
+    int used = 0;
+    int size = 2;
+    FILE **config_files = NULL;
+    char **config_names = malloc(sizeof(char *) * size);
+    char path[100];
+    uint16_t logcfg_flags = 0;
 
-    if((argc == 2) && (strcmp(argv[1], "-nondaemonize") == 0)) {
-        dessert_info("starting OLSR in non daemonize mode");
-        dessert_init("OLSR", 0x02, DESSERT_OPT_NODAEMONIZE);
-        char cfg_file_name[] = "/etc/des-olsr.conf";
-        cfg = fopen(cfg_file_name, "r");
-
-        if(cfg == NULL) {
-            printf("Config file '%s' not found. Exit ...\n", cfg_file_name);
-            return EXIT_FAILURE;
+    int c;
+    while((c = getopt (argc, argv, "nc:")) != -1) {
+        switch(c) {
+            case 'n':
+                init_flags = DESSERT_OPT_NODAEMONIZE;
+                logcfg_flags |= DESSERT_LOG_STDERR;
+                break;
+            case 'c':
+                if(used == size) {
+                    config_names = realloc(config_names, sizeof(char *) * (size *= 2));
+                }
+                config_names[used++] = optarg;
+                break;
+            default:
+                exit(EXIT_FAILURE);
+                break;
         }
     }
-    else {
-        dessert_info("starting OLSR in daemonize mode");
-        cfg = dessert_cli_get_cfg(argc, argv);
-        dessert_init("OLSR", 0x02, DESSERT_OPT_DAEMONIZE);
+    //no options given -- assume old style invocation
+    if(optind == 1) {
+        if(argc > optind) {
+            config_names[used++] = argv[1];
+        }
+        else {
+            snprintf(path, sizeof(path), "/etc/%s.conf", basename(argv[0]));
+            config_names[used++] = path;
+        }
     }
+    else if(used == 0) {
+        config_names[used++] = "./des-aodv.cli";
+    }
+
+    //open config files before (possibly) daemonizing
+    config_files = malloc(sizeof(FILE *) * used);
+    int i;
+    for(i = 0; i < used; ++i) {
+        config_files[i] = fopen(config_names[i], "r");
+        if(!config_files[i]) {
+            dessert_err("could not open config file %s\n", config_names[i]);
+            exit(EXIT_FAILURE);
+        }
+    }
+    free(config_names);
+
+    if(init_flags & DESSERT_OPT_DAEMONIZE) {
+        dessert_notice("starting OLSR in daemonize mode");
+    }
+    else {
+        dessert_notice("starting OLSR in non daemonize mode");
+    }
+    dessert_init("OLSR", 0x02, init_flags);
 
     /* routing table initialization */
     olsr_db_init();
@@ -158,7 +200,11 @@ int main(int argc, char** argv) {
     _register_pipeline();
     _register_periodics();
 
-    cli_file(dessert_cli, cfg, PRIVILEGE_PRIVILEGED, MODE_CONFIG);
+    for(i = 0; i < used; ++i) {
+        cli_file(dessert_cli, config_files[i], PRIVILEGE_PRIVILEGED, MODE_CONFIG);
+        fclose(config_files[i]);
+    }
+    free(config_files);
     dessert_cli_run();
     dessert_run();
 
