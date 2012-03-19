@@ -38,4 +38,6 @@ int olsr_db_rt_report(char** str_out);
 
 int olsr_db_rt_report_so(char** str_out);
 
+int olsr_db_rt_report_dump(char** str_out);
+
 #endif

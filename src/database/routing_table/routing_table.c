@@ -170,3 +170,35 @@ int olsr_db_rt_report_so(char** str_out) {
     *str_out = output;
     return true;
 }
+
+int olsr_db_rt_report_dump(char** str_out) {
+    int report_str_len = 25;
+    olsr_db_rt_t* current_entry = rt_set;
+    char* output;
+    char entry_str[report_str_len  + 1];
+
+    output = malloc(sizeof(char) * report_str_len * (HASH_COUNT(rt_set)) + 1);
+
+    if(output == NULL) {
+        return false;
+    }
+
+    struct timeval curr_time;
+
+    gettimeofday(&curr_time, NULL);
+
+    // initialize first byte to \0 to mark output as empty
+    *output = '\0';
+
+    while(current_entry != NULL) {
+        snprintf(entry_str, report_str_len + 1, "%02hhx%02hhx%02hhx | %02hhx%02hhx%02hhx | %6d;",
+                 current_entry->dest_addr[3], current_entry->dest_addr[4], current_entry->dest_addr[5],
+                 current_entry->next_hop[3], current_entry->next_hop[4], current_entry->next_hop[5],
+                 current_entry->hop_count);
+        strcat(output, entry_str);
+        current_entry = current_entry->hh.next;
+    }
+
+    *str_out = output;
+    return true;
+}
