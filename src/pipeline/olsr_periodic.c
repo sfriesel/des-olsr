@@ -262,7 +262,7 @@ dessert_per_result_t olsr_periodic_build_routingtable(void* data, struct timeval
     olsr_db_rt_report_dump(&output);
     olsr_db_unlock();
 
-    dessert_trace("%s", output);
+    dessert_info("%s", output);
     free(output);
 
     if(pending != false) {
