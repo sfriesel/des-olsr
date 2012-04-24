@@ -270,7 +270,6 @@ int olsr_db_tc_report_dump(char** str_out) {
         mac_addr next_hop;
         bool has_next_hop = olsr_db_rt_getnexthop(current->tc_orig_addr, next_hop);
         uint8_t hop_count = olsr_db_rt_gethopcount(current->tc_orig_addr);
-        //TODO
         intmax_t age_ms = (now.tv_sec - current->last_update.tv_sec) * 1000;
         age_ms += (now.tv_usec - current->last_update.tv_usec) / 1000;
         intmax_t age_intervals = age_ms / tc_interval_ms;
