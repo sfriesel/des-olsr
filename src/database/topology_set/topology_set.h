@@ -43,10 +43,11 @@ int olsr_db_tc_removeneighbors(uint8_t tc_orig_addr[ETH_ALEN]);
 
 int olsr_db_tc_removetc(uint8_t tc_orig_addr[ETH_ALEN]);
 
-int olsr_db_tc_updateseqnum(uint8_t tc_orig_addr[ETH_ALEN], uint16_t seq_num, struct timeval* purge_time);
+int olsr_db_tc_updateseqnum(uint8_t tc_orig_addr[ETH_ALEN], uint16_t seq_num, struct timeval* purge_time, struct timeval);
 
 olsr_db_tc_tcsentry_t* olsr_db_tc_getneighbors(uint8_t tc_orig_addr[ETH_ALEN]);
 
 int olsr_db_tc_report(char** str_out);
+int olsr_db_tc_report_dump(char** str_out);
 
 #endif

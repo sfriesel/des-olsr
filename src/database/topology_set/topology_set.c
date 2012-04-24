@@ -23,11 +23,13 @@ For further information and questions please use the web site
 
 #include <stdio.h>
 #include "topology_set.h"
+#include "../routing_table/routing_table.h"
 #include "../timeslot.h"
 #include "../../config.h"
 #include "../../helper.h"
 
 typedef struct olsr_db_tc_tcs {
+    struct timeval			last_update;
     uint8_t				tc_orig_addr[ETH_ALEN];
     olsr_db_tc_tcsentry_t*	orig_neighbors;
     uint16_t				seq_num;
@@ -147,7 +149,7 @@ int olsr_db_tc_removetc(uint8_t tc_orig_addr[ETH_ALEN]) {
     return true;
 }
 
-int olsr_db_tc_updateseqnum(uint8_t tc_orig_addr[ETH_ALEN], uint16_t seq_num, struct timeval* purge_time) {
+int olsr_db_tc_updateseqnum(uint8_t tc_orig_addr[ETH_ALEN], uint16_t seq_num, struct timeval* purge_time, struct timeval last_update) {
     olsr_db_tc_tcs_t* tcs = NULL;
     HASH_FIND(hh, tc_set, tc_orig_addr, ETH_ALEN, tcs);
 
@@ -162,6 +164,7 @@ int olsr_db_tc_updateseqnum(uint8_t tc_orig_addr[ETH_ALEN], uint16_t seq_num, st
         tcs->seq_num = seq_num - 1;
     }
 
+    tcs->last_update = last_update;
     timeslot_addobject(tc_ts, purge_time, tcs);
 
     if(hf_seq_comp_i_j(tcs->seq_num, seq_num) >= 0) {
@@ -232,6 +235,57 @@ int olsr_db_tc_report(char** str_out) {
         }
 
         strcat(output, "+-------------------+-------------------+--------------+\n");
+    }
+
+    *str_out = output;
+    return true;
+}
+
+int olsr_db_tc_report_dump(char** str_out) {
+    timeslot_purgeobjects(tc_ts);
+    int report_str_len = 57;
+    olsr_db_tc_tcs_t* current;
+    char* output;
+    char entry_str[report_str_len  + 1];
+
+    size_t str_count = 0;
+
+    for(current = tc_set; current != NULL; current = current->hh.next) {
+        str_count += HASH_COUNT(current->orig_neighbors) + 1 ;
+    }
+
+    output = malloc(sizeof(char) * report_str_len * (str_count) + 1);
+
+    if(output == NULL) {
+        return false;
+    }
+
+    // initialize first byte to \0 to mark output as empty
+    *output = '\0';
+
+    struct timeval now;
+    gettimeofday(&now, NULL);
+
+    for(current = tc_set; current != NULL; current = current->hh.next) {
+        mac_addr next_hop;
+        bool has_next_hop = olsr_db_rt_getnexthop(current->tc_orig_addr, next_hop);
+        uint8_t hop_count = olsr_db_rt_gethopcount(current->tc_orig_addr);
+        //TODO
+        intmax_t age_ms = (now.tv_sec - current->last_update.tv_sec) * 1000;
+        age_ms += (now.tv_usec - current->last_update.tv_usec) / 1000;
+        intmax_t age_intervals = age_ms / tc_interval_ms;
+        if(has_next_hop) {
+            snprintf(entry_str, report_str_len + 1, "%02hhx%02hhx%02hhx\t%02hhx%02hhx%02hhx\t%3d\t%jd;",
+                     current->tc_orig_addr[3], current->tc_orig_addr[4], current->tc_orig_addr[5],
+                     next_hop[3], next_hop[4], next_hop[5],
+                     hop_count, age_intervals);
+        }
+        else {
+            snprintf(entry_str, report_str_len + 1, "%02hhx%02hhx%02hhx\t<null>\t>99\t%jd;",
+                     current->tc_orig_addr[3], current->tc_orig_addr[4], current->tc_orig_addr[5],
+                     age_intervals);
+        }
+        strcat(output, entry_str);
     }
 
     *str_out = output;

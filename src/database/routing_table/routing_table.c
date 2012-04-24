@@ -97,6 +97,17 @@ int olsr_db_rt_getnexthop(uint8_t dest_addr[ETH_ALEN], uint8_t next_hop_out[ETH_
     return true;
 }
 
+uint8_t olsr_db_rt_gethopcount(uint8_t dest_addr[ETH_ALEN]) {
+    olsr_db_rt_t* entry = NULL;
+    HASH_FIND(hh, rt_set, dest_addr, ETH_ALEN, entry);
+
+    if(entry == NULL) {
+        return 255;
+    }
+
+    return entry->hop_count;
+}
+
 // ------------------- reporting -----------------------------------------------
 
 int olsr_db_rt_report(char** str_out) {
@@ -183,15 +194,11 @@ int olsr_db_rt_report_dump(char** str_out) {
         return false;
     }
 
-    struct timeval curr_time;
-
-    gettimeofday(&curr_time, NULL);
-
     // initialize first byte to \0 to mark output as empty
     *output = '\0';
 
     while(current_entry != NULL) {
-        snprintf(entry_str, report_str_len + 1, "%02hhx%02hhx%02hhx | %02hhx%02hhx%02hhx | %6d;",
+        snprintf(entry_str, report_str_len + 1, "%02hhx%02hhx%02hhx\t%02hhx%02hhx%02hhx\t%3d;",
                  current_entry->dest_addr[3], current_entry->dest_addr[4], current_entry->dest_addr[5],
                  current_entry->next_hop[3], current_entry->next_hop[4], current_entry->next_hop[5],
                  current_entry->hop_count);

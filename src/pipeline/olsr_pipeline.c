@@ -230,7 +230,7 @@ dessert_cb_result olsr_handle_tc(dessert_msg_t* msg, uint32_t len, dessert_msg_p
         struct ether_header* l25h = dessert_msg_getl25ether(msg);
 
         olsr_db_wlock();
-        int seq_update_result = olsr_db_tc_updateseqnum(l25h->ether_shost, hdr->seq_num, &purge_time);
+        int seq_update_result = olsr_db_tc_updateseqnum(l25h->ether_shost, hdr->seq_num, &purge_time, curr_time);
         olsr_db_unlock();
 
         if(seq_update_result != true) {
