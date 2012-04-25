@@ -40,15 +40,15 @@ enum extension_types {
 #define SEQNO_MAX                   (1 << 16) - 1
 
 // emission intervals
-#define HELLO_INTERVAL_MS           4000
-#define TC_INTERVAL_MS              8000
+#define HELLO_INTERVAL_MS           2000
+#define TC_INTERVAL_MS              5000
 #define ETT_INTERVAL_MS             60000
 
 #define FISHEYE                     0
 
 // holding times
 // determines max. number of missed HELLO packets before neighbor is discarded
-#define LINK_HOLD_TIME_COEFF        5
+#define LINK_HOLD_TIME_COEFF        7
 // determines max. number of missed TCs packets the corresponding information is discarded
 #if FISHEYE
 #define TC_HOLD_TIME_COEFF          (8 * 32) ///< distant nodes receive 8x fewer TCs when using fisheye
