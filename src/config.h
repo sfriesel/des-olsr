@@ -40,7 +40,7 @@ enum extension_types {
 #define SEQNO_MAX                   (1 << 16) - 1
 
 // emission intervals
-#define HELLO_INTERVAL_MS           2000
+#define HELLO_INTERVAL_MS           2500
 #define TC_INTERVAL_MS              5000
 #define ETT_INTERVAL_MS             60000
 
